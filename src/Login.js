@@ -13,7 +13,7 @@ const Login = () => {
         </div>
         <div className="col-12 col-lg-7 h-100 illustration-form position-relative">
           <div className="row">
-            <div className="col-10 col-sm-8 mx-auto">
+            <div className="col-12 col-sm-8 mx-auto">
               <form className="mt-5">
                 <img
                   className="mt-5 mb-3"
