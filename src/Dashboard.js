@@ -19,7 +19,7 @@ import Patient from "./pages/Patient";
 const Dashboard = () => {
   return (
     <>
-      <header className="container-fluid navbar navbar-dark bg-white sticky-top flex-md-nowrap px-0 py-4 shadow1 d-md-none">
+      <header className="container-fluid navbar navbar-dark bg-white sticky-top flex-md-nowrap px-0 py-4 shadow d-md-none">
         <a
           className="navbar-brand1 bg-white col-md-3 col-lg-2 me-0 px-3"
           href="#"
@@ -49,7 +49,7 @@ const Dashboard = () => {
               <div className="col-12 d-none d-md-block text-center py-5 m-0">
                 <img src={mc} alt="" />
               </div>
-              <div className="d-md-none py-2"></div>
+              <div className="d-md-none py-3"></div>
               <ul className="nav flex-column">
                 <li className="nav-item">
                   <Link to="/dashboard/" className="nav-link active">
@@ -211,14 +211,14 @@ const Dashboard = () => {
               <Route path="/parametre" element={<Settings />} />
             </Routes>
           </main>
-          <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div className="text-small d-inline-block my-4 me-4">
+          <div className="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div className="text-small d-inline-block my-1 me-2">
               © Laafi Vision Médical All rights reserved.
             </div>
-            <Link to="#" className="text-small link d-inline-block my-4 me-4">
+            <Link to="#" className="text-small link d-inline-block my-1 me-2">
               Terms
             </Link>
-            <Link to="#" className="text-small link d-inline-block my-4 me-4">
+            <Link to="#" className="text-small link d-inline-block my-1 me-2">
               Privacy
             </Link>
           </div>

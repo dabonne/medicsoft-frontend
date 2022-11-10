@@ -8,8 +8,7 @@ import { Link } from "react-router-dom";
 const Login = () => {
   return (
     <>
-      <div className="row">
-        <div className="d-none d-lg-block col-lg-5 h-100 illustration-img">
+      <div className="d-none d-lg-block col-lg-5 h-100 illustration-img">
           <img width="110%" src={doctor} alt="" />
         </div>
         <div className="col-12 col-lg-7 h-100 illustration-form position-relative">
@@ -82,7 +81,6 @@ const Login = () => {
                 <img className="" src={btn_circle} alt="" />
             </div>
         </div>
-      </div>
     </>
   );
 };
