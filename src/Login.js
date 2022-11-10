@@ -13,7 +13,7 @@ const Login = () => {
         </div>
         <div className="col-12 col-lg-7 h-100 illustration-form position-relative">
           <div className="row">
-            <div className="col-12 col-sm-8 mx-auto">
+            <div className="col-12 px-3 col-sm-8 mx-auto">
               <form className="mt-5">
                 <img
                   className="mt-5 mb-3"
@@ -34,7 +34,7 @@ const Login = () => {
                   />
                   <label htmlFor="floatingInput">Email</label>
                 </div>
-                <div className="form-floating mb-4">
+                <div className="form-floating mb-4 position-relative">
                   <input
                     type="password"
                     className="form-control"
@@ -42,8 +42,9 @@ const Login = () => {
                     placeholder="Password"
                   />
                   <label htmlFor="floatingPassword">
-                    Mots de passe <img src={intersect} alt="" />
+                    Mots de passe 
                   </label>
+                  <img className="position-absolute eye-position" src={intersect} alt="" />
                 </div>
 
                 <div className="checkbox mb-4 position-relative">
