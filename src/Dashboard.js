@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import mc from "./assets/imgs/medicsoft_crois.svg";
 import msg from "./assets/imgs/msg.png";
@@ -20,12 +20,12 @@ const Dashboard = () => {
   return (
     <>
       <header className="container-fluid navbar navbar-dark bg-white sticky-top flex-md-nowrap px-0 py-4 shadow d-md-none">
-        <a
+        <Link
           className="navbar-brand1 bg-white col-md-3 col-lg-2 me-0 px-3"
-          href="#"
+          to="#"
         >
           <img src={mc} alt="" />
-        </a>
+        </Link>
         <button
           className="navbar-toggler p-2 position-absolute mx-0 my-4 d-md-none collapsed"
           type="button"
@@ -182,16 +182,16 @@ const Dashboard = () => {
                     </span>
                   </Link>
                   <ul
-                    class="ms-5 my-2 dropdown-menu text-small shadow"
+                    className="ms-5 my-2 dropdown-menu text-small shadow"
                     aria-labelledby="dropdownUser2"
                   >
                     <li>
-                      <Link class="dropdown-item" to="/dashboard/parametre">
+                      <Link className="dropdown-item" to="/dashboard/parametre">
                         Paramètre
                       </Link>
                     </li>
                     <li>
-                      <Link class="dropdown-item" to="/">
+                      <Link className="dropdown-item" to="/">
                         Se déconnecter
                       </Link>
                     </li>
