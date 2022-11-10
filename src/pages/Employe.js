@@ -124,7 +124,7 @@ const Employe = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="fname" className="form-label">
-                    Spécialistion
+                    Spécialisation
                   </label>
                   <input
                     type="name"
