@@ -53,7 +53,7 @@ const Dashboard = () => {
               <div className="d-md-none py-3"></div>
               <ul className="nav flex-column">
                 <li className="nav-item">
-                  <NavLink to="/dashboard/" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={home} alt="" />
                     </span>
