@@ -673,10 +673,13 @@ const Employe = () => {
                   <td className="text-center">
                     <div className="btn-group">
                       <div className="d-inline-block mx-1">
-                        <img src={view} alt="" />
+                        <img
+                          title="Voir l'employé" 
+                          src={view} alt="" />
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
+                          title="Éditer l'employé"
                           data-bs-toggle="modal"
                           data-bs-target="#editEmploye"
                           onClick={(e) => {
@@ -688,6 +691,7 @@ const Employe = () => {
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
+                        title="Supprimer l'employé"
                           data-bs-toggle="modal"
                           data-bs-target="#deleteEmploye"
                           onClick={(e) =>{
