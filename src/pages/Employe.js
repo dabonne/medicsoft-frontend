@@ -119,6 +119,8 @@ const Employe = () => {
           res.data.employeeResponseList[0].classifications;
         jsData.employeeReference =
           res.data.employeeResponseList[0].employeeReference;
+          jsData.registrationReference =
+          res.data.employeeResponseList[0].employeeReference;
         setJsData(jsData);
       })
       .catch((error) => {
