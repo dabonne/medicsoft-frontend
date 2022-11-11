@@ -15,6 +15,7 @@ import Home from "./pages/Home";
 import Meet from "./pages/Meet";
 import Notebook from "./pages/Notebook";
 import Patient from "./pages/Patient";
+import NotebookGard from "./pages/NotebookGard";
 
 const Dashboard = () => {
   return (
@@ -52,12 +53,12 @@ const Dashboard = () => {
               <div className="d-md-none py-3"></div>
               <ul className="nav flex-column">
                 <li className="nav-item">
-                  <NavLink to="/dashboard/" className={({ isActive }) => isActive ? "nav-link active":"nav-link active"}>
+                  <NavLink to="/dashboard/" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={home} alt="" />
                     </span>
                     <span
-                      className="d-block d-md-none d-lg-block wd-80 bg-primary"
+                      className="d-block d-md-none d-lg-block wd-80"
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
@@ -66,7 +67,7 @@ const Dashboard = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/dashboard/employe" className={({ isActive }) => isActive ? "nav-link":"nav-link"}>
+                  <NavLink to="/dashboard/employe" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={employe} alt="" />
                     </span>
@@ -80,66 +81,66 @@ const Dashboard = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link to="/dashboard/rendez-vous" className="nav-link">
+                  <NavLink to="/dashboard/rendez-vous" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={rendv} alt="" />
                     </span>
                     <span
-                      className="d-block d-md-none d-lg-block wd-80 p-0 m-0"
+                      className="d-block d-md-none d-lg-block wd-80"
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
                       Mes rendez-vous
                     </span>
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link to="/dashboard/agenda" className="nav-link">
+                  <NavLink to="/dashboard/agenda" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={agenda} alt="" />
                     </span>
                     <span
-                      className="d-block d-md-none d-lg-block wd-80 p-0 m-0"
+                      className="d-block d-md-none d-lg-block wd-80"
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
                       Mon agenda
                     </span>
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link to="/dashboard/patient" className="nav-link">
+                  <NavLink to="/dashboard/patient" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={patient} alt="" />
                     </span>
                     <span
-                      className="d-block d-md-none d-lg-block wd-80 p-0 m-0"
+                      className="d-block d-md-none d-lg-block wd-80"
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
                       Mes patients
                     </span>
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link to="/dashboard/patient" className="nav-link">
+                  <NavLink to="/dashboard/agenda_garde" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={agenda} alt="" />
                     </span>
                     <span
-                      className="d-block d-md-none d-lg-block wd-80 p-0 m-0"
+                      className="d-block d-md-none d-lg-block wd-80"
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
                       Agenda de Garde
                     </span>
-                  </Link>
+                  </NavLink>
                 </li>
               </ul>
 
-              <ul className="nav flex-column w-100 position-md-absolute bottom-0 mb-5">
+              <ul className="nav flex-column w-100 position-absolute bottom-0 mb-5">
                 <li className="nav-item link-border1">
-                  <Link to="/dashboard/patient" className="nav-link">
+                  <Link to="#" className="nav-link">
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={msg} alt="" />
                     </span>
@@ -150,7 +151,7 @@ const Dashboard = () => {
                   </Link>
                 </li>
                 <li className="nav-item link-border1">
-                  <Link to="/dashboard/patient" className="nav-link">
+                  <Link to="#" className="nav-link">
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={supp} alt="" />
                     </span>
@@ -176,7 +177,7 @@ const Dashboard = () => {
                         className="d-inline-block"
                         src={user}
                         alt=""
-                        style={{ marginLeft: "-6px" }}
+                        style={{ marginLeft: "-6px", marginTop:"-6px" }}
                       />
                       <span className="d-inline-block ms-2">Jannette DOE</span>
                     </span>
@@ -208,6 +209,7 @@ const Dashboard = () => {
               <Route path="/rendez-vous" element={<Meet />} />
               <Route path="/agenda" element={<Notebook />} />
               <Route path="/patient" element={<Patient />} />
+              <Route path="/agenda_garde" element={<NotebookGard />} />
               <Route path="/parametre" element={<Settings />} />
             </Routes>
           </main>
