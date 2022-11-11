@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, NavLink, Route, Routes } from "react-router-dom";
 import mc from "./assets/imgs/medicsoft_crois.svg";
 import msg from "./assets/imgs/msg.png";
@@ -16,8 +16,15 @@ import Meet from "./pages/Meet";
 import Notebook from "./pages/Notebook";
 import Patient from "./pages/Patient";
 import NotebookGard from "./pages/NotebookGard";
+import { useNavigate } from "react-router-dom/dist";
 
 const Dashboard = () => {
+  let navigate = useNavigate();
+
+  useEffect(()=>{
+    return navigate("/dashboard/")
+  },[])
+
   return (
     <>
       <header className="container-fluid navbar navbar-dark bg-white sticky-top flex-md-nowrap px-0 py-4 shadow d-md-none">
