@@ -98,7 +98,7 @@ const Employe = () => {
         console.log(res.data.employeeResponseList);
         setLastName(res.data.employeeResponseList[0].lastName);
         setFirstName(res.data.employeeResponseList[0].firstName);
-        setBirthdate(res.data.employeeResponseList[0].birthdate);
+        //setBirthdate(res.data.employeeResponseList[0].birthdate);
         setCnib(res.data.employeeResponseList[0].cnib);
         setEmail(res.data.employeeResponseList[0].email);
         setPhone(res.data.employeeResponseList[0].phone);
@@ -126,8 +126,9 @@ const Employe = () => {
       });
   };
 
-  const onSearch = (e, str) => {
+  const onSearch = (e) => {
     e.preventDefault();
+    let str = e.target.value
     let dd = datas.filter((data) => {
       const fullNameOne = data.lastName + " " + data.firstName;
       const fullNameTwo = data.firstName + " " + data.lastName;
@@ -147,7 +148,7 @@ const Employe = () => {
       );
     });
 
-    dd !== [] ? setList(dd) : setList(datas);
+    dd !== [] ? setList(dd) : setList(datas);   
   };
 
   return (
@@ -219,13 +220,13 @@ const Employe = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="date" className="form-label">
                     Date de naissance
                   </label>
                   <input
                     type="date"
                     className="form-control"
-                    id="fname"
+                    id="date"
                     placeholder="Entrer la date de naissance"
                     value={birthdate}
                     onChange={(e) => {
@@ -237,13 +238,13 @@ const Employe = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="cni" className="form-label">
                     Numéro CNI
                   </label>
                   <input
                     type="text"
                     className="form-control"
-                    id="fname"
+                    id="cni"
                     placeholder="Entrer le numéro CNI"
                     value={cnib}
                     onChange={(e) => {
@@ -255,13 +256,13 @@ const Employe = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="email" className="form-label">
                     Email
                   </label>
                   <input
                     type="email"
                     className="form-control"
-                    id="fname"
+                    id="email"
                     placeholder="Entrer l’adresse mail"
                     value={email}
                     onChange={(e) => {
@@ -273,13 +274,13 @@ const Employe = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="phone" className="form-label">
                     Telephone
                   </label>
                   <input
                     type="text"
                     className="form-control"
-                    id="fname"
+                    id="phone"
                     placeholder="Entrer le numero de téléphone"
                     value={phone}
                     onChange={(e) => {
@@ -291,10 +292,11 @@ const Employe = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="clst" className="form-label">
                     Classification
                   </label>
                   <select
+                    id="clst"
                     className="form-select"
                     value={classification}
                     onChange={(e) => {
@@ -315,10 +317,11 @@ const Employe = () => {
                   </select>
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="spft" className="form-label">
                     Spécialisation
                   </label>
                   <select
+                    id="spft"
                     className="form-select"
                     value={specialisation}
                     onChange={(e) => {
