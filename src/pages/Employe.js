@@ -1,22 +1,166 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import view from "../assets/imgs/view.png";
 import edit from "../assets/imgs/edit.png";
 import del from "../assets/imgs/delete.png";
 import back from "../assets/imgs/back.png";
 import sui from "../assets/imgs/sui.png";
+import requestEmploye from "../services/requestEmploye";
+import { apiEmploye } from "../services/api";
 
 const Employe = () => {
-  const [datas, setDatas] = useState([...Array(12).keys()]);
+  const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState("");
+  const [datas, setDatas] = useState([]);
+  const [list, setList] = useState([]);
+  const [jsData, setJsData] = useState({
+    registrationReference: "",
+    firstName: "",
+    lastName: "",
+    cnib: "",
+    title: "",
+    birthdate: "",
+    specialisation: "",
+    specialisations: {},
+    classification: "",
+    classifications: {},
+    email: "",
+    phone: "",
+    medicalStaff: "",
+  });
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [cnib, setCnib] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [classification, setClassification] = useState("");
+  const [specialisation, setSpecialisation] = useState("");
+  useEffect(() => {
+    requestEmploye
+      .get(apiEmploye.getAll)
+      .then((res) => {
+        setDatas(res.data.employeeResponseList);
+        setList(res.data.employeeResponseList);
+        //console.log(res.data.employeeResponseList);
+      })
+      .catch((error) => {});
+  }, [refresh]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    //console.log(jsData)
+    requestEmploye
+      .post(apiEmploye.post, jsData)
+      .then((res) => {
+        console.log("enregistrement ok");
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleSubmitEdite = (e) => {
+    e.preventDefault();
+    //console.log(jsData)
+    requestEmploye
+      .put(apiEmploye.put, jsData)
+      .then((res) => {
+        console.log("enregistrement ok");
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getJsData = (e) => {
+    e.preventDefault();
+    requestEmploye
+      .get(apiEmploye.getJsData)
+      .then((res) => {
+        //get dataForm success
+        setJsData(res.data);
+      })
+      .catch((error) => {
+        //get dataForm faille
+        console.log(error);
+      });
+  };
+
+  const getEmploye = (e, ref) => {
+    e.preventDefault();
+    console.log("getEmploye");
+    requestEmploye
+      .get(`${apiEmploye.get}/${ref}`)
+      .then((res) => {
+        //setDatas(res.data.employeeResponseList);
+        console.log(res.data.employeeResponseList);
+        setLastName(res.data.employeeResponseList[0].lastName);
+        setFirstName(res.data.employeeResponseList[0].firstName);
+        setBirthdate(res.data.employeeResponseList[0].birthdate);
+        setCnib(res.data.employeeResponseList[0].cnib);
+        setEmail(res.data.employeeResponseList[0].email);
+        setPhone(res.data.employeeResponseList[0].phone);
+        //setClassification(res.data.employeeResponseList[0].classification);
+        //setSpecialisation(res.data.employeeResponseList[0].specialisation);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const onDelete = (e, ref) => {
+    e.preventDefault();
+    requestEmploye
+      .delete(
+        `${apiEmploye.delete}/${ref}` /*, {
+                headers: { Authorization: `Bearer ${user.token}` },
+            }*/
+      )
+      .then((res) => {
+        console.log("suppression ok");
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const onSearch = (e, str) => {
+    e.preventDefault();
+    let dd = datas.filter((data) => {
+      const fullNameOne = data.lastName + " " + data.firstName;
+      const fullNameTwo = data.firstName + " " + data.lastName;
+      const fullNameOneDepart =
+        data.lastName + " " + data.firstName + " " + data.department;
+      const fullNameTwoDepart =
+        data.firstName + " " + data.lastName + " " + data.department;
+
+      return (
+        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
+        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
+        data.department.toLowerCase().includes(str.toLowerCase()) ||
+        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
+        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
+        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
+        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
+      );
+    });
+
+    dd !== [] ? setList(dd) : setList(datas);
+  };
+
   return (
     <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-        <h1 className="h2">Les employés</h1>
+        <h1 className="h2">Employés</h1>
         <div className="btn-toolbar">
           <button
             className="btn btn-primary"
             type="button"
             data-bs-toggle="modal"
             data-bs-target="#newEmploye"
+            onClick={(e) => getJsData(e)}
           >
             Ajouter un employé
           </button>
@@ -37,7 +181,7 @@ const Employe = () => {
             </div>
 
             <div className="modal-body">
-              <form action="">
+              <form onSubmit={handleSubmit}>
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Nom
@@ -47,7 +191,13 @@ const Employe = () => {
                     className="form-control"
                     id="lname"
                     placeholder="Entrer le nom de famille de l’employé(e)"
-                    name="lname"
+                    value={lastName}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setLastName(e.target.value);
+                      jsData.lastName = e.target.value;
+                      setJsData(jsData);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -59,7 +209,13 @@ const Employe = () => {
                     className="form-control"
                     id="fname"
                     placeholder="Entrer le ou les prenom(s) de l’employé(e)"
-                    name="fname"
+                    value={firstName}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setFirstName(e.target.value);
+                      jsData.firstName = e.target.value;
+                      setJsData(jsData);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -71,7 +227,13 @@ const Employe = () => {
                     className="form-control"
                     id="fname"
                     placeholder="Entrer la date de naissance"
-                    name="fname"
+                    value={birthdate}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setBirthdate(e.target.value);
+                      jsData.birthdate = e.target.value;
+                      setJsData(jsData);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -83,7 +245,13 @@ const Employe = () => {
                     className="form-control"
                     id="fname"
                     placeholder="Entrer le numéro CNI"
-                    name="fname"
+                    value={cnib}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setCnib(e.target.value);
+                      jsData.cnib = e.target.value;
+                      setJsData(jsData);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -95,7 +263,13 @@ const Employe = () => {
                     className="form-control"
                     id="fname"
                     placeholder="Entrer l’adresse mail"
-                    name="fname"
+                    value={email}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setEmail(e.target.value);
+                      jsData.email = e.target.value;
+                      setJsData(jsData);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
@@ -107,22 +281,65 @@ const Employe = () => {
                     className="form-control"
                     id="fname"
                     placeholder="Entrer le numero de téléphone"
-                    name="fname"
+                    value={phone}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setPhone(e.target.value);
+                      jsData.phone = e.target.value;
+                      setJsData(jsData);
+                    }}
                   />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="fname" className="form-label">
                     Classification
                   </label>
-                  <select className="form-select">
+                  <select
+                    className="form-select"
+                    value={classification}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setClassification(e.target.value);
+                      jsData.classification = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  >
                     <option>Choisir la classification</option>
-                    <option>classification 1</option>
-                    <option>classification 2</option>
-                    <option>classification 3</option>
-                    <option>classification 4</option>
+                    {Object.keys(jsData.classifications).map((key) => {
+                      return (
+                        <option key={key} value={jsData.classifications[key]}>
+                          {jsData.classifications[key]}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
                 <div className="mb-3">
+                  <label htmlFor="fname" className="form-label">
+                    Spécialisation
+                  </label>
+                  <select
+                    className="form-select"
+                    value={specialisation}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setSpecialisation(e.target.value);
+                      jsData.specialisation = e.target.value;
+                      jsData.title = jsData.specialisations[e.target.value];
+                      setJsData(jsData);
+                    }}
+                  >
+                    <option>Choisir la specialisation</option>
+                    {Object.keys(jsData.specialisations).map((key) => {
+                      return (
+                        <option className="w-100" key={key} value={key}>
+                          {jsData.specialisations[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                {/*<div className="mb-3">
                   <label htmlFor="fname" className="form-label">
                     Spécialisation
                   </label>
@@ -133,25 +350,24 @@ const Employe = () => {
                     placeholder="Entrer la spécialisation"
                     name="fname"
                   />
+                </div>*/}
+                <div className="modal-footer d-flex justify-content-start border-0">
+                  <button
+                    type="reset"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Effacer
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    data-bs-dismiss="modal"
+                  >
+                    Ajouter l’employé(e)
+                  </button>
                 </div>
               </form>
-            </div>
-
-            <div className="modal-footer d-flex justify-content-start border-0">
-              <button
-                type="reset"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Effacer
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                Ajouter l’employé(e)
-              </button>
             </div>
           </div>
         </div>
@@ -167,15 +383,20 @@ const Employe = () => {
               type="text"
               className="form-control search"
               placeholder="Rechercher..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                onSearch(e, search);
+              }}
             />
           </div>
           <div className="btn-group">
-          <div className="d-inline-block my-1 mx-1">
-            <img src={back} alt="" />
-          </div>
-          <div className="d-inline-block my-1 mx-1">
-            <img src={sui} alt="" />
-          </div>
+            <div className="d-inline-block my-1 mx-1">
+              <img src={back} alt="" />
+            </div>
+            <div className="d-inline-block my-1 mx-1">
+              <img src={sui} alt="" />
+            </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
             Page 1/10
@@ -198,24 +419,38 @@ const Employe = () => {
             </tr>
           </thead>
           <tbody>
-            {datas.map((data, idx) => {
+            {list.map((data, idx) => {
               return (
                 <tr key={idx}>
                   <td>
                     <input type="checkbox" value="selected" />
                   </td>
-                  <td>Jannette DOE</td>
-                  <td>Département 1</td>
+                  <td>{data.firstName + " " + data.lastName}</td>
+                  <td>{data.department}</td>
                   <td className="text-center">
                     <div className="btn-group">
                       <div className="d-inline-block mx-1">
                         <img src={view} alt="" />
                       </div>
                       <div className="d-inline-block mx-1">
-                        <img src={edit} alt="" />
+                        <img
+                          data-bs-toggle="modal"
+                          data-bs-target="#newEmploye"
+                          onClick={(e) => {
+                            getEmploye(e, data.employeeReference);
+                          }}
+                          src={edit}
+                          alt=""
+                        />
                       </div>
                       <div className="d-inline-block mx-1">
-                        <img src={del} alt="" />
+                        <img
+                          onClick={(e) => {
+                            onDelete(e, data.employeeReference);
+                          }}
+                          src={del}
+                          alt=""
+                        />
                       </div>
                     </div>
                   </td>

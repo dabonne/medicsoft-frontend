@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, NavLink, Route, Routes } from "react-router-dom";
 import mc from "./assets/imgs/medicsoft_crois.svg";
 import msg from "./assets/imgs/msg.png";
 import supp from "./assets/imgs/supp.png";
@@ -52,21 +52,21 @@ const Dashboard = () => {
               <div className="d-md-none py-3"></div>
               <ul className="nav flex-column">
                 <li className="nav-item">
-                  <Link to="/dashboard/" className="nav-link active">
+                  <NavLink to="/dashboard/" className={({ isActive }) => isActive ? "nav-link active":"nav-link active"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={home} alt="" />
                     </span>
                     <span
-                      className="d-block d-md-none d-lg-block wd-80"
+                      className="d-block d-md-none d-lg-block wd-80 bg-primary"
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
                       Accueil
                     </span>
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link to="/dashboard/employe" className="nav-link">
+                  <NavLink to="/dashboard/employe" className={({ isActive }) => isActive ? "nav-link":"nav-link"}>
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={employe} alt="" />
                     </span>
@@ -77,7 +77,7 @@ const Dashboard = () => {
                     >
                       Les employés
                     </span>
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
                   <Link to="/dashboard/rendez-vous" className="nav-link">
