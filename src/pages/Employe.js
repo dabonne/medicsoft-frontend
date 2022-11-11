@@ -10,6 +10,7 @@ import { apiEmploye } from "../services/api";
 const Employe = () => {
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState("");
+  const [dele, setDelete] = useState("");
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
   const [jsData, setJsData] = useState({
@@ -81,6 +82,14 @@ const Employe = () => {
       .then((res) => {
         //get dataForm success
         setJsData(res.data);
+        setLastName("");
+        setFirstName("");
+        setBirthdate("");
+        setCnib("");
+        setEmail("");
+        setPhone("");
+        setClassification("");
+        setSpecialisation("");
       })
       .catch((error) => {
         //get dataForm faille
@@ -102,18 +111,25 @@ const Employe = () => {
         setCnib(res.data.employeeResponseList[0].cnib);
         setEmail(res.data.employeeResponseList[0].email);
         setPhone(res.data.employeeResponseList[0].phone);
-        //setClassification(res.data.employeeResponseList[0].classification);
-        //setSpecialisation(res.data.employeeResponseList[0].specialisation);
+        setClassification(res.data.employeeResponseList[0].classification);
+        setSpecialisation(res.data.employeeResponseList[0].specialisation);
+        jsData.specialisations =
+          res.data.employeeResponseList[0].specialisations;
+        jsData.classifications =
+          res.data.employeeResponseList[0].classifications;
+        jsData.employeeReference =
+          res.data.employeeResponseList[0].employeeReference;
+        setJsData(jsData);
       })
       .catch((error) => {
         console.log(error);
       });
   };
-  const onDelete = (e, ref) => {
+  const onDelete = (e) => {
     e.preventDefault();
     requestEmploye
       .delete(
-        `${apiEmploye.delete}/${ref}` /*, {
+        `${apiEmploye.delete}/${dele}` /*, {
                 headers: { Authorization: `Bearer ${user.token}` },
             }*/
       )
@@ -128,7 +144,7 @@ const Employe = () => {
 
   const onSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value
+    let str = e.target.value;
     let dd = datas.filter((data) => {
       const fullNameOne = data.lastName + " " + data.firstName;
       const fullNameTwo = data.firstName + " " + data.lastName;
@@ -148,7 +164,7 @@ const Employe = () => {
       );
     });
 
-    dd !== [] ? setList(dd) : setList(datas);   
+    dd !== [] ? setList(dd) : setList(datas);
   };
 
   return (
@@ -364,6 +380,240 @@ const Employe = () => {
         </div>
       </div>
 
+      <div className="modal fade" id="editEmploye">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Modification d’un(e) employé(e)
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <form onSubmit={handleSubmitEdite}>
+                <div className="mb-3 mt-3">
+                  <label htmlFor="lname" className="form-label">
+                    Nom
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="lname"
+                    placeholder="Entrer le nom de famille de l’employé(e)"
+                    value={lastName}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setLastName(e.target.value);
+                      jsData.lastName = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="fname" className="form-label">
+                    Prénom(s)
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="fname"
+                    placeholder="Entrer le ou les prenom(s) de l’employé(e)"
+                    value={firstName}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setFirstName(e.target.value);
+                      jsData.firstName = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="date" className="form-label">
+                    Date de naissance
+                  </label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    id="date"
+                    placeholder="Entrer la date de naissance"
+                    value={birthdate}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setBirthdate(e.target.value);
+                      jsData.birthdate = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="cni" className="form-label">
+                    Numéro CNI
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="cni"
+                    placeholder="Entrer le numéro CNI"
+                    value={cnib}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setCnib(e.target.value);
+                      jsData.cnib = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    placeholder="Entrer l’adresse mail"
+                    value={email}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setEmail(e.target.value);
+                      jsData.email = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="phone" className="form-label">
+                    Telephone
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="phone"
+                    placeholder="Entrer le numero de téléphone"
+                    value={phone}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setPhone(e.target.value);
+                      jsData.phone = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="clst" className="form-label">
+                    Classification
+                  </label>
+                  <select
+                    id="clst"
+                    className="form-select"
+                    value={classification}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setClassification(e.target.value);
+                      jsData.classification = e.target.value;
+                      setJsData(jsData);
+                    }}
+                  >
+                    <option>Choisir la classification</option>
+                    {Object.keys(jsData.classifications).map((key) => {
+                      return (
+                        <option key={key} value={jsData.classifications[key]}>
+                          {jsData.classifications[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="spft" className="form-label">
+                    Spécialisation
+                  </label>
+                  <select
+                    id="spft"
+                    className="form-select"
+                    value={specialisation}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setSpecialisation(e.target.value);
+                      jsData.specialisation = e.target.value;
+                      jsData.title = jsData.specialisations[e.target.value];
+                      setJsData(jsData);
+                    }}
+                  >
+                    <option>Choisir la specialisation</option>
+                    {Object.keys(jsData.specialisations).map((key) => {
+                      return (
+                        <option className="w-100" key={key} value={key}>
+                          {jsData.specialisations[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className="modal-footer d-flex justify-content-start border-0">
+                  <button
+                    type="reset"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Fermer
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    data-bs-dismiss="modal"
+                  >
+                    Sauvegarder les informations
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="modal fade" id="deleteEmploye">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Supprimer l'employé</h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">Comfirmer l'action</div>
+
+            <div className="modal-footer">
+            <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  onDelete(e);
+                }}
+              >
+                Supprimer
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="row my-4">
         <div className="col-12">
           <div className="d-inline-block my-1 me-1">
@@ -426,7 +676,7 @@ const Employe = () => {
                       <div className="d-inline-block mx-1">
                         <img
                           data-bs-toggle="modal"
-                          data-bs-target="#newEmploye"
+                          data-bs-target="#editEmploye"
                           onClick={(e) => {
                             getEmploye(e, data.employeeReference);
                           }}
@@ -436,8 +686,11 @@ const Employe = () => {
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
-                          onClick={(e) => {
-                            onDelete(e, data.employeeReference);
+                          data-bs-toggle="modal"
+                          data-bs-target="#deleteEmploye"
+                          onClick={(e) =>{
+                            e.preventDefault()
+                            setDelete(data.employeeReference)
                           }}
                           src={del}
                           alt=""
