@@ -205,7 +205,7 @@ const Employe = () => {
                     Prénom(s)
                   </label>
                   <input
-                    type="name"
+                    type="text"
                     className="form-control"
                     id="fname"
                     placeholder="Entrer le ou les prenom(s) de l’employé(e)"
@@ -223,7 +223,7 @@ const Employe = () => {
                     Date de naissance
                   </label>
                   <input
-                    type="name"
+                    type="date"
                     className="form-control"
                     id="fname"
                     placeholder="Entrer la date de naissance"
@@ -241,7 +241,7 @@ const Employe = () => {
                     Numéro CNI
                   </label>
                   <input
-                    type="name"
+                    type="text"
                     className="form-control"
                     id="fname"
                     placeholder="Entrer le numéro CNI"
@@ -259,7 +259,7 @@ const Employe = () => {
                     Email
                   </label>
                   <input
-                    type="name"
+                    type="email"
                     className="form-control"
                     id="fname"
                     placeholder="Entrer l’adresse mail"
@@ -277,7 +277,7 @@ const Employe = () => {
                     Telephone
                   </label>
                   <input
-                    type="name"
+                    type="text"
                     className="form-control"
                     id="fname"
                     placeholder="Entrer le numero de téléphone"
@@ -339,25 +339,13 @@ const Employe = () => {
                     })}
                   </select>
                 </div>
-                {/*<div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
-                    Spécialisation
-                  </label>
-                  <input
-                    type="name"
-                    className="form-control"
-                    id="fname"
-                    placeholder="Entrer la spécialisation"
-                    name="fname"
-                  />
-                </div>*/}
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
                   >
-                    Effacer
+                    Fermer
                   </button>
                   <button
                     type="submit"

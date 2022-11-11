@@ -145,7 +145,7 @@ const Settings = () => {
                 className="btn btn-secondary me-2"
                 data-bs-dismiss="modal"
               >
-                Effacer
+                Fermer
               </button>
               <button
                 type="submit"
