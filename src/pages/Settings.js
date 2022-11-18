@@ -13,27 +13,27 @@ const Settings = () => {
         <div className="col-12 col-md-5 col-lg-4">
           <img width="100%" src={profile} alt="" />
           <div className="my-3">
-            <button className="btn btn-primary me-2 w-75" data-bs-dismiss="modal">
+            <button className="btn btn-primary me-2" data-bs-dismiss="modal" style={{width:"85%"}}>
               Modifier la photo
             </button>
             <img src={del} alt="" />
           </div>
-          <div className="border border-1 p-4 mt-4">
-            <p className="text-16 text-bold">Autres actions</p>
+          <div className="border border-1 border-radius p-4 mt-4">
+            <p className="text-16 text-bold ps-1">Autres actions</p>
             <button
-              className="btn border border-1 my-2 w-100"
+              className="btn border border-1 border-radius my-2 w-100 text-bold text-start"
               data-bs-dismiss="modal"
             >
-              Modification du mot de passe
+              Modifier le mot de passe
             </button>
             <button
-              className="btn border border-1 my-2 w-100"
+              className="btn border border-1 border-radius my-2 w-100 text-bold text-start"
               data-bs-dismiss="modal"
             >
               Aide et support
             </button>
             <button
-              className="btn border border-1 my-2 w-100"
+              className="btn border border-1 border-radius my-2 w-100 text-bold text-start"
               data-bs-dismiss="modal"
             >
               Conditions d’utilisation

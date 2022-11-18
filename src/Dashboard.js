@@ -153,7 +153,7 @@ const Dashboard = () => {
                     </span>
                     <span className="d-block d-md-none border border-2 d-lg-block wd-80 p-2">
                       <img src={msg} alt="" />
-                      <span className="d-inline-block ms-3">Messagérie</span>
+                      <span className="d-inline-block ms-3">Messagerie</span>
                     </span>
                   </Link>
                 </li>
@@ -195,7 +195,7 @@ const Dashboard = () => {
                   >
                     <li>
                       <Link className="dropdown-item" to="/dashboard/parametre">
-                        Paramètre
+                        Paramètres
                       </Link>
                     </li>
                     <li>

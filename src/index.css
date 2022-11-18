@@ -169,6 +169,10 @@ span.wd-80 {
   color: black;
 }
 
+.border-radius{
+  border-radius: var(--border-radius);
+}
+
 input, select{
   border-radius: 16px !important;
   height: 50px;
