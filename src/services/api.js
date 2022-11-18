@@ -5,7 +5,7 @@ const apiEmploye = {
     "get":"employee-request",
     "post":"employee-request",
     "put":"employee-update-form",
-    "delete":"employee-delete",
+    "delete":"employee-delete-list",
 }
 
 

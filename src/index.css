@@ -2,6 +2,7 @@
   --primary-color:#005BDD;
   --secondary-color:#E9F2FF;
   --danger-color:#FEEBEF;
+  --bg-card-color:#F4F4FB;
   --table-accent-color:#F4F4FB;
   --border-radius: 16px;
 }
@@ -213,4 +214,17 @@ thead{
 .eye-position{
   bottom: 35%;
   right: 6%;
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+}
+
+.v-card{
+  background-color: var(--bg-card-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
 }

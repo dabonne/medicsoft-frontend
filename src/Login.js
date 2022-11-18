@@ -56,7 +56,7 @@ const Login = () => {
                     Mot de passe oublié ?
                   </Link>
                 </div>
-                <Link className="w-100 btn btn-lg btn-primary" to="/dashboard">
+                <Link className="w-100 btn btn-lg btn-primary" to="/dashboard/">
                     Se connecter
                 </Link>
               </form>

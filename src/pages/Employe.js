@@ -4,13 +4,14 @@ import edit from "../assets/imgs/edit.png";
 import del from "../assets/imgs/delete.png";
 import back from "../assets/imgs/back.png";
 import sui from "../assets/imgs/sui.png";
+import userProfile from "../assets/imgs/userinfo.png";
 import requestEmploye from "../services/requestEmploye";
 import { apiEmploye } from "../services/api";
 
 const Employe = () => {
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState("");
-  const [dele, setDelete] = useState("");
+  const [dele, setDelete] = useState([]);
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
   const [jsData, setJsData] = useState({
@@ -36,6 +37,14 @@ const Employe = () => {
   const [phone, setPhone] = useState("");
   const [classification, setClassification] = useState("");
   const [specialisation, setSpecialisation] = useState("");
+  const [userInfos, setUserInfos] = useState({
+    lastName: "",
+    firstName: "",
+    cnib: "",
+    department: "",
+    fonction: "",
+    birthDate: "",
+  });
   useEffect(() => {
     requestEmploye
       .get(apiEmploye.getAll)
@@ -63,7 +72,7 @@ const Employe = () => {
 
   const handleSubmitEdite = (e) => {
     e.preventDefault();
-    //console.log(jsData)
+    console.log(jsData)
     requestEmploye
       .put(apiEmploye.put, jsData)
       .then((res) => {
@@ -106,20 +115,27 @@ const Employe = () => {
         //setDatas(res.data.employeeResponseList);
         console.log(res.data.employeeResponseList);
         setLastName(res.data.employeeResponseList[0].lastName);
+        jsData.lastName = res.data.employeeResponseList[0].lastName;
         setFirstName(res.data.employeeResponseList[0].firstName);
+        jsData.firstName = res.data.employeeResponseList[0].firstName;
         //setBirthdate(res.data.employeeResponseList[0].birthdate);
         setCnib(res.data.employeeResponseList[0].cnib);
+        jsData.cnib = res.data.employeeResponseList[0].cnib;
         setEmail(res.data.employeeResponseList[0].email);
+        jsData.email = res.data.employeeResponseList[0].email
         setPhone(res.data.employeeResponseList[0].phone);
+        jsData.phone = res.data.employeeResponseList[0].phone;
         setClassification(res.data.employeeResponseList[0].classification);
+        jsData.classification = res.data.employeeResponseList[0].classification;
         setSpecialisation(res.data.employeeResponseList[0].specialisation);
+        jsData.specialisation = res.data.employeeResponseList[0].specialisation;
         jsData.specialisations =
           res.data.employeeResponseList[0].specialisations;
         jsData.classifications =
           res.data.employeeResponseList[0].classifications;
         jsData.employeeReference =
           res.data.employeeResponseList[0].employeeReference;
-          jsData.registrationReference =
+        jsData.registrationReference =
           res.data.employeeResponseList[0].employeeReference;
         setJsData(jsData);
       })
@@ -127,21 +143,40 @@ const Employe = () => {
         console.log(error);
       });
   };
+
+  const viewEmploye = (data) => {
+    userInfos.lastName = data.lastName;
+    userInfos.firstName = data.firstName;
+    userInfos.cnib = data.cnib;
+    userInfos.department = data.department;
+    userInfos.birthDate = data.birthDate;
+    userInfos.fonction = "?";
+  };
   const onDelete = (e) => {
     e.preventDefault();
     requestEmploye
-      .delete(
-        `${apiEmploye.delete}/${dele}` /*, {
-                headers: { Authorization: `Bearer ${user.token}` },
-            }*/
-      )
+      .delete(apiEmploye.delete, { data: dele })
       .then((res) => {
         console.log("suppression ok");
+        setDelete([]);
         setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const deleteList = (data) => {
+    if (data.checkValue === undefined || data.checkValue === false) {
+      data.checkValue = true;
+      setDelete([...dele, data.employeeReference]);
+    } else {
+      data.checkValue = false;
+      const list = dele.filter(function (ref) {
+        return ref !== data.employeeReference;
+      });
+      setDelete(list);
+    }
   };
 
   const onSearch = (e) => {
@@ -582,8 +617,8 @@ const Employe = () => {
       <div className="modal fade" id="deleteEmploye">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Supprimer l'employé</h4>
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">Supprimer l'employé</h4>
               <button
                 type="button"
                 className="btn-close"
@@ -593,8 +628,8 @@ const Employe = () => {
 
             <div className="modal-body">Comfirmer l'action</div>
 
-            <div className="modal-footer">
-            <button
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
                 type="button"
                 className="btn btn-danger"
                 data-bs-dismiss="modal"
@@ -615,17 +650,80 @@ const Employe = () => {
           </div>
         </div>
       </div>
+      <div className="modal fade" id="viewEmploye">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">Information de l’employé</h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-3">
+                  <img src={userProfile} alt="" />
+                </div>
+                <div className="col-9">
+                  <div className="d-flex justify-content-between">
+                    <span>Nom:</span>
+                    <span className="text-bold">{userInfos.lastName}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span>Prenom:</span>
+                    <span className="text-bold">{userInfos.firstName}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span>CNIB:</span>
+                    <span className="text-bold">{userInfos.cnib}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span>Département:</span>
+                    <span className="text-bold">{userInfos.department}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span>fonction:</span>
+                    <span className="text-bold">{userInfos.fonction}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span>Date de naissance:</span>
+                    <span className="text-bold">{userInfos.birthDate}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteEmploye"
+              >
+                Supprimer
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Activer comme utilisateur
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="row my-4">
         <div className="col-12">
-          <div className="d-inline-block my-1 me-1">
-            <img src={del} alt="" />
-          </div>
           <div className="d-inline-block">
             <input
               type="text"
               className="form-control search"
-              placeholder="Rechercher..."
+              placeholder="Rechercher par le nom, le prénom ou le département..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -642,7 +740,7 @@ const Employe = () => {
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            Page 1/10
+            1/10
           </div>
         </div>
       </div>
@@ -663,10 +761,17 @@ const Employe = () => {
           </thead>
           <tbody>
             {list.map((data, idx) => {
+              //data.checkValue = false
               return (
                 <tr key={idx}>
                   <td>
-                    <input type="checkbox" value="selected" />
+                    <input
+                      type="checkbox"
+                      value="seleted"
+                      onChange={() => {
+                        deleteList(data);
+                      }}
+                    />
                   </td>
                   <td>{data.firstName + " " + data.lastName}</td>
                   <td>{data.department}</td>
@@ -674,8 +779,17 @@ const Employe = () => {
                     <div className="btn-group">
                       <div className="d-inline-block mx-1">
                         <img
-                          title="Voir l'employé" 
-                          src={view} alt="" />
+                          title="Voir l'employé"
+                          data-bs-toggle="modal"
+                          data-bs-target="#viewEmploye"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setDelete(["" + data.employeeReference]);
+                            viewEmploye(data);
+                          }}
+                          src={view}
+                          alt=""
+                        />
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
@@ -691,12 +805,12 @@ const Employe = () => {
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
-                        title="Supprimer l'employé"
+                          title="Supprimer l'employé"
                           data-bs-toggle="modal"
                           data-bs-target="#deleteEmploye"
-                          onClick={(e) =>{
-                            e.preventDefault()
-                            setDelete(data.employeeReference)
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setDelete(["" + data.employeeReference]);
                           }}
                           src={del}
                           alt=""
@@ -709,6 +823,15 @@ const Employe = () => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="d-inline-block my-1 me-1">
+        <img
+          title="Supprimer l'employé"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteEmploye"
+          src={del}
+          alt=""
+        />
       </div>
     </>
   );

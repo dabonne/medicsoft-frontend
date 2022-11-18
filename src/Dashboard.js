@@ -22,7 +22,7 @@ const Dashboard = () => {
   let navigate = useNavigate();
 
   useEffect(()=>{
-    return navigate("/dashboard/")
+    //return navigate("/dashboard/")
   },[])
 
   return (
@@ -215,7 +215,7 @@ const Dashboard = () => {
               <Route path="/employe" element={<Employe />} />
               <Route path="/rendez-vous" element={<Meet />} />
               <Route path="/agenda" element={<Notebook />} />
-              <Route path="/patient" element={<Patient />} />
+              <Route path="/patient/*" element={<Patient />} />
               <Route path="/agenda_garde" element={<NotebookGard />} />
               <Route path="/parametre" element={<Settings />} />
             </Routes>
