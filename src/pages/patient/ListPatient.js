@@ -95,14 +95,14 @@ const ListPatient = () => {
                   <span className="d-block text-center text-bold text-meduim">
                     Jannie DOE
                   </span>
-                  <span className="d-block text-center">
+                  <span className="d-block my-1 text-center">
                     <span>ID Patient: </span>
                     <span className="text-bold">P12902</span>
                   </span>
-                  <span className="d-block text-center">
+                  <span className="d-block my-1 text-center">
                     <span className="text-bold">23 ans . Femme</span>
                   </span>
-                  <span className="d-block text-center">
+                  <span className="d-block my-1 text-center">
                     <span className="text-bold text-meduim">
                       <img src={sang} alt="" /> O+
                     </span>

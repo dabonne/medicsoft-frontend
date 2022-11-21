@@ -216,7 +216,7 @@ const Employe = () => {
             data-bs-target="#newEmploye"
             onClick={(e) => getJsData(e)}
           >
-            Ajouter un employé
+            +
           </button>
         </div>
       </div>

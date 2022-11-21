@@ -10,7 +10,7 @@ const Settings = () => {
         <h1 className="h2">Paramètres de mon compte</h1>
       </div>
       <div className="row my-4">
-        <div className="col-12 col-md-5 col-lg-4">
+        <div className="col-10 col-sm-8 mx-auto col-md-5 col-lg-4">
           <img width="100%" src={profile} alt="" />
           <div className="my-3">
             <button className="btn btn-primary me-2" data-bs-dismiss="modal" style={{width:"85%"}}>
@@ -18,11 +18,12 @@ const Settings = () => {
             </button>
             <img src={del} alt="" />
           </div>
-          <div className="border border-1 border-radius p-4 mt-4">
+          <div className="border border-1 border-radius p-4 my-4">
             <p className="text-16 text-bold ps-1">Autres actions</p>
             <button
               className="btn border border-1 border-radius my-2 w-100 text-bold text-start"
-              data-bs-dismiss="modal"
+              data-bs-toggle="modal"
+              data-bs-target="#editPassword"
             >
               Modifier le mot de passe
             </button>
@@ -40,7 +41,7 @@ const Settings = () => {
             </button>
           </div>
         </div>
-        <div className="col-12 col-md-7 col-lg-6 mx-auto border border-1 p-4">
+        <div className="col-12 col-md-7 col-lg-6 mx-auto border border-1 border-radius p-4">
           <p className="text-16 text-bold">Mes informations personnelles</p>
           <form className="w-100" action="">
             <div className="mb-3 mt-3">
@@ -156,6 +157,92 @@ const Settings = () => {
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      <div className="modal fade" id="editPassword">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Modification du mot de passe
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <form >
+                <div className="mb-3 mt-3">
+                  <label htmlFor="lname" className="form-label">
+                  Nouveau mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="lname"
+                    placeholder="Entrer le nouveau mot de passe"
+                    value={""}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="fname" className="form-label">
+                    Confirmation du nouveau mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="fname"
+                    placeholder="Confirmer le nouveau mot de passe"
+                    value={""}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      
+                    }}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="date" className="form-label">
+                    Ancien mot de passe
+                  </label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="date"
+                    placeholder="Entrer l’ancien mot de passe"
+                    value={""}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      
+                    }}
+                  />
+                </div>
+                <div className="modal-footer d-flex justify-content-start border-0">
+                  <button
+                    type="reset"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Fermer
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    data-bs-dismiss="modal"
+                  >
+                    Enrégistrer les modifications
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </>
