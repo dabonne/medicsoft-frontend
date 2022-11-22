@@ -680,7 +680,7 @@ const Employe = () => {
                     className="btn btn-primary"
                     data-bs-dismiss="modal1"
                     onClick={() => fValidate('was-validated')}
-                    disabled
+                    
                   >
                     Sauvegarder les informations
                   </button>
