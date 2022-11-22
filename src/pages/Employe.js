@@ -56,6 +56,7 @@ const Employe = () => {
       .then((res) => {
         setDatas(res.data.employeeResponseList);
         setList(res.data.employeeResponseList);
+        document.documentElement.scrollTo(0, 0);
         //console.log(res.data.employeeResponseList);
       })
       .catch((error) => {});
@@ -63,6 +64,7 @@ const Employe = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    configNotify('loading','',"Ajout d’un nouvel(le) employé(e) en cours...")
     //console.log(jsData)
     requestEmploye
       .post(apiEmploye.post, jsData)
@@ -79,13 +81,13 @@ const Employe = () => {
 
   const handleSubmitEdite = (e) => {
     e.preventDefault();
-    console.log(jsData);
+    configNotify('loading','',"Modification de l'employé(e) en cours...")
     requestEmploye
       .put(apiEmploye.put, jsData)
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
-        configNotify('success','Ajout réussi',"Les informations ont bien été enrégistrées")
+        configNotify('success','Modification réussi',"Les informations ont bien été enrégistrées")
       })
       .catch((error) => {
         console.log(error);
@@ -129,7 +131,8 @@ const Employe = () => {
         jsData.lastName = res.data.employeeResponseList[0].lastName;
         setFirstName(res.data.employeeResponseList[0].firstName);
         jsData.firstName = res.data.employeeResponseList[0].firstName;
-        //setBirthdate(res.data.employeeResponseList[0].birthdate);
+        setBirthdate(res.data.employeeResponseList[0].birthDate);
+        jsData.birthdate = res.data.employeeResponseList[0].birthDate;
         setCnib(res.data.employeeResponseList[0].cnib);
         jsData.cnib = res.data.employeeResponseList[0].cnib;
         setEmail(res.data.employeeResponseList[0].email);
@@ -149,6 +152,8 @@ const Employe = () => {
         jsData.registrationReference =
           res.data.employeeResponseList[0].employeeReference;
         setJsData(jsData);
+        configNotify('','','')
+        fValidate('needs-validation')
       })
       .catch((error) => {
         console.log(error);
@@ -478,6 +483,9 @@ const Employe = () => {
             </div>
 
             <div className="modal-body">
+            {
+              (notifyBg != "") ? <FormNotify bg={notifyBg} title={notifyTitle} message={notifyMessage} /> : null
+            }
               <form 
                 className={formValidate}
                 onSubmit={handleSubmitEdite}
@@ -672,6 +680,7 @@ const Employe = () => {
                     className="btn btn-primary"
                     data-bs-dismiss="modal1"
                     onClick={() => fValidate('was-validated')}
+                    disabled
                   >
                     Sauvegarder les informations
                   </button>
