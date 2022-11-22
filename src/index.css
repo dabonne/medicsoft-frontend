@@ -2,6 +2,8 @@
   --primary-color:#005BDD;
   --secondary-color:#E9F2FF;
   --danger-color:#FEEBEF;
+  --success-color:#EBFEF7;
+  --loading-color:#E9F2FF;
   --bg-card-color:#F4F4FB;
   --table-accent-color:#F4F4FB;
   --border-radius: 16px;
@@ -163,9 +165,27 @@ span.wd-80 {
   color: var(--primary-color);
 }
 
-.btn-danger{
+.btn-danger, .bg-danger{
   background-color: var(--danger-color);
   border: 1px solid var(--danger-color);
+  color: black;
+}
+
+.bg-danger{
+  background-color: var(--danger-color) !important;
+  border: 1px solid red;
+  color: black;
+}
+
+.bg-success{
+  background-color: var(--success-color) !important;
+  border: 1px solid #33F6B0;
+  color: black;
+}
+
+.bg-loading{
+  background-color: var(--loading-color) !important;
+  border: 1px solid #005BDD;
   color: black;
 }
 
@@ -232,3 +252,41 @@ thead{
   border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
 }
+
+/**** loading css****/
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  margin: 4px;
+  border: 3px solid #005BDD;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #005BDD transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/**** end loading css****/

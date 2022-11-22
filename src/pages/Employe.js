@@ -7,6 +7,7 @@ import sui from "../assets/imgs/sui.png";
 import userProfile from "../assets/imgs/userinfo.png";
 import requestEmploye from "../services/requestEmploye";
 import { apiEmploye } from "../services/api";
+import FormNotify from "../components/FormNotify";
 
 const Employe = () => {
   const [refresh, setRefresh] = useState(0);
@@ -45,6 +46,10 @@ const Employe = () => {
     fonction: "",
     birthDate: "",
   });
+  const [notifyBg, setNotifyBg] = useState("")
+  const [notifyTitle, setNotifyTitle] = useState("")
+  const [notifyMessage, setNotifyMessage] = useState("")
+  const [formValidate, setFormValidate] = useState("needs-validation")
   useEffect(() => {
     requestEmploye
       .get(apiEmploye.getAll)
@@ -64,23 +69,27 @@ const Employe = () => {
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
+        configNotify('success','Ajout réussi',"Les informations ont bien été enrégistrées")
       })
       .catch((error) => {
         console.log(error);
+        configNotify('danger','Ouppss!!',"Une erreur est survenue, veuillez reesayer plus tard...")
       });
   };
 
   const handleSubmitEdite = (e) => {
     e.preventDefault();
-    console.log(jsData)
+    console.log(jsData);
     requestEmploye
       .put(apiEmploye.put, jsData)
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
+        configNotify('success','Ajout réussi',"Les informations ont bien été enrégistrées")
       })
       .catch((error) => {
         console.log(error);
+        configNotify('danger','Ouppss!!',"Une erreur est survenue, veuillez reesayer plus tard...")
       });
   };
 
@@ -99,6 +108,8 @@ const Employe = () => {
         setPhone("");
         setClassification("");
         setSpecialisation("");
+        setFormValidate("needs-validation");
+        configNotify('','','')
       })
       .catch((error) => {
         //get dataForm faille
@@ -122,7 +133,7 @@ const Employe = () => {
         setCnib(res.data.employeeResponseList[0].cnib);
         jsData.cnib = res.data.employeeResponseList[0].cnib;
         setEmail(res.data.employeeResponseList[0].email);
-        jsData.email = res.data.employeeResponseList[0].email
+        jsData.email = res.data.employeeResponseList[0].email;
         setPhone(res.data.employeeResponseList[0].phone);
         jsData.phone = res.data.employeeResponseList[0].phone;
         setClassification(res.data.employeeResponseList[0].classification);
@@ -204,6 +215,17 @@ const Employe = () => {
     dd !== [] ? setList(dd) : setList(datas);
   };
 
+  const fValidate = (cl) =>{
+    setFormValidate(cl)
+  }
+
+  const configNotify = (bg, title, message) => {
+    setNotifyBg(bg,)
+    setNotifyTitle(title)
+    setNotifyMessage(message)
+
+  }
+
   return (
     <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
@@ -233,9 +255,15 @@ const Employe = () => {
                 data-bs-dismiss="modal"
               ></button>
             </div>
-
             <div className="modal-body">
-              <form onSubmit={handleSubmit}>
+            {
+              (notifyBg != "") ? <FormNotify bg={notifyBg} title={notifyTitle} message={notifyMessage} /> : null
+            }
+              <form
+                className={formValidate}
+                onSubmit={handleSubmit}
+                noValidate
+              >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Nom
@@ -252,7 +280,9 @@ const Employe = () => {
                       jsData.lastName = e.target.value;
                       setJsData(jsData);
                     }}
+                    required
                   />
+                  <div className="invalid-feedback">Veuillez entrer un nom</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="fname" className="form-label">
@@ -262,7 +292,7 @@ const Employe = () => {
                     type="text"
                     className="form-control"
                     id="fname"
-                    placeholder="Entrer le ou les prenom(s) de l’employé(e)"
+                    placeholder="Entrer le ou les prénom(s) de l’employé(e)"
                     value={firstName}
                     onChange={(e) => {
                       e.preventDefault();
@@ -270,7 +300,9 @@ const Employe = () => {
                       jsData.firstName = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer un prénom</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="date" className="form-label">
@@ -288,7 +320,9 @@ const Employe = () => {
                       jsData.birthdate = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer une date de naissance</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="cni" className="form-label">
@@ -306,7 +340,9 @@ const Employe = () => {
                       jsData.cnib = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer le numéro CNI</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">
@@ -324,14 +360,16 @@ const Employe = () => {
                       jsData.email = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer l’adresse mail</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="phone" className="form-label">
                     Telephone
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="phone"
                     placeholder="Entrer le numero de téléphone"
@@ -342,7 +380,9 @@ const Employe = () => {
                       jsData.phone = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer le numero de téléphone</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clst" className="form-label">
@@ -358,8 +398,9 @@ const Employe = () => {
                       jsData.classification = e.target.value;
                       setJsData(jsData);
                     }}
+                    required
                   >
-                    <option>Choisir la classification</option>
+                    <option value="">Choisir la classification</option>
                     {Object.keys(jsData.classifications).map((key) => {
                       return (
                         <option key={key} value={jsData.classifications[key]}>
@@ -368,6 +409,7 @@ const Employe = () => {
                       );
                     })}
                   </select>
+                    <div className="invalid-feedback">Veuillez Choisir une classification</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="spft" className="form-label">
@@ -384,8 +426,9 @@ const Employe = () => {
                       jsData.title = jsData.specialisations[e.target.value];
                       setJsData(jsData);
                     }}
+                    required
                   >
-                    <option>Choisir la specialisation</option>
+                    <option value="">Choisir la specialisation</option>
                     {Object.keys(jsData.specialisations).map((key) => {
                       return (
                         <option className="w-100" key={key} value={key}>
@@ -394,19 +437,22 @@ const Employe = () => {
                       );
                     })}
                   </select>
+                  <div className="invalid-feedback">Veuillez Choisir une classification</div>
                 </div>
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
+                    onClick={()=> fValidate("needs-validation")}
                   >
                     Fermer
                   </button>
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    data-bs-dismiss="modal"
+                    data-bs-dismiss="modal1"
+                    onClick={() => fValidate('was-validated')}
                   >
                     Ajouter l’employé(e)
                   </button>
@@ -432,7 +478,11 @@ const Employe = () => {
             </div>
 
             <div className="modal-body">
-              <form onSubmit={handleSubmitEdite}>
+              <form 
+                className={formValidate}
+                onSubmit={handleSubmitEdite}
+                noValidate
+                >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Nom
@@ -449,7 +499,9 @@ const Employe = () => {
                       jsData.lastName = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer un nom</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="fname" className="form-label">
@@ -467,7 +519,9 @@ const Employe = () => {
                       jsData.firstName = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer un prénom</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="date" className="form-label">
@@ -485,7 +539,9 @@ const Employe = () => {
                       jsData.birthdate = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer une date de naissance</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="cni" className="form-label">
@@ -503,7 +559,9 @@ const Employe = () => {
                       jsData.cnib = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer le numéro CNI</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">
@@ -521,14 +579,16 @@ const Employe = () => {
                       jsData.email = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer l’adresse mail</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="phone" className="form-label">
                     Telephone
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     id="phone"
                     placeholder="Entrer le numero de téléphone"
@@ -539,7 +599,9 @@ const Employe = () => {
                       jsData.phone = e.target.value;
                       setJsData(jsData);
                     }}
-                  />
+                    required
+                    />
+                    <div className="invalid-feedback">Veuillez entrer le numero de téléphone</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clst" className="form-label">
@@ -555,6 +617,7 @@ const Employe = () => {
                       jsData.classification = e.target.value;
                       setJsData(jsData);
                     }}
+                    required
                   >
                     <option>Choisir la classification</option>
                     {Object.keys(jsData.classifications).map((key) => {
@@ -565,6 +628,7 @@ const Employe = () => {
                       );
                     })}
                   </select>
+                  <div className="invalid-feedback">Veuillez Choisir une classification</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="spft" className="form-label">
@@ -581,6 +645,7 @@ const Employe = () => {
                       jsData.title = jsData.specialisations[e.target.value];
                       setJsData(jsData);
                     }}
+                    required
                   >
                     <option>Choisir la specialisation</option>
                     {Object.keys(jsData.specialisations).map((key) => {
@@ -591,19 +656,22 @@ const Employe = () => {
                       );
                     })}
                   </select>
+                  <div className="invalid-feedback">Veuillez Choisir une classification</div>
                 </div>
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
+                    onClick={()=> fValidate("needs-validation")}
                   >
                     Fermer
                   </button>
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    data-bs-dismiss="modal"
+                    data-bs-dismiss="modal1"
+                    onClick={() => fValidate('was-validated')}
                   >
                     Sauvegarder les informations
                   </button>
@@ -618,7 +686,9 @@ const Employe = () => {
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">Supprimer l'employé</h4>
+              <h4 className="modal-title text-meduim text-bold">
+                Supprimer l'employé
+              </h4>
               <button
                 type="button"
                 className="btn-close"
@@ -654,7 +724,9 @@ const Employe = () => {
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">Information de l’employé</h4>
+              <h4 className="modal-title text-meduim text-bold">
+                Information de l’employé
+              </h4>
               <button
                 type="button"
                 className="btn-close"
