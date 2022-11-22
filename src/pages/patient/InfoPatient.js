@@ -45,26 +45,26 @@ const InfoPatient = () => {
           </div>
         </div>
         <div className="col-12 col-md-7 col-lg-8 mx-auto">
-          <ul class="nav nav-tabs mx-0" role="tablist">
-            <li class="nav-item">
-              <Link class="nav-link active" data-bs-toggle="tab" to="#home">
+          <ul className="nav nav-tabs mx-0" role="tablist">
+            <li className="nav-item">
+              <Link className="nav-link active" data-bs-toggle="tab" to="#home">
                 Rendez-vous
               </Link>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" data-bs-toggle="tab" to="#menu1">
+            <li className="nav-item">
+              <Link className="nav-link" data-bs-toggle="tab" to="#menu1">
                 Prescription
               </Link>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" data-bs-toggle="tab" to="#menu2">
+            <li className="nav-item">
+              <Link className="nav-link" data-bs-toggle="tab" to="#menu2">
                 Rapports médicaux
               </Link>
             </li>
           </ul>
 
-          <div class="tab-content">
-            <div id="home" class="container tab-pane active">
+          <div className="tab-content">
+            <div id="home" className="container tab-pane active">
               <br />
               <h3>Rendez-vous</h3>
               <p>
@@ -72,7 +72,7 @@ const InfoPatient = () => {
                 eiusmod tempor incididunt ut labore et dolore magna aliqua.
               </p>
             </div>
-            <div id="menu1" class="container tab-pane fade">
+            <div id="menu1" className="container tab-pane fade">
               <br />
               <h3>Prescription</h3>
               <p>
@@ -80,7 +80,7 @@ const InfoPatient = () => {
                 laboris nisi ut aliquip ex ea commodo consequat.
               </p>
             </div>
-            <div id="menu2" class="container tab-pane fade">
+            <div id="menu2" className="container tab-pane fade">
               <br />
               <h3>Rapports médicaux</h3>
               <p>
