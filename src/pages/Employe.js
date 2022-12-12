@@ -8,6 +8,7 @@ import userProfile from "../assets/imgs/userinfo.png";
 import requestEmploye from "../services/requestEmploye";
 import { apiEmploye } from "../services/api";
 import FormNotify from "../components/FormNotify";
+import Modal from "bootstrap/js/dist/modal";
 
 const Employe = () => {
   const [refresh, setRefresh] = useState(0);
@@ -56,7 +57,6 @@ const Employe = () => {
       .then((res) => {
         setDatas(res.data.employeeResponseList);
         setList(res.data.employeeResponseList);
-        document.documentElement.scrollTo(0, 0);
         //console.log(res.data.employeeResponseList);
       })
       .catch((error) => {});
@@ -72,6 +72,11 @@ const Employe = () => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
         configNotify('success','Ajout réussi',"Les informations ont bien été enrégistrées")
+        var myModal1 = new Modal(document.getElementById("newEmploye"), {});
+        myModal1.hide();
+        var myModal = new Modal(document.getElementById("successAdd"), {});
+       
+        myModal.show();
       })
       .catch((error) => {
         console.log(error);
@@ -797,6 +802,34 @@ const Employe = () => {
           </div>
         </div>
       </div>
+      <div className="modal fade" id="successAdd">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Ajout Reussi
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">L'employé a été très bien Ajouter</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="row my-4">
         <div className="col-12">
@@ -907,7 +940,7 @@ const Employe = () => {
       </div>
       <div className="d-inline-block my-1 me-1">
         <img
-          title="Supprimer l'employé"
+          title="Supprimer les employés selectionnés"
           data-bs-toggle="modal"
           data-bs-target="#deleteEmploye"
           src={del}

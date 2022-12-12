@@ -171,6 +171,12 @@ span.wd-80 {
   color: black;
 }
 
+.bg-secondary{
+  background-color: var(--secondary-color) !important;
+  border: 1px solid var(--primary-color);
+  color: black;
+}
+
 .bg-danger{
   background-color: var(--danger-color) !important;
   border: 1px solid red;
@@ -208,8 +214,8 @@ h1{
 
 .search{
   height: 45px;
-  width: 45vw;
-  max-width: 400px;
+  width: 50vw;
+  max-width: 500px;
 }
 
 .table-striped > tbody > tr:nth-of-type(2n+1) > * {
