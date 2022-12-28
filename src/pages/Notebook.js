@@ -11,6 +11,8 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { Link } from "react-router-dom";
 import Modal from "bootstrap/js/dist/modal";
 import user from "../assets/imgs/user_agenda.png";
+import Toolbar from "react-big-calendar/lib/Toolbar";
+import filtrer from "../assets/imgs/filtrer.png";
 
 let localizer = momentLocalizer(moment);
 function getRandomDate() {
@@ -76,6 +78,13 @@ const message = {
 
   showMore: (total) => `+${total} plus`,
 };
+const handleNavigation = (date, view, action) => {
+  console.log(date, view, action);
+  //it returns current date, view options[month,day,week,agenda] and action like prev, next or today
+};
+const handleChange = () => {
+  console.log("this block code executed");
+};
 
 const Notebook = () => {
   const [eventDetail, setEventDetail] = useState({
@@ -100,7 +109,7 @@ const Notebook = () => {
     myModal.show();
     //handleSelectEvent();
   };
-
+  let change = handleChange;
   return (
     <>
       <div className="row">
@@ -132,7 +141,7 @@ const Notebook = () => {
               <div className="row">
                 <div className="col-12">
                   <Calendar
-                    defaultView="month"
+                    defaultView="week"
                     localizer={localizer}
                     events={myEventsList}
                     startAccessor="start"
@@ -140,7 +149,12 @@ const Notebook = () => {
                     style={{ height: 500 }}
                     onSelectEvent={setDetailEvent}
                     messages={message}
-                    //views={["week", "day"]}
+                    views={["day", "week", "month"]}
+                    onNavigate={handleNavigation}
+                    components={{
+                      event: EventComponent({ myEventsList, change }),
+                      toolbar: CustomToolbar({ myEventsList, change }),
+                    }}
                   />
                 </div>
               </div>
@@ -149,8 +163,8 @@ const Notebook = () => {
               <br />
               <div className="row">
                 <div className="col-12">
-                  <Calendar
-                    defaultView="month"
+                <Calendar
+                    defaultView="week"
                     localizer={localizer}
                     events={myEventsList}
                     startAccessor="start"
@@ -158,6 +172,12 @@ const Notebook = () => {
                     style={{ height: 500 }}
                     onSelectEvent={setDetailEvent}
                     messages={message}
+                    views={["day", "week", "month"]}
+                    onNavigate={handleNavigation}
+                    components={{
+                      event: EventComponent({ myEventsList, change }),
+                      toolbar: CustomToolbar({ myEventsList, change }),
+                    }}
                   />
                 </div>
               </div>
@@ -166,8 +186,8 @@ const Notebook = () => {
               <br />
               <div className="row">
                 <div className="col-12">
-                  <Calendar
-                    defaultView="month"
+                <Calendar
+                    defaultView="week"
                     localizer={localizer}
                     events={myEventsList}
                     startAccessor="start"
@@ -175,6 +195,12 @@ const Notebook = () => {
                     style={{ height: 500 }}
                     onSelectEvent={setDetailEvent}
                     messages={message}
+                    views={["day", "week", "month"]}
+                    onNavigate={handleNavigation}
+                    components={{
+                      event: EventComponent({ myEventsList, change }),
+                      toolbar: CustomToolbar({ myEventsList, change }),
+                    }}
                   />
                 </div>
               </div>
@@ -237,5 +263,130 @@ const Notebook = () => {
     </>
   );
 };
+// design html for event tile
+const EventComponent =
+  ({ events, change }) =>
+  (props) => {
+    return (
+      <div className="customEventTile" title="This is EventTile">
+        <h5>{props.event.title}</h5>
+        {/** <button onClick={props.change}>Do Something</button> */}
+      </div>
+    );
+  };
+// design custom design or elements for top navigation toolbaar, for today, next, prev or all views
 
+var CustomToolbar = ({ handleChange }) => {
+  return class BaseToolBar extends Toolbar {
+    constructor(props) {
+      super(props);
+    }
+    handleDayChange = (event, mconte) => {
+      mconte(event.target.value);
+    };
+    handleNamvigate = (detail, elem) => {
+      detail.navigate(elem);
+    };
+    render() {
+      return (
+        <div className="row py-2">
+          <div className="col-12 col-sm my-1">
+            <button
+              className="btn bg-secondary border-0"
+            >
+              {" "}
+              {"7 - 13 Novembre < >"}
+            </button>
+          </div>
+          <div className="col-12 col-sm d-flex justify-content-center my-1">
+            <div
+              defaultValue={"week"}
+              className="d-inline-block bg-secondary border-radius border-0 p-0 text-bold"
+            >
+              <div
+                className="d-inline-block mx-1 p-2"
+                onClick={(e) => {
+                  e.target.value = "day";
+                  this.handleDayChange(e, this.view);
+                }}
+              >
+                Jour
+              </div>
+              <div
+                className="d-inline-block mx-1 bg-primary p-2 text-white"
+                onClick={(e) => {
+                  e.target.value = "week";
+                  this.handleDayChange(e, this.view);
+                }}
+              >
+                Semaine
+              </div>
+              <div
+                className="d-inline-block mx-1 p-2"
+                onClick={(e) => {
+                  e.target.value = "month";
+                  this.handleDayChange(e, this.view);
+                }}
+              >
+                Mois
+              </div>
+            </div>
+          </div>
+          <div className="col-12 col-sm d-flex justify-content-end my-1">
+            <button className="btn text-bold">
+              <img src={filtrer} alt="" /> {"Filtrer"}
+            </button>
+          </div>
+          {/**
+             * <div className="rbc-btn-group">
+            <button
+              type="button"
+              className="defaultbtn"
+              onClick={() => this.handleNamvigate(this, "TODAY")}
+            >
+              Today
+            </button>
+            <button
+              type="button"
+              className="nextp-btn"
+              onClick={() => this.handleNamvigate(this, "PREV")}
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              className="nextp-btn"
+              onClick={() => this.handleNamvigate(this, "NEXT")}
+            >
+              Next
+            </button>
+          </div>
+          <div className="rbc-toolbar-label">{this.props.label}</div>
+             
+
+          <div className="rbc-btn-group">
+            <select
+              className="form-control"
+              onChange={(e) => this.handleDayChange(e, this.view)}
+              defaultValue={"week"}
+            >
+              <option className="optionbar" value="day">
+                Day
+              </option>
+              <option className="optionbar" value="week">
+                Week
+              </option>
+              <option className="optionbar" value="month">
+                Month
+              </option>
+              <option className="optionbar" value="agenda">
+                Agenda
+              </option>
+            </select>
+          </div>*/}
+        </div>
+      );
+    }
+  };
+};
 export default Notebook;

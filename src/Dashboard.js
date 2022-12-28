@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, NavLink, Route, Routes } from "react-router-dom";
 import mc from "./assets/imgs/medicsoft_crois.svg";
 import msg from "./assets/imgs/msg.png";
@@ -17,13 +17,36 @@ import Notebook from "./pages/Notebook";
 import Patient from "./pages/Patient";
 import NotebookGard from "./pages/NotebookGard";
 import { useNavigate } from "react-router-dom/dist";
+import { deleteUser, getUser } from "./services/storage";
+import { AppContext, initialUser } from "./services/context";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const Dashboard = () => {
+  const authCtx = useContext(AppContext);
+  const { user, onUserChange } = authCtx;
+  const [userLocal, setUserLocal] = useState("")
   let navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     //return navigate("/dashboard/")
-  },[])
+    setUserLocal(getUser())
+    isAuth();
+  }, [user]);
+  const isAuth = () => {
+    if (user.isAuth == false || user.token == null || user.token == "") {
+      console.log(`connexion échoué, isAuth`);
+      console.log(user);
+
+      //return navigate("/");
+    } else {
+      console.log("isAuth true");
+    }
+  };
+
+  const deconnect = () => {
+    deleteUser();
+    onUserChange(initialUser);
+  };
 
   return (
     <>
@@ -60,7 +83,12 @@ const Dashboard = () => {
               <div className="d-md-none py-3"></div>
               <ul className="nav flex-column">
                 <li className="nav-item">
-                  <NavLink to="/dashboard/" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink
+                    to="/dashboard/"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={home} alt="" />
                     </span>
@@ -74,7 +102,12 @@ const Dashboard = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/dashboard/employe" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink
+                    to="/dashboard/personnel"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={employe} alt="" />
                     </span>
@@ -83,12 +116,17 @@ const Dashboard = () => {
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
-                      Les employés
+                      Le personnel
                     </span>
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/dashboard/rendez-vous" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink
+                    to="/dashboard/rendez-vous"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={rendv} alt="" />
                     </span>
@@ -102,7 +140,12 @@ const Dashboard = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/dashboard/agenda" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink
+                    to="/dashboard/agenda"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={agenda} alt="" />
                     </span>
@@ -111,12 +154,17 @@ const Dashboard = () => {
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
-                      Mon agenda
+                      Agenda
                     </span>
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/dashboard/patient" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink
+                    to="/dashboard/patient"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={patient} alt="" />
                     </span>
@@ -130,7 +178,12 @@ const Dashboard = () => {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to="/dashboard/agenda_garde" className={({ isActive }) => isActive ? "nav-link active":"nav-link"}>
+                  <NavLink
+                    to="/dashboard/agenda_garde"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     <span className="d-none d-md-block d-lg-none wd-0">
                       <img src={agenda} alt="" />
                     </span>
@@ -139,7 +192,7 @@ const Dashboard = () => {
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
-                      Agenda de Garde
+                      Planning des Soignants
                     </span>
                   </NavLink>
                 </li>
@@ -184,7 +237,7 @@ const Dashboard = () => {
                         className="d-inline-block"
                         src={user}
                         alt=""
-                        style={{ marginLeft: "-6px", marginTop:"-6px" }}
+                        style={{ marginLeft: "-6px", marginTop: "-6px" }}
                       />
                       <span className="d-inline-block ms-2">Jannette DOE</span>
                     </span>
@@ -199,7 +252,14 @@ const Dashboard = () => {
                       </Link>
                     </li>
                     <li>
-                      <Link className="dropdown-item" to="/">
+                      <Link
+                        className="dropdown-item"
+                        to="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          deconnect();
+                        }}
+                      >
                         Se déconnecter
                       </Link>
                     </li>
@@ -210,14 +270,13 @@ const Dashboard = () => {
           </nav>
 
           <main className="col-md-11 ms-sm-auto col-lg-10 px-md-4 pt-5 h-90 text-small">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/employe" element={<Employe />} />
-              <Route path="/rendez-vous" element={<Meet />} />
-              <Route path="/agenda" element={<Notebook />} />
-              <Route path="/patient/*" element={<Patient />} />
-              <Route path="/agenda_garde" element={<NotebookGard />} />
-              <Route path="/parametre" element={<Settings />} />
+          <Routes>
+              <Route path="/" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Home /></ProtectedRoute> } />
+              <Route path="/personnel" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Employe /></ProtectedRoute>} />
+              <Route path="/rendez-vous" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Meet /></ProtectedRoute>} />
+              <Route path="/agenda" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Notebook /></ProtectedRoute>} />
+              <Route path="/patient/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
+              <Route path="/parametre" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Settings /></ProtectedRoute>} />
             </Routes>
           </main>
           <div className="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4">

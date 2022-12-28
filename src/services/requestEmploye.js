@@ -5,7 +5,7 @@ const URL_EMPLOYE = "employee-management/external-api/employee/"
 
 const requestEmploye = axios.create({
     baseURL: URL+URL_EMPLOYE,
-    withCredentials: false,
+    
     headers: {
         'Accept':'application/json',
     },

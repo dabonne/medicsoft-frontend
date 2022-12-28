@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import view from "../assets/imgs/view.png";
 import edit from "../assets/imgs/edit.png";
 import del from "../assets/imgs/delete.png";
@@ -9,8 +9,11 @@ import requestEmploye from "../services/requestEmploye";
 import { apiEmploye } from "../services/api";
 import FormNotify from "../components/FormNotify";
 import Modal from "bootstrap/js/dist/modal";
+import { AppContext } from "../services/context";
 
 const Employe = () => {
+  const authCtx = useContext(AppContext);
+  const { user, onUserChange } = authCtx;
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState("");
   const [dele, setDelete] = useState([]);
@@ -53,7 +56,9 @@ const Employe = () => {
   const [formValidate, setFormValidate] = useState("needs-validation")
   useEffect(() => {
     requestEmploye
-      .get(apiEmploye.getAll)
+      .get(apiEmploye.getAll,{
+        headers: { Authorization: `${user.token}` },
+    })
       .then((res) => {
         setDatas(res.data.employeeResponseList);
         setList(res.data.employeeResponseList);
@@ -67,7 +72,9 @@ const Employe = () => {
     configNotify('loading','',"Ajout d’un nouvel(le) employé(e) en cours...")
     //console.log(jsData)
     requestEmploye
-      .post(apiEmploye.post, jsData)
+      .post(apiEmploye.post, jsData,{
+        headers: { Authorization: `${user.token}` },
+    })
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
@@ -239,7 +246,7 @@ const Employe = () => {
   return (
     <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-        <h1 className="h2">Employés</h1>
+        <h1 className="h2">Le personnel</h1>
         <div className="btn-toolbar">
           <button
             className="btn btn-primary"

@@ -8,9 +8,13 @@ const apiEmploye = {
     "delete":"employee-delete-list",
 }
 
-
+const apiUser = {
+    "login":"auth/login",
+    "get":"user/user-account"
+}
 
 
 export {
-    apiEmploye
+    apiEmploye,
+    apiUser
 }
