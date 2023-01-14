@@ -1,6 +1,7 @@
 
 const apiEmploye = {
     "getJsData":"employee-request-form",
+    "active":"employee-active-account",
     "getAll":"get/employee",
     "get":"employee-request",
     "post":"employee-request",
@@ -10,7 +11,8 @@ const apiEmploye = {
 
 const apiUser = {
     "login":"auth/login",
-    "get":"user/user-account"
+    "get":"user/user-account",
+    "getRoles":"/user/rolename-request",
 }
 
 

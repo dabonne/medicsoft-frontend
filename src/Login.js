@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import doctor from "./assets/imgs/doctor.svg";
+import doctor from "./assets/imgs/doc.svg";
 import logo from "./assets/imgs/medicsoft.png";
 import intersect from "./assets/imgs/intersect.png";
 import pwd from "./assets/imgs/pwd.png";
@@ -37,20 +37,15 @@ const Login = () => {
       })
       .then((res) => {
         console.log(res.data);
-        /*requestUser
-          .get(apiUser.get, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          })
-          .then((res) => {
-            console.log(res.data);
-            //console.log(res.data.employeeResponseList);
-          })
-          .catch((error) => {});*/
+        
 
         onUserChange({
           isAuth: true,
           type: "",
-          name: "",
+          name: res.data.firstname + " " + res.data.lastname,
+          organisation: res.data.roles[0].organisation,
+          organisations: res.data.organisation,
+          roles: res.data.roles,
           token: res.data.token,
         });
         isAuth();
@@ -73,11 +68,11 @@ const Login = () => {
   return (
     <>
       <div className="d-none d-lg-block col-lg-5 h-100 illustration-img">
-        <img width="107%" src={doctor} alt="" />
+        <img width="100%" src={doctor} alt="" />
       </div>
       <div className="col-12 col-lg-7 h-100 illustration-form position-relative">
-        <div className="row">
-          <div className="col-12 px-3 col-sm-8 mx-auto">
+        <div className="row px-3">
+          <div className="col-12 col-sm-12 col-md-7">
             <form onSubmit={handleSubmit} className="mt-5">
               <img
                 className="mt-5 mb-3"
@@ -159,16 +154,18 @@ const Login = () => {
         </div>
 
         <div className="row position-absolute bottom-0 w-100">
-          <div className="col-12 col-lg-9 text-center mx-auto my-2">
+          <div className="col-12 col-md-11 mx-auto my-2 d-flex justify-content-between ">
             <div className="text-small d-inline-block my-1 me-2">
-              © Laafi Vision Médical All rights reserved.
+              © Laafi Vision Médical, Tous droits réservés.
             </div>
+            <div className="d-inline-block">
             <Link to="#" className="text-small link d-inline-block my-1 me-2">
-              Terms
+              Conditions générales
             </Link>
             <Link to="#" className="text-small link d-inline-block my-1">
-              Privacy
+              Politiques de confidentialités
             </Link>
+            </div>
           </div>
         </div>
       </div>

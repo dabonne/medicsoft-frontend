@@ -52,6 +52,13 @@ body {
 .text-bold{
   font-weight:700;
 }
+.text-48{
+  font-size: 3rem;
+}
+
+.text-32{
+  font-size: 2rem;
+}
 
 .text-meduim{
   font-size: 1.125rem;
@@ -67,6 +74,9 @@ body {
 
 .text-ultra-small{
   font-size: 0.75rem;
+}
+.line-height{
+  line-height: 180%;
 }
 
 .link{
@@ -296,3 +306,8 @@ thead{
   }
 }
 /**** end loading css****/
+
+.react-datepicker__day--highlighted-custom-1, .react-datepicker__day--highlighted-custom-2{
+  color: red !important;
+  
+}

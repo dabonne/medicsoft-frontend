@@ -3,7 +3,7 @@ import { Link, NavLink, Route, Routes } from "react-router-dom";
 import mc from "./assets/imgs/medicsoft_crois.svg";
 import msg from "./assets/imgs/msg.png";
 import supp from "./assets/imgs/supp.png";
-import user from "./assets/imgs/user.png";
+import userp from "./assets/imgs/user.png";
 import home from "./assets/imgs/home.png";
 import employe from "./assets/imgs/employe.png";
 import rendv from "./assets/imgs/rendezvous.png";
@@ -235,11 +235,11 @@ const Dashboard = () => {
                     <span className="d-block d-md-none border border-2 d-lg-block wd-80 p-2">
                       <img
                         className="d-inline-block"
-                        src={user}
+                        src={userp}
                         alt=""
                         style={{ marginLeft: "-6px", marginTop: "-6px" }}
                       />
-                      <span className="d-inline-block ms-2">Jannette DOE</span>
+                      <span className="d-inline-block ms-2">{user.name}</span>
                     </span>
                   </Link>
                   <ul
@@ -279,16 +279,18 @@ const Dashboard = () => {
               <Route path="/parametre" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Settings /></ProtectedRoute>} />
             </Routes>
           </main>
-          <div className="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div className="text-small d-inline-block my-1 me-2">
-              © Laafi Vision Médical All rights reserved.
+          <div className="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4 text-center text-md-start">
+          <div className="text-small d-inline-block  my-1 me-2">
+              © Laafi Vision Médical, Tous droits réservés.
             </div>
+            <div className="d-inline-block ms-md-5">
             <Link to="#" className="text-small link d-inline-block my-1 me-2">
-              Terms
+              Conditions générales
             </Link>
-            <Link to="#" className="text-small link d-inline-block my-1 me-2">
-              Privacy
+            <Link to="#" className="text-small link d-inline-block my-1">
+              Politiques de confidentialités
             </Link>
+            </div>
           </div>
         </div>
       </div>

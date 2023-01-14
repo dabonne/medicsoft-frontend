@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import view from "../assets/imgs/view.png";
 import edit from "../assets/imgs/edit.png";
 import del from "../assets/imgs/delete.png";
@@ -6,10 +6,14 @@ import back from "../assets/imgs/back.png";
 import sui from "../assets/imgs/sui.png";
 import userProfile from "../assets/imgs/userinfo.png";
 import requestEmploye from "../services/requestEmploye";
-import { apiEmploye } from "../services/api";
+import { apiEmploye, apiUser } from "../services/api";
 import FormNotify from "../components/FormNotify";
 import Modal from "bootstrap/js/dist/modal";
 import { AppContext } from "../services/context";
+import { getRoles } from "@testing-library/react";
+import requestUser from "../services/requestUser";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 
 const Employe = () => {
   const authCtx = useContext(AppContext);
@@ -49,61 +53,86 @@ const Employe = () => {
     department: "",
     fonction: "",
     birthDate: "",
+    employeeReference: "",
+    username: "",
+    roles: [],
   });
-  const [notifyBg, setNotifyBg] = useState("")
-  const [notifyTitle, setNotifyTitle] = useState("")
-  const [notifyMessage, setNotifyMessage] = useState("")
-  const [formValidate, setFormValidate] = useState("needs-validation")
+  const [notifyBg, setNotifyBg] = useState("");
+  const [notifyTitle, setNotifyTitle] = useState("");
+  const [notifyMessage, setNotifyMessage] = useState("");
+  const [formValidate, setFormValidate] = useState("needs-validation");
+  const [roles, setRoles] = useState([]);
+  const [roleList, setRoleList] = useState([]);
+  const header = {
+    headers: { Authorization: `${user.token}` },
+  };
+  const closeRef = useRef();
+  const successRef = useRef()
+
   useEffect(() => {
     requestEmploye
-      .get(apiEmploye.getAll,{
-        headers: { Authorization: `${user.token}` },
-    })
+      .get(apiEmploye.getAll, header)
       .then((res) => {
         setDatas(res.data.employeeResponseList);
         setList(res.data.employeeResponseList);
         //console.log(res.data.employeeResponseList);
+        getRoles();
       })
       .catch((error) => {});
   }, [refresh]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    configNotify('loading','',"Ajout d’un nouvel(le) employé(e) en cours...")
+    configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
     //console.log(jsData)
+    
+        
     requestEmploye
-      .post(apiEmploye.post, jsData,{
-        headers: { Authorization: `${user.token}` },
-    })
+      .post(apiEmploye.post, jsData, header)
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
-        configNotify('success','Ajout réussi',"Les informations ont bien été enrégistrées")
-        var myModal1 = new Modal(document.getElementById("newEmploye"), {});
-        myModal1.hide();
-        var myModal = new Modal(document.getElementById("successAdd"), {});
-       
-        myModal.show();
+        configNotify(
+          "success",
+          "Ajout réussi",
+          "Les informations ont bien été enrégistrées"
+        );
+        closeRef.current.click()
+        successRef.current.click()
+        closeRef.current = successRef.current = null
+        
       })
       .catch((error) => {
         console.log(error);
-        configNotify('danger','Ouppss!!',"Une erreur est survenue, veuillez reesayer plus tard...")
+        configNotify(
+          "danger",
+          "Ouppss!!",
+          "Une erreur est survenue, veuillez reesayer plus tard..."
+        );
       });
   };
 
   const handleSubmitEdite = (e) => {
     e.preventDefault();
-    configNotify('loading','',"Modification de l'employé(e) en cours...")
+    configNotify("loading", "", "Modification de l'employé(e) en cours...");
     requestEmploye
       .put(apiEmploye.put, jsData)
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
-        configNotify('success','Modification réussi',"Les informations ont bien été enrégistrées")
+        configNotify(
+          "success",
+          "Modification réussi",
+          "Les informations ont bien été enrégistrées"
+        );
       })
       .catch((error) => {
         console.log(error);
-        configNotify('danger','Ouppss!!',"Une erreur est survenue, veuillez reesayer plus tard...")
+        configNotify(
+          "danger",
+          "Ouppss!!",
+          "Une erreur est survenue, veuillez reesayer plus tard..."
+        );
       });
   };
 
@@ -123,7 +152,56 @@ const Employe = () => {
         setClassification("");
         setSpecialisation("");
         setFormValidate("needs-validation");
-        configNotify('','','')
+        configNotify("", "", "");
+      })
+      .catch((error) => {
+        //get dataForm faille
+        console.log(error);
+      });
+  };
+  const getRoles = () => {
+    requestUser
+      .get(apiUser.getRoles,{
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+      .then((res) => {
+        //get dataForm success
+        console.log(res.data);
+        let list = res.data.map((data) => {
+          return { value: data, label: data };
+        });
+        //console.log(list)
+        setRoleList(list);
+      })
+      .catch((error) => {
+        //get dataForm faille
+        console.log(error);
+      });
+  };
+  const activeUserRoles = () => {
+    console.log({
+      username: userInfos.username,
+      firstName: userInfos.firstName,
+      lastName: userInfos.lastName,
+      roles: roles.map((role) => role.value),
+      employeeReference: userInfos.employeeReference,
+    });
+    requestEmploye
+      .post(
+        apiEmploye.active,
+        {
+          username: userInfos.username,
+          email: userInfos.username,
+          firstName: userInfos.firstName,
+          lastName: userInfos.lastName,
+          roles: roles.map((role) => role.value),
+          employeeReference: userInfos.employeeReference,
+        },
+        header
+      )
+      .then((res) => {
+        //get dataForm success
+        console.log(res.data);
       })
       .catch((error) => {
         //get dataForm faille
@@ -138,7 +216,7 @@ const Employe = () => {
       .get(`${apiEmploye.get}/${ref}`)
       .then((res) => {
         //setDatas(res.data.employeeResponseList);
-        console.log(res.data.employeeResponseList);
+        //console.log(res.data);
         setLastName(res.data.employeeResponseList[0].lastName);
         jsData.lastName = res.data.employeeResponseList[0].lastName;
         setFirstName(res.data.employeeResponseList[0].firstName);
@@ -164,8 +242,8 @@ const Employe = () => {
         jsData.registrationReference =
           res.data.employeeResponseList[0].employeeReference;
         setJsData(jsData);
-        configNotify('','','')
-        fValidate('needs-validation')
+        configNotify("", "", "");
+        fValidate("needs-validation");
       })
       .catch((error) => {
         console.log(error);
@@ -179,6 +257,11 @@ const Employe = () => {
     userInfos.department = data.department;
     userInfos.birthDate = data.birthDate;
     userInfos.fonction = "?";
+    userInfos.username = data.email;
+    userInfos.roles = data.roleList;
+    userInfos.employeeReference = data.employeeReference;
+    setRoles([]);
+    console.log(userInfos);
   };
   const onDelete = (e) => {
     e.preventDefault();
@@ -232,16 +315,15 @@ const Employe = () => {
     dd !== [] ? setList(dd) : setList(datas);
   };
 
-  const fValidate = (cl) =>{
-    setFormValidate(cl)
-  }
+  const fValidate = (cl) => {
+    setFormValidate(cl);
+  };
 
   const configNotify = (bg, title, message) => {
-    setNotifyBg(bg,)
-    setNotifyTitle(title)
-    setNotifyMessage(message)
-
-  }
+    setNotifyBg(bg);
+    setNotifyTitle(title);
+    setNotifyMessage(message);
+  };
 
   return (
     <>
@@ -273,14 +355,14 @@ const Employe = () => {
               ></button>
             </div>
             <div className="modal-body">
-            {
-              (notifyBg != "") ? <FormNotify bg={notifyBg} title={notifyTitle} message={notifyMessage} /> : null
-            }
-              <form
-                className={formValidate}
-                onSubmit={handleSubmit}
-                noValidate
-              >
+              {notifyBg != "" ? (
+                <FormNotify
+                  bg={notifyBg}
+                  title={notifyTitle}
+                  message={notifyMessage}
+                />
+              ) : null}
+              <form className={formValidate} onSubmit={handleSubmit} noValidate>
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Nom
@@ -318,8 +400,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer un prénom</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer un prénom
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="date" className="form-label">
@@ -338,8 +422,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer une date de naissance</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer une date de naissance
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="cni" className="form-label">
@@ -358,8 +444,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer le numéro CNI</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer le numéro CNI
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">
@@ -378,8 +466,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer l’adresse mail</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer l’adresse mail
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="phone" className="form-label">
@@ -398,8 +488,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer le numero de téléphone</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer le numero de téléphone
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clst" className="form-label">
@@ -426,7 +518,9 @@ const Employe = () => {
                       );
                     })}
                   </select>
-                    <div className="invalid-feedback">Veuillez Choisir une classification</div>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir une classification
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="spft" className="form-label">
@@ -454,25 +548,27 @@ const Employe = () => {
                       );
                     })}
                   </select>
-                  <div className="invalid-feedback">Veuillez Choisir une classification</div>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir une classification
+                  </div>
                 </div>
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
-                    type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
-                    onClick={()=> fValidate("needs-validation")}
+                    ref={closeRef}
+                    onClick={() => fValidate("needs-validation")}
                   >
                     Fermer
                   </button>
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    data-bs-dismiss="modal1"
-                    onClick={() => fValidate('was-validated')}
+                    onClick={() => fValidate("was-validated")}
                   >
                     Ajouter l’employé(e)
                   </button>
+                  <input type="hidden" ref={successRef} data-bs-toggle="modal" data-bs-target="#successAdd"  />
                 </div>
               </form>
             </div>
@@ -495,14 +591,18 @@ const Employe = () => {
             </div>
 
             <div className="modal-body">
-            {
-              (notifyBg != "") ? <FormNotify bg={notifyBg} title={notifyTitle} message={notifyMessage} /> : null
-            }
-              <form 
+              {notifyBg != "" ? (
+                <FormNotify
+                  bg={notifyBg}
+                  title={notifyTitle}
+                  message={notifyMessage}
+                />
+              ) : null}
+              <form
                 className={formValidate}
                 onSubmit={handleSubmitEdite}
                 noValidate
-                >
+              >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Nom
@@ -520,8 +620,8 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer un nom</div>
+                  />
+                  <div className="invalid-feedback">Veuillez entrer un nom</div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="fname" className="form-label">
@@ -540,8 +640,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer un prénom</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer un prénom
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="date" className="form-label">
@@ -560,8 +662,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer une date de naissance</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer une date de naissance
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="cni" className="form-label">
@@ -580,8 +684,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer le numéro CNI</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer le numéro CNI
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">
@@ -600,8 +706,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer l’adresse mail</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer l’adresse mail
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="phone" className="form-label">
@@ -620,8 +728,10 @@ const Employe = () => {
                       setJsData(jsData);
                     }}
                     required
-                    />
-                    <div className="invalid-feedback">Veuillez entrer le numero de téléphone</div>
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer le numero de téléphone
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clst" className="form-label">
@@ -648,7 +758,9 @@ const Employe = () => {
                       );
                     })}
                   </select>
-                  <div className="invalid-feedback">Veuillez Choisir une classification</div>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir une classification
+                  </div>
                 </div>
                 <div className="mb-3">
                   <label htmlFor="spft" className="form-label">
@@ -676,14 +788,16 @@ const Employe = () => {
                       );
                     })}
                   </select>
-                  <div className="invalid-feedback">Veuillez Choisir une classification</div>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir une classification
+                  </div>
                 </div>
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
-                    onClick={()=> fValidate("needs-validation")}
+                    onClick={() => fValidate("needs-validation")}
                   >
                     Fermer
                   </button>
@@ -691,8 +805,7 @@ const Employe = () => {
                     type="submit"
                     className="btn btn-primary"
                     data-bs-dismiss="modal1"
-                    onClick={() => fValidate('was-validated')}
-                    
+                    onClick={() => fValidate("was-validated")}
                   >
                     Sauvegarder les informations
                   </button>
@@ -728,7 +841,7 @@ const Employe = () => {
                   onDelete(e);
                 }}
               >
-                Supprimer
+                Comfirmer
               </button>
               <button
                 type="button"
@@ -786,24 +899,96 @@ const Employe = () => {
                     <span className="text-bold">{userInfos.birthDate}</span>
                   </div>
                 </div>
+                {userInfos.roles[0] ? (
+                  <div className="col-9 py-3">
+                    <p className="fw-bold">Rôles et Droits</p>
+                    {userInfos.roles.map((role, idx) => {
+                      return (
+                        <button className="btn btn-secondary me-1" key={idx}>
+                          {role + " X"}
+                        </button>
+                      );
+                    })}
+                    <div className="my-4">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteEmploye"
+                      >
+                        Bloquer le compte utilisateur
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="modal-footer border-0 d-flex justify-content-start">
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteEmploye"
+                    >
+                      Supprimer
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      data-bs-dismiss="modal"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        var myModal = new Modal(
+                          document.getElementById("activeEmploye"),
+                          {}
+                        );
+                        myModal.show();
+                      }}
+                    >
+                      Activer comme utilisateur
+                    </button>
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="modal fade" id="activeEmploye">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Attribution d’un droit
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <Select
+                isMulti
+                options={roleList}
+                onChange={(choice) => setRoles(choice)}
+              />
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
               <button
                 type="button"
-                className="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteEmploye"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
               >
-                Supprimer
+                Annuler
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
+                onClick={() => activeUserRoles()}
               >
-                Activer comme utilisateur
+                Attribuer le droit
               </button>
             </div>
           </div>

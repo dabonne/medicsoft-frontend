@@ -1,4 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
 import {
   Calendar,
   momentLocalizer,
@@ -13,6 +16,8 @@ import Modal from "bootstrap/js/dist/modal";
 import user from "../assets/imgs/user_agenda.png";
 import Toolbar from "react-big-calendar/lib/Toolbar";
 import filtrer from "../assets/imgs/filtrer.png";
+import { forwardRef } from "react";
+import DPicker from "../components/DPicker";
 
 let localizer = momentLocalizer(moment);
 function getRandomDate() {
@@ -163,7 +168,7 @@ const Notebook = () => {
               <br />
               <div className="row">
                 <div className="col-12">
-                <Calendar
+                  <Calendar
                     defaultView="week"
                     localizer={localizer}
                     events={myEventsList}
@@ -186,7 +191,7 @@ const Notebook = () => {
               <br />
               <div className="row">
                 <div className="col-12">
-                <Calendar
+                  <Calendar
                     defaultView="week"
                     localizer={localizer}
                     events={myEventsList}
@@ -277,6 +282,12 @@ const EventComponent =
 // design custom design or elements for top navigation toolbaar, for today, next, prev or all views
 
 var CustomToolbar = ({ handleChange }) => {
+  const [viewBtn, setViewBtn] = useState({
+    type: "week",
+    true: "d-inline-block p-2 bg-primary text-white border-radius",
+    false: "d-inline-block p-2",
+  });
+
   return class BaseToolBar extends Toolbar {
     constructor(props) {
       super(props);
@@ -291,12 +302,7 @@ var CustomToolbar = ({ handleChange }) => {
       return (
         <div className="row py-2">
           <div className="col-12 col-sm my-1">
-            <button
-              className="btn bg-secondary border-0"
-            >
-              {" "}
-              {"7 - 13 Novembre < >"}
-            </button>
+            <DPicker />
           </div>
           <div className="col-12 col-sm d-flex justify-content-center my-1">
             <div
@@ -304,27 +310,56 @@ var CustomToolbar = ({ handleChange }) => {
               className="d-inline-block bg-secondary border-radius border-0 p-0 text-bold"
             >
               <div
-                className="d-inline-block mx-1 p-2"
+                type="button"
+                className={
+                  viewBtn.type === "day" ? viewBtn.true : viewBtn.false
+                }
+                style={{
+                  borderEndEndRadius: 0,
+                  borderTopRightRadius: 0,
+                }}
                 onClick={(e) => {
                   e.target.value = "day";
+                  viewBtn.type = "day";
+                  setViewBtn(viewBtn);
                   this.handleDayChange(e, this.view);
                 }}
               >
                 Jour
               </div>
               <div
-                className="d-inline-block mx-1 bg-primary p-2 text-white"
+                type="button"
+                className={
+                  viewBtn.type === "week" ? viewBtn.true : viewBtn.false
+                }
+                style={{
+                  borderTopLeftRadius: 0,
+                  borderEndStartRadius: 0,
+                  borderEndEndRadius: 0,
+                  borderTopRightRadius: 0,
+                }}
                 onClick={(e) => {
                   e.target.value = "week";
+                  viewBtn.type = "week";
+                  setViewBtn(viewBtn);
                   this.handleDayChange(e, this.view);
                 }}
               >
                 Semaine
               </div>
               <div
-                className="d-inline-block mx-1 p-2"
+                type="button"
+                className={
+                  viewBtn.type === "month" ? viewBtn.true : viewBtn.false
+                }
+                style={{
+                  borderTopLeftRadius: 0,
+                  borderEndStartRadius: 0,
+                }}
                 onClick={(e) => {
                   e.target.value = "month";
+                  viewBtn.type = "month";
+                  setViewBtn(viewBtn);
                   this.handleDayChange(e, this.view);
                 }}
               >
@@ -389,4 +424,6 @@ var CustomToolbar = ({ handleChange }) => {
     }
   };
 };
+
+
 export default Notebook;
