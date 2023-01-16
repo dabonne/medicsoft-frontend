@@ -15,6 +15,7 @@ import requestUser from "../services/requestUser";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
+
 const Employe = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
@@ -67,7 +68,7 @@ const Employe = () => {
     headers: { Authorization: `${user.token}` },
   };
   const closeRef = useRef();
-  const successRef = useRef()
+  const notifyRef = useRef()
 
   useEffect(() => {
     requestEmploye
@@ -98,8 +99,8 @@ const Employe = () => {
           "Les informations ont bien été enrégistrées"
         );
         closeRef.current.click()
-        successRef.current.click()
-        closeRef.current = successRef.current = null
+        notifyRef.current.click()
+        closeRef.current = notifyRef.current = null
         
       })
       .catch((error) => {
@@ -125,6 +126,9 @@ const Employe = () => {
           "Modification réussi",
           "Les informations ont bien été enrégistrées"
         );
+        closeRef.current.click()
+        notifyRef.current.click()
+        closeRef.current = notifyRef.current = null
       })
       .catch((error) => {
         console.log(error);
@@ -166,7 +170,7 @@ const Employe = () => {
       })
       .then((res) => {
         //get dataForm success
-        console.log(res.data);
+        //console.log(res.data);
         let list = res.data.map((data) => {
           return { value: data, label: data };
         });
@@ -202,6 +206,7 @@ const Employe = () => {
       .then((res) => {
         //get dataForm success
         console.log(res.data);
+        setRefresh(refresh + 1);
       })
       .catch((error) => {
         //get dataForm faille
@@ -568,7 +573,6 @@ const Employe = () => {
                   >
                     Ajouter l’employé(e)
                   </button>
-                  <input type="hidden" ref={successRef} data-bs-toggle="modal" data-bs-target="#successAdd"  />
                 </div>
               </form>
             </div>
@@ -797,6 +801,7 @@ const Employe = () => {
                     type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
+                    ref={closeRef}
                     onClick={() => fValidate("needs-validation")}
                   >
                     Fermer
@@ -916,7 +921,7 @@ const Employe = () => {
                         data-bs-toggle="modal"
                         data-bs-target="#deleteEmploye"
                       >
-                        Bloquer le compte utilisateur
+                        Bloquer le compte
                       </button>
                     </div>
                   </div>
@@ -994,7 +999,7 @@ const Employe = () => {
           </div>
         </div>
       </div>
-      <div className="modal fade" id="successAdd">
+      <div className="modal fade" id="notifyRef">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
@@ -1139,6 +1144,8 @@ const Employe = () => {
           alt=""
         />
       </div>
+      <input type="hidden"  data-bs-dismiss="modal"/>
+      <input type="hidden" ref={notifyRef} data-bs-toggle="modal" data-bs-target="#notifyRef"  />
     </>
   );
 };

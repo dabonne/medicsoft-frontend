@@ -15,8 +15,16 @@ const apiUser = {
     "getRoles":"/user/rolename-request",
 }
 
+const apiAgenda = {
+    "getData":"agenda/agenda-form",
+    "getAll":"agenda/agenda-list",
+    "post":"agenda/agenda-request",
+    
+}
+
 
 export {
     apiEmploye,
-    apiUser
+    apiUser,
+    apiAgenda
 }
