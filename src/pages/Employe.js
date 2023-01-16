@@ -64,10 +64,12 @@ const Employe = () => {
   const [formValidate, setFormValidate] = useState("needs-validation");
   const [roles, setRoles] = useState([]);
   const [roleList, setRoleList] = useState([]);
+  const [modalNotifyMsg, setModalNotifyMsg] = useState('')
   const header = {
     headers: { Authorization: `${user.token}` },
   };
   const closeRef = useRef();
+  const closeEditRef = useRef();
   const notifyRef = useRef()
 
   useEffect(() => {
@@ -86,8 +88,6 @@ const Employe = () => {
     e.preventDefault();
     configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
     //console.log(jsData)
-    
-        
     requestEmploye
       .post(apiEmploye.post, jsData, header)
       .then((res) => {
@@ -98,9 +98,9 @@ const Employe = () => {
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
+        setModalNotifyMsg("L'employé a été très bien Ajouter")
         closeRef.current.click()
         notifyRef.current.click()
-        closeRef.current = notifyRef.current = null
         
       })
       .catch((error) => {
@@ -126,9 +126,11 @@ const Employe = () => {
           "Modification réussi",
           "Les informations ont bien été enrégistrées"
         );
-        closeRef.current.click()
+        closeEditRef.current.click()
+        setModalNotifyMsg("Les informations ont été très bien modifier")
+
         notifyRef.current.click()
-        closeRef.current = notifyRef.current = null
+        
       })
       .catch((error) => {
         console.log(error);
@@ -146,10 +148,11 @@ const Employe = () => {
       .get(apiEmploye.getJsData)
       .then((res) => {
         //get dataForm success
+        res.data.birthdate = "2000-01-01"
         setJsData(res.data);
         setLastName("");
         setFirstName("");
-        setBirthdate("");
+        setBirthdate("2000-01-01");
         setCnib("");
         setEmail("");
         setPhone("");
@@ -207,9 +210,15 @@ const Employe = () => {
         //get dataForm success
         console.log(res.data);
         setRefresh(refresh + 1);
+        setModalNotifyMsg("Le ou les droits on été très bien attribuer")
+        notifyRef.current.click()
+        setRoles([])
       })
       .catch((error) => {
         //get dataForm faille
+        setModalNotifyMsg("Échec de l'attribution du ou des droits")
+        notifyRef.current.click()
+        setRoles([])
         console.log(error);
       });
   };
@@ -274,6 +283,8 @@ const Employe = () => {
       .delete(apiEmploye.delete, { data: dele })
       .then((res) => {
         console.log("suppression ok");
+        setModalNotifyMsg("Suppression réussie !")
+        notifyRef.current.click()
         setDelete([]);
         setRefresh(refresh + 1);
       })
@@ -562,7 +573,10 @@ const Employe = () => {
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
                     ref={closeRef}
-                    onClick={() => fValidate("needs-validation")}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      fValidate("needs-validation")
+                    }}
                   >
                     Fermer
                   </button>
@@ -801,7 +815,7 @@ const Employe = () => {
                     type="reset"
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
-                    ref={closeRef}
+                    ref={closeEditRef}
                     onClick={() => fValidate("needs-validation")}
                   >
                     Fermer
@@ -1004,7 +1018,7 @@ const Employe = () => {
           <div className="modal-content">
             <div className="modal-header border-0">
               <h4 className="modal-title text-meduim text-bold">
-                Ajout Reussi
+                
               </h4>
               <button
                 type="button"
@@ -1013,13 +1027,17 @@ const Employe = () => {
               ></button>
             </div>
 
-            <div className="modal-body">L'employé a été très bien Ajouter</div>
+            <div className="modal-body">{modalNotifyMsg}</div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
               <button
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
+                onClick={(e) =>{
+                  e.preventDefault()
+                  setModalNotifyMsg('')
+                }}
               >
                 Ok
               </button>
@@ -1144,8 +1162,10 @@ const Employe = () => {
           alt=""
         />
       </div>
-      <input type="hidden"  data-bs-dismiss="modal"/>
-      <input type="hidden" ref={notifyRef} data-bs-toggle="modal" data-bs-target="#notifyRef"  />
+      <input type="hidden" ref={notifyRef} data-bs-toggle="modal" data-bs-target="#notifyRef" onClick={(e) =>{
+                    e.preventDefault()
+                    setNotifyBg("")
+                  }} />
     </>
   );
 };

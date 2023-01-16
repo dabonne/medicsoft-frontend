@@ -457,7 +457,7 @@ const Notebook = () => {
                 </div>
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
-                    className="btn btn-secondary"
+                    className="btn btn-danger"
                     data-bs-dismiss="modal"
                     onClick={() => fValidate("needs-validation")}
                   >
