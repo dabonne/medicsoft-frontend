@@ -16,10 +16,10 @@ const apiUser = {
 }
 
 const apiAgenda = {
-    "getData":"agenda/agenda-form",
-    "getAll":"agenda/agenda-list",
-    "post":"agenda/agenda-request",
-    
+    "getData":"agenda-form",
+    "getAll":"agenda-list",
+    "post":"agenda-request",
+    "put":"agenda-updateform"
 }
 
 

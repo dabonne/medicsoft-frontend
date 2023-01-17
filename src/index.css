@@ -79,6 +79,9 @@ body {
   line-height: 180%;
 }
 
+.text-primary{
+  color: var(--primary-color) !important;
+}
 .link{
   color: inherit;
   text-decoration: none;
@@ -311,3 +314,4 @@ thead{
   color: red !important;
   
 }
+

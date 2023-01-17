@@ -9,11 +9,12 @@ import requestEmploye from "../services/requestEmploye";
 import { apiEmploye, apiUser } from "../services/api";
 import FormNotify from "../components/FormNotify";
 import Modal from "bootstrap/js/dist/modal";
-import { AppContext } from "../services/context";
+import { AppContext, initialUser } from "../services/context";
 import { getRoles } from "@testing-library/react";
 import requestUser from "../services/requestUser";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
+import { deleteUser } from "../services/storage";
 
 
 const Employe = () => {
@@ -81,7 +82,9 @@ const Employe = () => {
         //console.log(res.data.employeeResponseList);
         getRoles();
       })
-      .catch((error) => {});
+      .catch((error) => {
+        deconnect()
+      });
   }, [refresh]);
 
   const handleSubmit = (e) => {
@@ -188,6 +191,7 @@ const Employe = () => {
   const activeUserRoles = () => {
     console.log({
       username: userInfos.username,
+      email: userInfos.username,
       firstName: userInfos.firstName,
       lastName: userInfos.lastName,
       roles: roles.map((role) => role.value),
@@ -339,6 +343,11 @@ const Employe = () => {
     setNotifyBg(bg);
     setNotifyTitle(title);
     setNotifyMessage(message);
+  };
+
+  const deconnect = () => {
+    deleteUser();
+    onUserChange(initialUser);
   };
 
   return (

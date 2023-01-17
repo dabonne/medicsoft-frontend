@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,7 +19,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { Link } from "react-router-dom";
 import Modal from "bootstrap/js/dist/modal";
-import user from "../assets/imgs/user_agenda.png";
+import userp from "../assets/imgs/user_agenda.png";
 import Toolbar from "react-big-calendar/lib/Toolbar";
 import filtrer from "../assets/imgs/filtrer.png";
 import { forwardRef } from "react";
@@ -22,6 +28,7 @@ import FormNotify from "../components/FormNotify";
 import { AppContext } from "../services/context";
 import requestAgenda from "../services/requestAgenda";
 import { apiAgenda } from "../services/api";
+import NotifyRef from "../components/NofifyRef";
 
 let localizer = momentLocalizer(moment);
 function getRandomDate() {
@@ -116,17 +123,41 @@ const Notebook = () => {
   const [type, setType] = useState("");
   const [listType, setTListype] = useState({});
   const [desc, setDesc] = useState("");
+  const [referenceId, setReferenceId] = useState("")
+  const [modalNotifyMsg, setModalNotifyMsg] = useState("");
+  //const [notifyRef,setNotifyRef] = useState('')
+  const notifyRef = useRef();
+  const [eventList, setEventList] = useState([]);
+  const [indexEvent, setIndexEvent] = useState(0);
+  const [refresh, setRefresh] = useState(0);
+
+
   const header = {
     headers: { Authorization: `${user.token}` },
   };
   useEffect(() => {
     requestAgenda
-      .get(apiAgenda.getData, header)
+      .get(apiAgenda.getAll, header)
       .then((res) => {
-        setTListype(res.data.listTypeEvent)
+        console.log(res.data)
+        const lst = res.data.map((data, idx) => {
+          return {
+            //allDay: true,
+            start: new Date(data.startDate + ", " + data.startHour),
+            end: new Date(data.endDate + ", " + data.endHour),
+            desc: data.typeEvent,
+            title: data.title,
+            name: "John Doe",
+            description: data.description,
+            idx: idx,
+            referenceId: data.referenceId
+          };
+        });
+        setEventList(lst);
+        getAgendaData();
       })
       .catch((error) => {});
-  }, []);
+  }, [refresh]);
 
   const handleSelectEvent = useCallback(() => {
     var myModal = new Modal(document.getElementById("eventDetail"), {});
@@ -134,28 +165,31 @@ const Notebook = () => {
   }, []);
 
   const setDetailEvent = (e) => {
-    console.log(e);
+    setIndexEvent(e.idx);
     eventDetail.name = e.name;
     eventDetail.start = e.start.toLocaleString();
     eventDetail.description = e.description;
     //console.log(moment(e.start))
     setEventDetail(eventDetail);
-    var myModal = new Modal(document.getElementById("detailEvent"), {});
-    myModal.show();
+    var myModal = new Modal(document.getElementById("planningEvent"), {});
+    eventList[e.idx] && myModal.show();
     //handleSelectEvent();
   };
 
+  const formatDate = (date) =>{
+    return date.getFullYear() +
+    "-" +
+    date.getMonth() +
+    1 +
+    "-" +
+    date.getDate()
+  }
   const createEvent = (e) => {
     setStartDay(
-      e.start.getFullYear() +
-        "-" +
-        e.start.getMonth() +
-        1 +
-        "-" +
-        e.start.getDate()
+      formatDate(e.start)
     );
     setEndDay(
-      e.end.getFullYear() + "-" + e.end.getMonth() + 1 + "-" + e.end.getDate()
+      formatDate(e.end)
     );
     setStartHours(e.start.toLocaleTimeString());
     setEndHours(e.end.toLocaleTimeString());
@@ -174,6 +208,28 @@ const Notebook = () => {
     setNotifyMessage(message);
   };
 
+  const getAgendaData = () => {
+    requestAgenda
+      .get(apiAgenda.getData, header)
+      .then((res) => {
+        setTListype(res.data.listTypeEvent);
+      })
+      .catch((error) => {});
+  };
+
+  const setEditData = () => {
+    console.log(eventList[indexEvent])
+    setStartDay(formatDate(eventList[indexEvent].start))
+    setEndDay(formatDate(eventList[indexEvent].end))
+    setStartHours(eventList[indexEvent].start.toLocaleTimeString())
+    setEndHours(eventList[indexEvent].end.toLocaleTimeString())
+    setDesc(eventList[indexEvent].description)
+    setTitre(eventList[indexEvent].title)
+    setType(eventList[indexEvent].desc)
+    setReferenceId(eventList[indexEvent].referenceId)
+
+  }
+
   const submitEvent = (e) => {
     e.preventDefault();
     console.log({
@@ -187,29 +243,96 @@ const Notebook = () => {
       organisationId: Object.keys(user.organisations)[0],
       description: desc,
     });
+
     requestAgenda
-      .get(apiAgenda.post,{
-        title: titre,
-        startDate: startDay,
-        endDate: endDay,
-        startHour: startHours,
-        endHour: endHours,
-        //username: user.roles[0].organisation,
-        typeEvent: type,
-        organisationId: Object.keys(user.organisations)[0],
-        description: desc,
-      },header)
+      .post(
+        apiAgenda.post,
+        {
+          title: titre,
+          startDate: startDay,
+          endDate: endDay,
+          startHour: startHours,
+          endHour: endHours,
+          //username: user.roles[0].organisation,
+          typeEvent: type,
+          organisationId: Object.keys(user.organisations)[0],
+          description: desc,
+        },
+        header
+      )
       .then((res) => {
-        console.log("creation ok")
+        console.log("creation ok");
+        setModalNotifyMsg("L'événement a été très bien ajouter");
+        notifyRef.current.click();
+        setRefresh(refresh + 1)
+        setStartDay("")
+        setEndDay("")
+        setTitre("")
+        setType("")
+        setDesc("")
+        fValidate("needs-validation");
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
+      });
+  };
+  const submitEditEvent = (e) => {
+    e.preventDefault();
+    console.log({
+      title: titre,
+      startDate: startDay,
+      endDate: endDay,
+      startHour: startHours,
+      endHour: endHours,
+      //username: user.roles[0].organisation,
+      typeEvent: type,
+      organisationId: Object.keys(user.organisations)[0],
+      description: desc,
+      referenceId: referenceId,
+    });
+
+    requestAgenda
+      .put(
+        apiAgenda.put,
+        {
+          title: titre,
+          startDate: startDay,
+          endDate: endDay,
+          startHour: startHours,
+          endHour: endHours,
+          //username: user.roles[0].organisation,
+          typeEvent: type,
+          organisationId: Object.keys(user.organisations)[0],
+          description: desc,
+          referenceId: referenceId,
+        },
+        header
+      )
+      .then((res) => {
+        console.log("creation ok");
+        setModalNotifyMsg("L'événement a été très bien modifier");
+        notifyRef.current.click();
+        setRefresh(refresh + 1)
+        setStartDay("")
+        setEndDay("")
+        setTitre("")
+        setType("")
+        setDesc("")
+        fValidate("needs-validation");
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
   let change = handleChange;
   return (
     <>
+      <NotifyRef
+        modalNotifyMsg={modalNotifyMsg}
+        setModalNotifyMsg={setModalNotifyMsg}
+        notifyRef={notifyRef}
+      />
       <div className="row">
         <h1 className="h2">Agenda</h1>
       </div>
@@ -242,7 +365,7 @@ const Notebook = () => {
                     onClick={() => alert("ok")}
                     defaultView="week"
                     localizer={localizer}
-                    events={myEventsList}
+                    events={eventList}
                     startAccessor="start"
                     endAccessor="end"
                     style={{ height: 500 }}
@@ -333,11 +456,8 @@ const Notebook = () => {
               <form className={formValidate} onSubmit={submitEvent} noValidate>
                 <div className="row mb-3">
                   <div className="col-4">
-                  <label htmlFor="lname" className="form-label">
-                    Date de début
-                  </label>
                     <input
-                      className="form-control"
+                      className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={startDay}
                       onChange={(e) => {
@@ -346,11 +466,8 @@ const Notebook = () => {
                     />
                   </div>
                   <div className="col-4">
-                  <label htmlFor="lname" className="form-label">
-                    Heure de fin
-                  </label>
                     <input
-                      className="form-control"
+                      className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={endDay}
                       onChange={(e) => {
@@ -360,12 +477,14 @@ const Notebook = () => {
                   </div>
                 </div>
                 <div className="row mb-3">
-                  <div className="col-4">
-                  <label htmlFor="lname" className="form-label">
-                    Heure de début
-                  </label>
+                  <div className="col-1 ">
+                    <span className="d-inline-block">
+                      <input className="border-0 bg-white text-bold text-meduim" type="button" value="Heure: " />
+                    </span>
+                  </div>
+                  <div className="col-2">
                     <input
-                      className="form-control"
+                      className="form-control border-0"
                       type="time"
                       value={startHours}
                       onChange={(e) => {
@@ -373,12 +492,9 @@ const Notebook = () => {
                       }}
                     />
                   </div>
-                  <div className="col-4">
-                  <label htmlFor="lname" className="form-label">
-                    Heure de fin
-                  </label>
+                  <div className="col-2">
                     <input
-                      className="form-control"
+                      className="form-control border-0"
                       type="time"
                       value={endHours}
                       onChange={(e) => {
@@ -476,6 +592,249 @@ const Notebook = () => {
           </div>
         </div>
       </div>
+      <div className="modal fade" id="editEvent">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              {notifyBg != "" ? (
+                <FormNotify
+                  bg={notifyBg}
+                  title={notifyTitle}
+                  message={notifyMessage}
+                />
+              ) : null}
+              <form className={formValidate} onSubmit={submitEditEvent} noValidate>
+              <div className="row mb-3">
+                  <div className="col-4">
+                    <input
+                      className="form-control text-32 border-0 text-primary"
+                      type="date"
+                      value={startDay}
+                      onChange={(e) => {
+                        setStartDay(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="col-4">
+                    <input
+                      className="form-control text-32 border-0 text-primary"
+                      type="date"
+                      value={endDay}
+                      onChange={(e) => {
+                        setEndDay(e.target.value);
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="row mb-3">
+                  <div className="col-1 ">
+                    <span className="d-inline-block">
+                      <input className="border-0 bg-white text-bold text-meduim" type="button" value="Heure: " />
+                    </span>
+                  </div>
+                  <div className="col-2">
+                    <input
+                      className="form-control border-0"
+                      type="time"
+                      value={startHours}
+                      onChange={(e) => {
+                        setStartHours(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="col-2">
+                    <input
+                      className="form-control border-0"
+                      type="time"
+                      value={endHours}
+                      onChange={(e) => {
+                        setEndHours(e.target.value);
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="mb-3 mt-3">
+                  <label htmlFor="lname" className="form-label">
+                    Titre
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="lname"
+                    placeholder="Entrer le nom de famille de l’employé(e)"
+                    value={titre}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setTitre(e.target.value);
+                    }}
+                    required
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer un titre
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="clst" className="form-label">
+                    Type
+                  </label>
+                  <select
+                    id="clst"
+                    className="form-select"
+                    value={type}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setType(e.target.value);
+                    }}
+                    required
+                  >
+                    <option value="">Choisir le type</option>
+                    {Object.keys(listType).map((key) => {
+                      return (
+                        <option key={key} value={key}>
+                          {listType[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir un type
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="fname" className="form-label">
+                    Description
+                  </label>
+                  <textarea
+                    type="text"
+                    className="form-control"
+                    id="fname"
+                    placeholder="Entrer la description"
+                    value={desc}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setDesc(e.target.value);
+                    }}
+                    required
+                  ></textarea>
+
+                  <div className="invalid-feedback">
+                    Veuillez entrer une description
+                  </div>
+                </div>
+                <div className="modal-footer d-flex justify-content-start border-0">
+                  <button
+                    className="btn btn-danger"
+                    data-bs-dismiss="modal"
+                    onClick={() => fValidate("needs-validation")}
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    onClick={() => fValidate("was-validated")}
+                  >
+                    Modifier l’activité
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="modal fade" id="planningEvent">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-9 col-sm-10 py-2">
+                  <div className="d-flex justify-content-between">
+                    <span className="text-bold text-32">
+                      {eventList[indexEvent] && eventList[indexEvent].desc}
+                    </span>
+                  </div>
+
+                  <div className="">
+                    <div className="d-inline-block me-5">
+                      <span>Date de début</span> <br />
+                      <span className="text-bold text-meduim">
+                        {eventList[indexEvent] &&
+                          " " +
+                            eventList[indexEvent].start.toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="d-inline-block me-5">
+                      <span>Date de fin</span> <br />
+                      <span className="text-bold text-meduim">
+                    {eventList[indexEvent] &&
+                      eventList[indexEvent].end.toLocaleDateString()}
+                  </span>
+                    </div>
+                    
+                  </div>
+                </div>
+                <div className="col-12 ">
+                  <span className="text-bold">Heure:</span>
+                  <span>
+                    {eventList[indexEvent] &&
+                      " " + eventList[indexEvent].start.toLocaleTimeString()}
+                  </span>
+                  <span>
+                    {eventList[indexEvent] &&
+                      " - " + eventList[indexEvent].end.toLocaleTimeString()}
+                  </span>
+                </div>
+
+                <div className="col-12 pt-3 ">
+                  <span className="text-bold text-underline">Détails</span>
+                  <hr className="mt-0" />
+                </div>
+              </div>
+              {eventList[indexEvent] && eventList[indexEvent].description}
+            </div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#editEvent"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setEditData()
+                }}
+              >
+               Modifier
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="modal fade" id="detailEvent">
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
@@ -493,35 +852,80 @@ const Notebook = () => {
             <div className="modal-body">
               <div className="row">
                 <div className="col-3 col-sm-2">
-                  <img src={user} alt="" />
+                  <img width="100px" src={userp} alt="" />
                 </div>
                 <div className="col-9 col-sm-10 py-2">
                   <div className="d-flex justify-content-between">
                     <span className="text-bold text-meduim">
-                      {eventDetail.name}
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      John DOE
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="text-bold">
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      (00226) xx xx xx xx
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="text-bold">
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      johndoe@example.com
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">
                     <span className="">
-                      Samedi 12 Novembre 2022 - 10h à 11h45
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      <Link to="#" className="text-black">
+                        Dossier patient
+                      </Link>
                     </span>
                   </div>
                 </div>
                 <div className="col-12 pt-3 ">
-                  <span className="text-bold text-underline">Description</span>
+                  <span className="text-bold">Date de consultation:</span>
+                  <span className="text-bold text-meduim">
+                    {eventList[indexEvent] &&
+                      " " + eventList[indexEvent].start.toLocaleDateString()}
+                  </span>
+                  <span className="text-bold text-meduim">
+                    {eventList[indexEvent] &&
+                      " - " + eventList[indexEvent].end.toLocaleDateString()}
+                  </span>{" "}
+                  <br />
+                  <span className="text-bold">Heure:</span>
+                  <span className="text-bold text-meduim">
+                    {eventList[indexEvent] &&
+                      " " + eventList[indexEvent].start.toLocaleTimeString()}
+                  </span>
+                  <span className="text-bold text-meduim">
+                    {eventList[indexEvent] &&
+                      " - " + eventList[indexEvent].end.toLocaleTimeString()}
+                  </span>
+                </div>
+
+                <div className="col-12 pt-3 ">
+                  <span className="text-bold text-underline">Détails</span>
                   <hr className="mt-0" />
                 </div>
               </div>
-              {eventDetail.description}
+              {eventList[indexEvent] && eventList[indexEvent].description}
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
               <button
                 type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
               >
-                Voir le dossier du patient
+                Confirmer le rendez-vous
               </button>
             </div>
           </div>
@@ -535,8 +939,8 @@ const EventComponent =
   ({ events, change }) =>
   (props) => {
     return (
-      <div className="customEventTile" title="This is EventTile">
-        <h5>{props.event.title}</h5>
+      <div className="customEventTile" title={props.event.title}>
+        <span className="text-16 text-bold">{props.event.title}</span>
         {/** <button onClick={props.change}>Do Something</button> */}
       </div>
     );
