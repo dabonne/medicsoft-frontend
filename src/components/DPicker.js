@@ -1,7 +1,6 @@
 import { addDays, subDays } from "date-fns";
 import React, { forwardRef, useState } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
-import fr from "date-fns/locale/fr";
+import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
@@ -58,7 +57,7 @@ const DPicker = ({ open = false }) => {
       </>
     );
   });
-  registerLocale("fr", fr);
+
 
   return (
     <>

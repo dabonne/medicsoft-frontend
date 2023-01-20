@@ -7,13 +7,14 @@ const apiEmploye = {
     "post":"employee-request",
     "put":"employee-update-form",
     "delete":"employee-delete-list",
+    "deleteRole":"remove-role",
+    "disableAccount":"desactive-account"
 }
-
 const apiUser = {
     "login":"auth/login",
     "get":"user/user-account",
     "getRoles":"/user/rolename-request",
-    "delete":"user/remove-role"
+    //"delete":"user/remove-role"
 }
 
 const apiAgenda = {
@@ -23,7 +24,6 @@ const apiAgenda = {
     "put":"agenda-updateform",
     "delete":"agenda-delete"
 }
-
 
 export {
     apiEmploye,

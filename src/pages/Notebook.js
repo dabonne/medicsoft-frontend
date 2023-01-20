@@ -592,7 +592,10 @@ const Notebook = () => {
                   <button
                     className="btn btn-danger"
                     data-bs-dismiss="modal"
-                    onClick={() => fValidate("needs-validation")}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      fValidate("needs-validation")
+                    }}
                   >
                     Annuler
                   </button>

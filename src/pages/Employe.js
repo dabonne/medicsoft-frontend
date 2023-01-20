@@ -101,7 +101,7 @@ const Employe = () => {
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("L'employé a été très bien Ajouter")
+        setModalNotifyMsg("L'employé a été ajoute avec succès")
         closeRef.current.click()
         notifyRef.current.click()
         
@@ -227,15 +227,36 @@ const Employe = () => {
       });
   };
 
+  const disableAccount = () => {
+    console.log({ 
+      "employeeReference": userInfos.employeeReference,
+      "organisationId": Object.keys(user.organisations)[0],
+  })
+    requestEmploye
+      .put(apiEmploye.disableAccount, {data:{ 
+        "employeeReference": userInfos.employeeReference,
+        "organisationId": Object.keys(user.organisations)[0],
+    }},header)
+      .then((res) => {
+        console.log("suppression ok");
+        setModalNotifyMsg("Suppression réussie !")
+        notifyRef.current.click()
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   const deleteRole = (role) => {
     console.log({ 
-      "username": userInfos.username,
+      "employeeReference": userInfos.employeeReference,
       "role": role,
       "organisationId": Object.keys(user.organisations)[0],
   })
-    requestUser
-      .delete(apiUser.delete, {data:{ 
-        "username": userInfos.username,
+    requestEmploye
+      .delete(apiEmploye.deleteRole, {data:{ 
+        "employeeReference": userInfos.employeeReference,
         "role": role,
         "organisationId": Object.keys(user.organisations)[0],
     }},header)
@@ -967,8 +988,10 @@ const Employe = () => {
                       <button
                         type="button"
                         className="btn btn-danger"
-                        data-bs-toggle="modal"
-                        data-bs-target="#deleteEmploye"
+                        onClick={(e) =>{
+                          e.preventDefault()
+                          disableAccount()
+                        }}
                       >
                         Bloquer le compte
                       </button>
