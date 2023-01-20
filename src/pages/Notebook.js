@@ -127,6 +127,7 @@ const Notebook = () => {
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   //const [notifyRef,setNotifyRef] = useState('')
   const notifyRef = useRef();
+  const agendaRef = useRef();
   const [eventList, setEventList] = useState([]);
   const [indexEvent, setIndexEvent] = useState(0);
   const [refresh, setRefresh] = useState(0);
@@ -139,7 +140,7 @@ const Notebook = () => {
     requestAgenda
       .get(apiAgenda.getAll, header)
       .then((res) => {
-        console.log(res.data)
+        //console.log(res.data)
         const lst = res.data.map((data, idx) => {
           return {
             //allDay: true,
@@ -177,12 +178,13 @@ const Notebook = () => {
   };
 
   const formatDate = (date) =>{
+    const day = date.getDate() < 10 ? 0 +""+date.getDate() : date.getDate()
     return date.getFullYear() +
     "-" +
     date.getMonth() +
     1 +
-    "-" +
-    date.getDate()
+    "-" + day
+    
   }
   const createEvent = (e) => {
     setStartDay(
@@ -193,7 +195,6 @@ const Notebook = () => {
     );
     setStartHours(e.start.toLocaleTimeString());
     setEndHours(e.end.toLocaleTimeString());
-    console.log(e);
 
     var myModal = new Modal(document.getElementById("createEvent"), {});
     myModal.show();
@@ -262,7 +263,8 @@ const Notebook = () => {
       )
       .then((res) => {
         console.log("creation ok");
-        setModalNotifyMsg("L'événement a été très bien ajouter");
+        setModalNotifyMsg("Ajoute réussi");
+        agendaRef.current.click()
         notifyRef.current.click();
         setRefresh(refresh + 1)
         setStartDay("")
@@ -309,8 +311,9 @@ const Notebook = () => {
         header
       )
       .then((res) => {
-        console.log("creation ok");
-        setModalNotifyMsg("L'événement a été très bien modifier");
+        console.log("modification ok");
+        setModalNotifyMsg("Modification réussie");
+        agendaRef.current.click()
         notifyRef.current.click();
         setRefresh(refresh + 1)
         setStartDay("")
@@ -324,7 +327,21 @@ const Notebook = () => {
         console.log(error);
       });
   };
-
+  const onDelete = (e) => {
+    e.preventDefault();
+    console.log(eventList[indexEvent].referenceId)
+    requestAgenda
+      .delete(apiAgenda.delete+"/"+eventList[indexEvent].referenceId)
+      .then((res) => {
+        console.log("suppression ok");
+        setModalNotifyMsg("Suppression réussie !")
+        notifyRef.current.click()
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   let change = handleChange;
   return (
     <>
@@ -582,7 +599,10 @@ const Notebook = () => {
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    onClick={() => fValidate("was-validated")}
+                    onClick={() => {
+                      
+                      fValidate("was-validated")
+                    }}
                   >
                     Enregistrer l’activité
                   </button>
@@ -815,7 +835,9 @@ const Notebook = () => {
               <button
                 type="button"
                 className="btn btn-danger"
-                data-bs-dismiss="modal"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteAgenda"
+                
               >
                 Annuler
               </button>
@@ -931,6 +953,44 @@ const Notebook = () => {
           </div>
         </div>
       </div>
+      <div className="modal fade" id="deleteAgenda">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Supprimer l'évènement
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">Comfirmer l'action</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+                onClick={onDelete}
+              >
+                Comfirmer
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input type="hidden" ref={agendaRef} data-bs-dismiss="modal" onClick={(e) =>{
+                    e.preventDefault()}} />
     </>
   );
 };

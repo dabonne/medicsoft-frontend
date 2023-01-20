@@ -13,13 +13,15 @@ const apiUser = {
     "login":"auth/login",
     "get":"user/user-account",
     "getRoles":"/user/rolename-request",
+    "delete":"user/remove-role"
 }
 
 const apiAgenda = {
     "getData":"agenda-form",
     "getAll":"agenda-list",
     "post":"agenda-request",
-    "put":"agenda-updateform"
+    "put":"agenda-updateform",
+    "delete":"agenda-delete"
 }
 
 

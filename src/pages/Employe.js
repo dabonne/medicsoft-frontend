@@ -227,6 +227,29 @@ const Employe = () => {
       });
   };
 
+  const deleteRole = (role) => {
+    console.log({ 
+      "username": userInfos.username,
+      "role": role,
+      "organisationId": Object.keys(user.organisations)[0],
+  })
+    requestUser
+      .delete(apiUser.delete, {data:{ 
+        "username": userInfos.username,
+        "role": role,
+        "organisationId": Object.keys(user.organisations)[0],
+    }},header)
+      .then((res) => {
+        console.log("suppression ok");
+        setModalNotifyMsg("Suppression réussie !")
+        notifyRef.current.click()
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   const getEmploye = (e, ref) => {
     e.preventDefault();
     console.log("getEmploye");
@@ -933,7 +956,10 @@ const Employe = () => {
                     {userInfos.roles.map((role, idx) => {
                       return (
                         <button className="btn btn-secondary me-1" key={idx}>
-                          {role + " X"}
+                          {role +" "} <span onClick={(e) =>{
+                            e.preventDefault()
+                            deleteRole(role)
+                          }}>X</span>
                         </button>
                       );
                     })}
