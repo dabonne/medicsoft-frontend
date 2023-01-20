@@ -1028,9 +1028,9 @@ var CustomToolbar = ({ handleChange }) => {
       return (
         <div className="row py-2">
           <div className="col-12 col-sm my-1">
-            <DPicker />
-          </div>
-          <div className="col-12 col-sm d-flex justify-content-center my-1">
+            <div className="d-inline-block  me-2">
+            <DPicker  />
+            </div>
             <div
               defaultValue={"week"}
               className="d-inline-block bg-secondary border-radius border-0 p-0 text-bold"
@@ -1093,8 +1093,31 @@ var CustomToolbar = ({ handleChange }) => {
               </div>
             </div>
           </div>
+        
           <div className="col-12 col-sm d-flex justify-content-end my-1">
-            <button className="btn text-bold">
+          <div className="mb-3 me-2">
+                  <select
+                    id="clst"
+                    className="form-select"
+                    value={"type"}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      //setType(e.target.value);
+                    }}
+                    style={{height:"40px"}}
+                    required
+                  >
+                    <option value="">Agenda du medecin</option>
+                    {["Traore Ali","Ouedraogo Moussa"].map((data,key) => {
+                      return (
+                        <option key={key} value={key}>
+                          {data}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+            <button className="btn text-bold btn-primary" style={{background:"#F4F4F4", color:"black", borderColor:"transparent"}}>
               <img src={filtrer} alt="" /> {"Filtrer"}
             </button>
           </div>
