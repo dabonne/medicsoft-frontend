@@ -9,6 +9,7 @@ import employe from "./assets/imgs/employe.png";
 import rendv from "./assets/imgs/rendezvous.png";
 import agenda from "./assets/imgs/agenda.png";
 import patient from "./assets/imgs/patient.png";
+import bk from "./assets/imgs/bk.png";
 import Employe from "./pages/Employe";
 import Settings from "./pages/Settings";
 import Home from "./pages/Home";
@@ -179,6 +180,25 @@ const Dashboard = () => {
                 </li>
                 <li className="nav-item">
                   <NavLink
+                    to="/dashboard/hospitalisation"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
+                    <span className="d-none d-md-block d-lg-none wd-0">
+                      <img src={agenda} alt="" />
+                    </span>
+                    <span
+                      className="d-block d-md-none d-lg-block wd-80"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#sidebarMenu.show"
+                    >
+                      Hospitalisation
+                    </span>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
                     to="/dashboard/agenda_garde"
                     className={({ isActive }) =>
                       isActive ? "nav-link active" : "nav-link"
@@ -269,13 +289,28 @@ const Dashboard = () => {
             </div>
           </nav>
 
-          <main className="col-md-11 ms-sm-auto col-lg-10 px-md-4 pt-5 h-90 text-small">
+          <main className="col-md-11 ms-sm-auto col-lg-10 px-md-4 pt-2 h-90 text-small">
+            <div className="d-flex justify-content-between py-3">
+              <div className="d-inline-block">
+                <span className="d-inline-block me-2">
+                <img src={bk} alt="" />
+
+                </span>
+                <span className="d-inline-block text-bold">retour</span>
+              </div>
+              <div className="d-inline-block btn btn-gray">
+                <span>Organisation 1 - </span>
+                <span className="text-bold text-decoration-underline">Changer d’organisation</span>
+              </div>
+
+            </div>
           <Routes>
               <Route path="/" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Home /></ProtectedRoute> } />
               <Route path="/personnel" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Employe /></ProtectedRoute>} />
               <Route path="/rendez-vous" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Meet /></ProtectedRoute>} />
               <Route path="/agenda" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Notebook /></ProtectedRoute>} />
               <Route path="/patient/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
+              <Route path="/hospitalisation/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
               <Route path="/parametre" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Settings /></ProtectedRoute>} />
             </Routes>
           </main>

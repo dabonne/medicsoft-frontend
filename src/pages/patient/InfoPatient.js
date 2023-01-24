@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Route, Routes, useLocation } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import profile from "../../assets/imgs/profile.png";
 import back from "../../assets/imgs/bck.png";
 import RendezVous from "./pages/RendezVous";
@@ -90,33 +90,41 @@ const InfoPatient = () => {
         <div className="col-12 col-sm-12 col-md-7 col-lg-9 mx-auto">
           <ul className="nav nav-tabs mx-0">
             <li className="nav-item">
-              <Link
-                className="nav-link"
+              <NavLink
+                className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
                 to="rendez-vous"
               >
                 Rendez-vous
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link"
+              <NavLink
+                className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
                 to="prescriptions"
               >
                 Prescriptions
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link"
+              <NavLink
+                className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
                 to="dossiers-medicaux"
               >
                 Dossiers médicaux
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="comptes-rendus">
+              <NavLink className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    } to="comptes-rendus">
                 Comptes rendus
-              </Link>
+              </NavLink>
             </li>
           </ul>
 

@@ -20,6 +20,8 @@ import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { Link } from "react-router-dom";
 import Modal from "bootstrap/js/dist/modal";
 import userp from "../assets/imgs/user_agenda.png";
+import sv from "../assets/imgs/sv.png";
+import bk from "../assets/imgs/bk.png";
 import Toolbar from "react-big-calendar/lib/Toolbar";
 import filtrer from "../assets/imgs/filtrer.png";
 import { forwardRef } from "react";
@@ -123,25 +125,26 @@ const Notebook = () => {
   const [type, setType] = useState("");
   const [listType, setTListype] = useState({});
   const [desc, setDesc] = useState("");
-  const [referenceId, setReferenceId] = useState("")
+  const [referenceId, setReferenceId] = useState("");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   //const [notifyRef,setNotifyRef] = useState('')
   const notifyRef = useRef();
   const agendaRef = useRef();
   const [eventList, setEventList] = useState([]);
+  const [employeList, setEmployeList] = useState([]);
   const [indexEvent, setIndexEvent] = useState(0);
   const [refresh, setRefresh] = useState(0);
-
 
   const header = {
     headers: { Authorization: `${user.token}` },
   };
   useEffect(() => {
     requestAgenda
-      .get(apiAgenda.getAll, header)
+      .get(apiAgenda.getAll + "/" + Object.keys(user.organisations)[0], header)
       .then((res) => {
-        //console.log(res.data)
-        const lst = res.data.map((data, idx) => {
+        console.log(res.data);
+        setEmployeList(res.data.employees);
+        const lst = res.data.events.map((data, idx) => {
           return {
             //allDay: true,
             start: new Date(data.startDate + ", " + data.startHour),
@@ -151,7 +154,7 @@ const Notebook = () => {
             name: "John Doe",
             description: data.description,
             idx: idx,
-            referenceId: data.referenceId
+            referenceId: data.referenceId,
           };
         });
         setEventList(lst);
@@ -165,6 +168,32 @@ const Notebook = () => {
     myModal.show();
   }, []);
 
+  const employeEvent = (e, list) =>{
+    requestAgenda
+      .get(apiAgenda.agendaEmployee + "/"+e+"/" + Object.keys(user.organisations)[0], header)
+      .then((res) => {
+        //console.log(res.data);
+        //setEmployeList(res.data.employees);
+        const lst = res.data.events.map((data, idx) => {
+          return {
+            //allDay: true,
+            start: new Date(data.startDate + ", " + data.startHour),
+            end: new Date(data.endDate + ", " + data.endHour),
+            desc: data.typeEvent,
+            title: data.title,
+            name: "John Doe",
+            description: data.description,
+            idx: idx,
+            referenceId: data.referenceId,
+          };
+        });
+        console.log(res.data)
+        setEventList(res.data);
+        getAgendaData();
+      })
+      .catch((error) => {});
+  }
+
   const setDetailEvent = (e) => {
     setIndexEvent(e.idx);
     eventDetail.name = e.name;
@@ -177,22 +206,13 @@ const Notebook = () => {
     //handleSelectEvent();
   };
 
-  const formatDate = (date) =>{
-    const day = date.getDate() < 10 ? 0 +""+date.getDate() : date.getDate()
-    return date.getFullYear() +
-    "-" +
-    date.getMonth() +
-    1 +
-    "-" + day
-    
-  }
+  const formatDate = (date) => {
+    const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + date.getMonth() + 1 + "-" + day;
+  };
   const createEvent = (e) => {
-    setStartDay(
-      formatDate(e.start)
-    );
-    setEndDay(
-      formatDate(e.end)
-    );
+    setStartDay(formatDate(e.start));
+    setEndDay(formatDate(e.end));
     setStartHours(e.start.toLocaleTimeString());
     setEndHours(e.end.toLocaleTimeString());
 
@@ -219,17 +239,16 @@ const Notebook = () => {
   };
 
   const setEditData = () => {
-    console.log(eventList[indexEvent])
-    setStartDay(formatDate(eventList[indexEvent].start))
-    setEndDay(formatDate(eventList[indexEvent].end))
-    setStartHours(eventList[indexEvent].start.toLocaleTimeString())
-    setEndHours(eventList[indexEvent].end.toLocaleTimeString())
-    setDesc(eventList[indexEvent].description)
-    setTitre(eventList[indexEvent].title)
-    setType(eventList[indexEvent].desc)
-    setReferenceId(eventList[indexEvent].referenceId)
-
-  }
+    console.log(eventList[indexEvent]);
+    setStartDay(formatDate(eventList[indexEvent].start));
+    setEndDay(formatDate(eventList[indexEvent].end));
+    setStartHours(eventList[indexEvent].start.toLocaleTimeString());
+    setEndHours(eventList[indexEvent].end.toLocaleTimeString());
+    setDesc(eventList[indexEvent].description);
+    setTitre(eventList[indexEvent].title);
+    setType(eventList[indexEvent].desc);
+    setReferenceId(eventList[indexEvent].referenceId);
+  };
 
   const submitEvent = (e) => {
     e.preventDefault();
@@ -264,14 +283,14 @@ const Notebook = () => {
       .then((res) => {
         console.log("creation ok");
         setModalNotifyMsg("Ajoute réussi");
-        agendaRef.current.click()
+        agendaRef.current.click();
         notifyRef.current.click();
-        setRefresh(refresh + 1)
-        setStartDay("")
-        setEndDay("")
-        setTitre("")
-        setType("")
-        setDesc("")
+        setRefresh(refresh + 1);
+        setStartDay("");
+        setEndDay("");
+        setTitre("");
+        setType("");
+        setDesc("");
         fValidate("needs-validation");
       })
       .catch((error) => {
@@ -313,14 +332,14 @@ const Notebook = () => {
       .then((res) => {
         console.log("modification ok");
         setModalNotifyMsg("Modification réussie");
-        agendaRef.current.click()
+        agendaRef.current.click();
         notifyRef.current.click();
-        setRefresh(refresh + 1)
-        setStartDay("")
-        setEndDay("")
-        setTitre("")
-        setType("")
-        setDesc("")
+        setRefresh(refresh + 1);
+        setStartDay("");
+        setEndDay("");
+        setTitre("");
+        setType("");
+        setDesc("");
         fValidate("needs-validation");
       })
       .catch((error) => {
@@ -329,13 +348,13 @@ const Notebook = () => {
   };
   const onDelete = (e) => {
     e.preventDefault();
-    console.log(eventList[indexEvent].referenceId)
+    console.log(eventList[indexEvent].referenceId);
     requestAgenda
-      .delete(apiAgenda.delete+"/"+eventList[indexEvent].referenceId)
+      .delete(apiAgenda.delete + "/" + eventList[indexEvent].referenceId)
       .then((res) => {
         console.log("suppression ok");
-        setModalNotifyMsg("Suppression réussie !")
-        notifyRef.current.click()
+        setModalNotifyMsg("Suppression réussie !");
+        notifyRef.current.click();
         setRefresh(refresh + 1);
       })
       .catch((error) => {
@@ -394,7 +413,7 @@ const Notebook = () => {
                     onNavigate={handleNavigation}
                     components={{
                       event: EventComponent({ myEventsList, change }),
-                      toolbar: CustomToolbar({ myEventsList, change }),
+                      toolbar: CustomToolbar({ myEventsList, change, employeList, employeEvent }),
                     }}
                   />
                 </div>
@@ -496,7 +515,11 @@ const Notebook = () => {
                 <div className="row mb-3">
                   <div className="col-1 ">
                     <span className="d-inline-block">
-                      <input className="border-0 bg-white text-bold text-meduim" type="button" value="Heure: " />
+                      <input
+                        className="border-0 bg-white text-bold text-meduim"
+                        type="button"
+                        value="Heure: "
+                      />
                     </span>
                   </div>
                   <div className="col-2">
@@ -593,8 +616,8 @@ const Notebook = () => {
                     className="btn btn-danger"
                     data-bs-dismiss="modal"
                     onClick={(e) => {
-                      e.preventDefault()
-                      fValidate("needs-validation")
+                      e.preventDefault();
+                      fValidate("needs-validation");
                     }}
                   >
                     Annuler
@@ -603,8 +626,7 @@ const Notebook = () => {
                     type="submit"
                     className="btn btn-primary"
                     onClick={() => {
-                      
-                      fValidate("was-validated")
+                      fValidate("was-validated");
                     }}
                   >
                     Enregistrer l’activité
@@ -635,8 +657,12 @@ const Notebook = () => {
                   message={notifyMessage}
                 />
               ) : null}
-              <form className={formValidate} onSubmit={submitEditEvent} noValidate>
-              <div className="row mb-3">
+              <form
+                className={formValidate}
+                onSubmit={submitEditEvent}
+                noValidate
+              >
+                <div className="row mb-3">
                   <div className="col-4">
                     <input
                       className="form-control text-32 border-0 text-primary"
@@ -661,7 +687,11 @@ const Notebook = () => {
                 <div className="row mb-3">
                   <div className="col-1 ">
                     <span className="d-inline-block">
-                      <input className="border-0 bg-white text-bold text-meduim" type="button" value="Heure: " />
+                      <input
+                        className="border-0 bg-white text-bold text-meduim"
+                        type="button"
+                        value="Heure: "
+                      />
                     </span>
                   </div>
                   <div className="col-2">
@@ -807,11 +837,10 @@ const Notebook = () => {
                     <div className="d-inline-block me-5">
                       <span>Date de fin</span> <br />
                       <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      eventList[indexEvent].end.toLocaleDateString()}
-                  </span>
+                        {eventList[indexEvent] &&
+                          eventList[indexEvent].end.toLocaleDateString()}
+                      </span>
                     </div>
-                    
                   </div>
                 </div>
                 <div className="col-12 ">
@@ -840,7 +869,6 @@ const Notebook = () => {
                 className="btn btn-danger"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteAgenda"
-                
               >
                 Annuler
               </button>
@@ -850,11 +878,11 @@ const Notebook = () => {
                 data-bs-toggle="modal"
                 data-bs-target="#editEvent"
                 onClick={(e) => {
-                  e.preventDefault()
-                  setEditData()
+                  e.preventDefault();
+                  setEditData();
                 }}
               >
-               Modifier
+                Modifier
               </button>
             </div>
           </div>
@@ -992,8 +1020,14 @@ const Notebook = () => {
           </div>
         </div>
       </div>
-      <input type="hidden" ref={agendaRef} data-bs-dismiss="modal" onClick={(e) =>{
-                    e.preventDefault()}} />
+      <input
+        type="hidden"
+        ref={agendaRef}
+        data-bs-dismiss="modal"
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+      />
     </>
   );
 };
@@ -1010,7 +1044,7 @@ const EventComponent =
   };
 // design custom design or elements for top navigation toolbaar, for today, next, prev or all views
 
-var CustomToolbar = ({ handleChange }) => {
+var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
   const [viewBtn, setViewBtn] = useState({
     type: "week",
     true: "d-inline-block p-2 bg-primary text-white border-radius",
@@ -1020,6 +1054,12 @@ var CustomToolbar = ({ handleChange }) => {
   return class BaseToolBar extends Toolbar {
     constructor(props) {
       super(props);
+      this.state={employeeReference: ""}
+      this.getEmployeAgenda = this.getEmployeAgenda.bind(this)
+    }
+
+    shouldComponentUpdate() {
+      return true;
     }
     handleDayChange = (event, mconte) => {
       mconte(event.target.value);
@@ -1027,12 +1067,25 @@ var CustomToolbar = ({ handleChange }) => {
     handleNamvigate = (detail, elem) => {
       detail.navigate(elem);
     };
+
+    getEmployeAgenda = (e) => {
+      e.preventDefault()
+      this.setState({employeeReference: e.target.value})
+      employeEvent(e.target.value, employeList)
+      console.log(e.target.value)
+    }
     render() {
       return (
         <div className="row py-2">
           <div className="col-12 col-sm my-1">
             <div className="d-inline-block  me-2">
-            <DPicker  />
+            <div className="border-radius bg-secondary border-0 px-0">
+            
+
+              <span className="btn" onClick={() => this.handleNamvigate(this, "PREV")}><img src={bk} alt="" /></span>
+              {this.props.label}
+              <span className="btn" onClick={() => this.handleNamvigate(this, "NEXT")}><img src={sv} alt="" /></span>
+            </div>
             </div>
             <div
               defaultValue={"week"}
@@ -1096,81 +1149,81 @@ var CustomToolbar = ({ handleChange }) => {
               </div>
             </div>
           </div>
-        
+
           <div className="col-12 col-sm d-flex justify-content-end my-1">
-          <div className="mb-3 me-2">
-                  <select
-                    id="clst"
-                    className="form-select"
-                    value={"type"}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      //setType(e.target.value);
-                    }}
-                    style={{height:"40px"}}
-                    required
-                  >
-                    <option value="">Agenda du medecin</option>
-                    {["Traore Ali","Ouedraogo Moussa"].map((data,key) => {
-                      return (
-                        <option key={key} value={key}>
-                          {data}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-            <button className="btn text-bold btn-primary" style={{background:"#F4F4F4", color:"black", borderColor:"transparent"}}>
+            <div className="mb-3 me-2">
+              <select
+                id="clst"
+                className="form-select"
+                value={""+this.state.employeeReference}
+                onChange={(e) => this.getEmployeAgenda(e)
+                }
+                style={{ height: "40px" }}
+                required
+              >
+                <option value="">Agenda du medecin</option>
+                {Object.keys(employeList).map((key) => {
+                  return (
+                    <option key={key} value={key}>
+                      {employeList[key]}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <button className="btn text-bold btn-gray">
               <img src={filtrer} alt="" /> {"Filtrer"}
             </button>
           </div>
-          {/**
-             * <div className="rbc-btn-group">
-            <button
-              type="button"
-              className="defaultbtn"
-              onClick={() => this.handleNamvigate(this, "TODAY")}
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              className="nextp-btn"
-              onClick={() => this.handleNamvigate(this, "PREV")}
-            >
-              Prev
-            </button>
-            <button
-              type="button"
-              className="nextp-btn"
-              onClick={() => this.handleNamvigate(this, "NEXT")}
-            >
-              Next
-            </button>
-          </div>
-          <div className="rbc-toolbar-label">{this.props.label}</div>
-             
+          {/*
+            <>
+              <div className="rbc-btn-group">
+                <button
+                  type="button"
+                  className="defaultbtn"
+                  onClick={() => this.handleNamvigate(this, "TODAY")}
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  className="nextp-btn"
+                  onClick={() => this.handleNamvigate(this, "PREV")}
+                >
+                  Prev
+                </button>
+                <button
+                  type="button"
+                  className="nextp-btn"
+                  onClick={() => this.handleNamvigate(this, "NEXT")}
+                >
+                  Next
+                </button>
+              </div>
+              <div className="rbc-toolbar-label">{this.props.label}</div>
 
-          <div className="rbc-btn-group">
-            <select
-              className="form-control"
-              onChange={(e) => this.handleDayChange(e, this.view)}
-              defaultValue={"week"}
-            >
-              <option className="optionbar" value="day">
-                Day
-              </option>
-              <option className="optionbar" value="week">
-                Week
-              </option>
-              <option className="optionbar" value="month">
-                Month
-              </option>
-              <option className="optionbar" value="agenda">
-                Agenda
-              </option>
-            </select>
-          </div>*/}
+              <div className="rbc-btn-group">
+                <select
+                  className="form-control"
+                  onChange={(e) => this.handleDayChange(e, this.view)}
+                  defaultValue={"week"}
+                >
+                  <option className="optionbar" value="day">
+                    Day
+                  </option>
+                  <option className="optionbar" value="week">
+                    Week
+                  </option>
+                  <option className="optionbar" value="month">
+                    Month
+                  </option>
+                  <option className="optionbar" value="agenda">
+                    Agenda
+                  </option>
+                </select>
+              </div>
+            </>*/
+          }
         </div>
       );
     }

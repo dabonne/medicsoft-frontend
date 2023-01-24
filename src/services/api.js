@@ -22,7 +22,8 @@ const apiAgenda = {
     "getAll":"agenda-list",
     "post":"agenda-request",
     "put":"agenda-updateform",
-    "delete":"agenda-delete"
+    "delete":"agenda-delete",
+    "agendaEmployee":"agenda-employee-list"
 }
 
 export {

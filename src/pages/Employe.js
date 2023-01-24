@@ -976,15 +976,24 @@ const Employe = () => {
                     <p className="fw-bold">Rôles et Droits</p>
                     {userInfos.roles.map((role, idx) => {
                       return (
-                        <button className="btn btn-secondary me-1" key={idx}>
+                        <>
+                        <button className="btn btn-gray me-1 my-1" key={idx}>
                           {role +" "} <span onClick={(e) =>{
                             e.preventDefault()
                             deleteRole(role)
                           }}>X</span>
                         </button>
+                        
+                        </>
                       );
                     })}
                     <div className="my-4">
+                    <button 
+                      className="btn btn-secondary me-1" 
+                      data-bs-toggle="modal"
+                      data-bs-target="#activeEmploye"
+                      >Ajouter un role</button>
+
                       <button
                         type="button"
                         className="btn btn-danger"
