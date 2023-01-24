@@ -164,6 +164,11 @@ span.wd-80 {
   border-color: var(--secondary-color);
 } 
 
+.btn-height{
+  height: 116px;
+  cursor: pointer;
+}
+
 .btn-primary,.btn-secondary,.btn-danger{
   background-color: var(--primary-color);
   font-weight: 600;
@@ -189,6 +194,11 @@ span.wd-80 {
   border: 1px solid var(--primary-color);
   color: black;
 }
+.bg-warning{
+  background-color: #FEF3EB !important;
+  border: 1px solid #F69C33;
+  color: black;
+}
 
 .bg-danger{
   background-color: var(--danger-color) !important;
@@ -210,6 +220,10 @@ span.wd-80 {
 
 .border-radius{
   border-radius: var(--border-radius);
+}
+
+.border-radius-2{
+  border-radius: 16px;
 }
 
 input, select{

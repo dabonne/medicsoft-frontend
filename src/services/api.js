@@ -8,7 +8,7 @@ const apiEmploye = {
     "put":"employee-update-form",
     "delete":"employee-delete-list",
     "deleteRole":"remove-role",
-    "disableAccount":"desactive-account"
+    "disableAccount":"desactive-account",
 }
 const apiUser = {
     "login":"auth/login",

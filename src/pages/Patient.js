@@ -51,7 +51,8 @@ const Patient = () => {
     <>
       <Routes>
         <Route path="/" element={<ListPatient />} />
-        <Route path="detail" element={<InfoPatient />} />
+        <Route path="details/*" element={<InfoPatient />} />
+        
       </Routes>
     </>
   );

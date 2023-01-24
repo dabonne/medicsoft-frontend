@@ -18,7 +18,7 @@ const ListPatient = () => {
 
   const navigateToPatientInfo = (e,idx) =>{
     e.preventDefault()
-    return navigate(`detail`)
+    return navigate(`details`)
   }
 
   const onSearch = (e) => {

@@ -30,6 +30,7 @@ const Login = () => {
       username: userId,
       password: password,
     });
+    setLoginFail(false)
     requestUser
       .post(apiUser.login, {
         username: userId,
