@@ -13,9 +13,11 @@ import { apiUser } from "../services/api";
 const Home = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange} = authCtx;
+  const [userImg, setUserImg] = useState(hp);
   const [value, onChange] = useState(new Date());
 
   useEffect(() => {
+    setUserImg(user.profile)
     requestUser
           .get(apiUser.get+"/"+user.organisationRef,{
             headers: { Authorization: `Bearer ${user.token}`, },
@@ -23,6 +25,7 @@ const Home = () => {
           .then((res) => {
             console.log(res.data.photo);
             user.profile = "data:image/jpeg;base64,"+res.data.photo
+            setUserImg("data:image/jpeg;base64,"+res.data.photo)
             onUserChange(user)
             //console.log(res.data.employeeResponseList);
           })
@@ -73,7 +76,7 @@ const Home = () => {
               </div>
             </div>
             <div className="col-4">
-              <img className="rounded-circle" width="100px" src={user.profile !== '' ? user.profile: hp} alt="" />
+              <img className="rounded-circle" width="100px" src={userImg} alt="" />
             </div>
           </div>
         </div>

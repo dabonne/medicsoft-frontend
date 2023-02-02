@@ -30,9 +30,24 @@ const Dashboard = () => {
   const { user, onUserChange } = authCtx;
   const [userLocal, setUserLocal] = useState("")
   let navigate = useNavigate();
-
+  const [userImg, setUserImg] = useState(userp);
   useEffect(() => {
     //return navigate("/dashboard/")
+    setUserImg(user.profile)
+    requestUser
+          .get(apiUser.get+"/"+user.organisationRef,{
+            headers: { Authorization: `Bearer ${user.token}`, },
+          })
+          .then((res) => {
+            console.log(res.data.photo);
+            user.profile = "data:image/jpeg;base64,"+res.data.photo
+            setUserImg("data:image/jpeg;base64,"+res.data.photo)
+            onUserChange(user)
+            //console.log(res.data.employeeResponseList);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
     setUserLocal(getUser())
     isAuth();
   }, [user]);
@@ -259,7 +274,7 @@ const Dashboard = () => {
                       <img 
                         className="rounded-circle" 
                         width="30px" 
-                        src={user.profile !== '' ? user.profile: userp} alt="" 
+                        src={userImg} alt="" 
                         style={{ marginLeft: "-6px", marginTop: "-6px" }}
                         />
                       <span className="d-inline-block ms-2">{user.name}</span>
