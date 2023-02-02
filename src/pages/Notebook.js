@@ -140,7 +140,7 @@ const Notebook = () => {
   };
   useEffect(() => {
     requestAgenda
-      .get(apiAgenda.getAll + "/" + Object.keys(user.organisations)[0], header)
+      .get(apiAgenda.getAll + "/" + user.organisationRef, header)
       .then((res) => {
         console.log(res.data);
         setEmployeList(res.data.employees);
@@ -170,11 +170,11 @@ const Notebook = () => {
 
   const employeEvent = (e, list) =>{
     requestAgenda
-      .get(apiAgenda.agendaEmployee + "/"+e+"/" + Object.keys(user.organisations)[0], header)
+      .get(apiAgenda.agendaEmployee + "/"+e+"/" + user.organisationRef, header)
       .then((res) => {
-        //console.log(res.data);
+        console.log(res.data);
         //setEmployeList(res.data.employees);
-        const lst = res.data.events.map((data, idx) => {
+        const lst = res.data.map((data, idx) => {
           return {
             //allDay: true,
             start: new Date(data.startDate + ", " + data.startHour),
@@ -187,8 +187,8 @@ const Notebook = () => {
             referenceId: data.referenceId,
           };
         });
-        console.log(res.data)
-        setEventList(res.data);
+        //console.log(res)
+        setEventList(lst);
         getAgendaData();
       })
       .catch((error) => {});
@@ -208,9 +208,12 @@ const Notebook = () => {
 
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
-    return date.getFullYear() + "-" + date.getMonth() + 1 + "-" + day;
+    const month = date.getMonth() < 10 ? 0 + "" + (date.getMonth() + 1) : (date.getMonth() + 1);
+    console.log(date.getFullYear() + "-" + month + "-" + day)
+    return date.getFullYear() + "-" + month + "-" + day;
   };
   const createEvent = (e) => {
+    
     setStartDay(formatDate(e.start));
     setEndDay(formatDate(e.end));
     setStartHours(e.start.toLocaleTimeString());
@@ -260,7 +263,7 @@ const Notebook = () => {
       endHour: endHours,
       //username: user.roles[0].organisation,
       typeEvent: type,
-      organisationId: Object.keys(user.organisations)[0],
+      organisationId: user.organisationRef,
       description: desc,
     });
 
@@ -275,7 +278,7 @@ const Notebook = () => {
           endHour: endHours,
           //username: user.roles[0].organisation,
           typeEvent: type,
-          organisationId: Object.keys(user.organisations)[0],
+          organisationId: user.organisationRef,
           description: desc,
         },
         header
@@ -307,7 +310,7 @@ const Notebook = () => {
       endHour: endHours,
       //username: user.roles[0].organisation,
       typeEvent: type,
-      organisationId: Object.keys(user.organisations)[0],
+      organisationId: user.organisationRef,
       description: desc,
       referenceId: referenceId,
     });
@@ -323,7 +326,7 @@ const Notebook = () => {
           endHour: endHours,
           //username: user.roles[0].organisation,
           typeEvent: type,
-          organisationId: Object.keys(user.organisations)[0],
+          organisationId: user.organisationRef,
           description: desc,
           referenceId: referenceId,
         },
@@ -1171,9 +1174,7 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
                 })}
               </select>
             </div>
-            <button className="btn text-bold btn-gray">
-              <img src={filtrer} alt="" /> {"Filtrer"}
-            </button>
+            
           </div>
           {/*
             <>

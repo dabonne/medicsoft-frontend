@@ -1,14 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import profile from "../assets/imgs/profile.png";
+import upld from "../assets/imgs/upld.png";
 import del from "../assets/imgs/delete.png";
 import requestUser from "../services/requestUser";
 import { apiUser } from "../services/api";
 import { AppContext } from "../services/context";
+import { useNavigate } from "react-router-dom";
 
 
 const Settings = () => {
   const authCtx = useContext(AppContext);
-  const { user } = authCtx;
+  const { user,onUserChange } = authCtx;
   const [jsData, setJsData] = useState({
     registrationReference: "",
     firstName: "",
@@ -36,13 +38,24 @@ const Settings = () => {
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
   const [formValidate, setFormValidate] = useState("needs-validation");
+  const header = {
+    headers: { Authorization: `Bearer ${user.token}`, },
+  }
+  const [refresh, setRefresh] = useState(0)
+  const [userProfile, setUserProfile] = useState({})
+  const [imgProfile, setImgProfile] = useState(user.profile)
+ 
+  const [modalNotifyMsg, setModalNotifyMsg] = useState('')
+  let notifyRef = useRef()
+  let btnUpload = useRef()
+  let navigate = useNavigate();
+
   useEffect(() => {
     requestUser
-          .get(apiUser.get,{
-            headers: { Authorization: `Bearer ${user.token}` },
-          })
+          .get(apiUser.get+"/"+user.organisationRef,header)
           .then((res) => {
-            console.log(res.data);
+            console.log(res.data.photo);
+            setImgProfile("data:image/jpeg;base64,"+res.data.photo)
             //console.log(res.data.employeeResponseList);
             setLastName(res.data.lastName);
         jsData.lastName = res.data.lastName;
@@ -74,12 +87,52 @@ const Settings = () => {
           });
   },[])
 
+  const updateProfile = () =>{
+    requestUser
+          .get(apiUser.get+"/"+user.organisationRef,{
+            headers: { Authorization: `Bearer ${user.token}`, },
+          })
+          .then((res) => {
+            console.log(res.data.photo);
+            user.profile = "data:image/jpeg;base64,"+res.data.photo
+            onUserChange(user)
+            //console.log(res.data.employeeResponseList);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
-    //console.log(jsData)
-    /*requestEmploye
-      .post(apiEmploye.post, jsData, header)
+    console.log({
+      registrationReference: jsData.registrationReference,
+      "firstName": jsData.firstName,
+      "lastName": jsData.lastName,
+      "cnib": jsData.cnib,
+      "birthdate": jsData.birthdate,
+      "specialisation": jsData.specialisation,
+      "classification": jsData.classification,
+      "email": jsData.email,
+      "phone": jsData.phone,
+      "organisationId": user.organisationRef,
+      "title": ""
+    })
+    requestUser
+      .put(apiUser.put, {
+        registrationReference: jsData.registrationReference,
+        "firstName": jsData.firstName,
+        "lastName": jsData.lastName,
+        "cnib": jsData.cnib,
+        "birthdate": jsData.birthdate,
+        "specialisation": jsData.specialisation,
+        "classification": jsData.classification,
+        "email": jsData.email,
+        "phone": jsData.phone,
+        "organisationId": jsData.organisationId,
+        "title": ""
+      }, header)
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
@@ -88,7 +141,8 @@ const Settings = () => {
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        
+        setModalNotifyMsg("Les informations ont modifier")
+        notifyRef.current.click();
 
       })
       .catch((error) => {
@@ -98,7 +152,35 @@ const Settings = () => {
           "Ouppss!!",
           "Une erreur est survenue, veuillez reesayer plus tard..."
         );
-      });*/
+      });
+  };
+
+  const editProfilePicture = (e) => {
+    e.preventDefault();
+    console.log(userProfile)
+
+    let data = new FormData();    //formdata object
+    data.append('photo', userProfile);   //append the values with key, value pair
+    console.log({photo:userProfile})
+    
+    requestUser
+      .post(apiUser.profile, data, header)
+      .then((res) => {
+        //console.log("enregistrement ok");
+        //setRefresh(refresh + 1);
+        updateProfile()
+        setModalNotifyMsg("La photo a été modifier")
+        notifyRef.current.click();
+
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Ouppss!!",
+          "Une erreur est survenue, veuillez reesayer plus tard..."
+        );
+      });
   };
   const fValidate = (cl) => {
     setFormValidate(cl);
@@ -115,9 +197,25 @@ const Settings = () => {
       </div>
       <div className="row my-4">
         <div className="col-10 col-sm-8 mx-auto col-md-5 col-lg-4">
-          <img width="100%" src={profile} alt="" />
+          <div className="w-100 position-relative">
+          <img width="100%" src={imgProfile} alt="" />
+          <img 
+            className="position-absolute" 
+            src={upld} alt=""  
+            style={{bottom:"20px", right:"20px"}}
+            onClick={(e) => {
+              e.preventDefault()
+              btnUpload.current.click()
+            }}
+            />
+          <input type="file"  accept="image/*" onChange={(e) =>{
+            //console.log(e.target.files[0])
+            setImgProfile(URL.createObjectURL(e.target.files[0]))
+            setUserProfile(e.target.files[0])
+          }} ref={btnUpload} hidden />
+          </div>
           <div className="my-3">
-            <button className="btn btn-primary me-2" data-bs-dismiss="modal" style={{width:"85%"}}>
+            <button className="btn btn-primary me-2" data-bs-dismiss="modal" style={{width:"85%"}} onClick={editProfilePicture}>
               Modifier la photo
             </button>
             <img src={del} alt="" />
@@ -301,7 +399,7 @@ const Settings = () => {
                     <option>Choisir la classification</option>
                     {Object.keys(jsData.classifications).map((key) => {
                       return (
-                        <option key={key} value={jsData.classifications[key]}>
+                        <option key={key} value={key}>
                           {jsData.classifications[key]}
                         </option>
                       );
@@ -344,7 +442,7 @@ const Settings = () => {
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     type="reset"
-                    className="btn btn-secondary"
+                    className="btn btn-secondary me-2"
                     data-bs-dismiss="modal"
                     onClick={() => fValidate("needs-validation")}
                   >
@@ -353,7 +451,6 @@ const Settings = () => {
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    data-bs-dismiss="modal1"
                     onClick={() => fValidate("was-validated")}
                   >
                     Sauvegarder les informations
@@ -380,15 +477,16 @@ const Settings = () => {
             <div className="modal-body">
               <form >
                 <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
+                  <label htmlFor="newMdp" className="form-label">
                   Nouveau mot de passe
                   </label>
                   <input
                     type="password"
                     className="form-control"
-                    id="lname"
+                    id="newMdp"
                     placeholder="Entrer le nouveau mot de passe"
                     value={""}
+                    autoComplete="false"
                     onChange={(e) => {
                       e.preventDefault();
                       
@@ -396,15 +494,16 @@ const Settings = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
+                  <label htmlFor="comfMdp" className="form-label">
                     Confirmation du nouveau mot de passe
                   </label>
                   <input
                     type="password"
                     className="form-control"
-                    id="fname"
+                    id="comfMdp"
                     placeholder="Confirmer le nouveau mot de passe"
                     value={""}
+                    autoComplete="false"
                     onChange={(e) => {
                       e.preventDefault();
                       
@@ -412,15 +511,16 @@ const Settings = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="date" className="form-label">
+                  <label htmlFor="oldMdp" className="form-label">
                     Ancien mot de passe
                   </label>
                   <input
                     type="password"
                     className="form-control"
-                    id="date"
+                    id="oldMdp"
                     placeholder="Entrer l’ancien mot de passe"
-                    value={""}
+                    value=""
+                    autoComplete="false"
                     onChange={(e) => {
                       e.preventDefault();
                       
@@ -448,6 +548,45 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      <div className="modal fade" id="notifyRef">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">{modalNotifyMsg}</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) =>{
+                  e.preventDefault()
+                  setModalNotifyMsg('')
+                  navigate("/dashboard/")
+                  
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input type="button" hidden ref={notifyRef} data-bs-toggle="modal" data-bs-target="#notifyRef" onClick={(e) =>{
+                    e.preventDefault()
+                    setNotifyBg("")
+                  }} />
     </>
   );
 };

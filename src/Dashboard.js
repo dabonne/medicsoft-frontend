@@ -21,6 +21,9 @@ import { useNavigate } from "react-router-dom/dist";
 import { deleteUser, getUser } from "./services/storage";
 import { AppContext, initialUser } from "./services/context";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Planning from "./pages/Planning";
+import requestUser from "./services/requestUser";
+import { apiUser } from "./services/api";
 
 const Dashboard = () => {
   const authCtx = useContext(AppContext);
@@ -199,7 +202,7 @@ const Dashboard = () => {
                 </li>
                 <li className="nav-item">
                   <NavLink
-                    to="/dashboard/agenda_garde"
+                    to="/dashboard/planning"
                     className={({ isActive }) =>
                       isActive ? "nav-link active" : "nav-link"
                     }
@@ -253,12 +256,12 @@ const Dashboard = () => {
                       <img src={user} alt="" />
                     </span>
                     <span className="d-block d-md-none border border-2 d-lg-block wd-80 p-2">
-                      <img
-                        className="d-inline-block"
-                        src={userp}
-                        alt=""
+                      <img 
+                        className="rounded-circle" 
+                        width="30px" 
+                        src={user.profile !== '' ? user.profile: userp} alt="" 
                         style={{ marginLeft: "-6px", marginTop: "-6px" }}
-                      />
+                        />
                       <span className="d-inline-block ms-2">{user.name}</span>
                     </span>
                   </Link>
@@ -299,8 +302,12 @@ const Dashboard = () => {
                 <span className="d-inline-block text-bold">retour</span>
               </div>
               <div className="d-inline-block btn btn-gray">
-                <span>Organisation 1 - </span>
-                <span className="text-bold text-decoration-underline">Changer d’organisation</span>
+                <span>{user.organisation} - </span>
+                <span 
+                  className="text-bold text-decoration-underline"
+                  data-bs-toggle="modal"
+                  data-bs-target="#changeOrganisation"
+                  >Changer d’organisation</span>
               </div>
 
             </div>
@@ -311,6 +318,7 @@ const Dashboard = () => {
               <Route path="/agenda" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Notebook /></ProtectedRoute>} />
               <Route path="/patient/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
               <Route path="/hospitalisation/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
+              <Route path="/planning/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Planning /></ProtectedRoute>} />
               <Route path="/parametre" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Settings /></ProtectedRoute>} />
             </Routes>
           </main>
@@ -325,6 +333,59 @@ const Dashboard = () => {
             <Link to="#" className="text-small link d-inline-block my-1">
               Politiques de confidentialités
             </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="modal fade" id="changeOrganisation">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+            <select
+                    id="clst"
+                    className="form-select"
+                    value={""}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      
+                    }}
+                    required
+                  >
+                    <option value="">Choisir l'organisation</option>
+                    {Object.keys(user.organisations).map((key) => {
+                      return (
+                        <option key={key} value={user.organisations[key]}>
+                          {user.organisations[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+            </div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) =>{
+                 /// e.preventDefault()
+                  //setModalNotifyMsg('')
+                }}
+              >
+                Changer
+              </button>
             </div>
           </div>
         </div>

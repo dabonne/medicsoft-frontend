@@ -37,19 +37,19 @@ const Login = () => {
         password: password,
       })
       .then((res) => {
-        console.log(res.data);
-        
 
         onUserChange({
           isAuth: true,
           type: "",
           name: res.data.firstname + " " + res.data.lastname,
           organisation: res.data.roles[0].organisation,
+          organisationRef: Object.keys(res.data.organisation)[0],
           organisations: res.data.organisation,
+          profile:"",
           roles: res.data.roles,
           token: res.data.token,
         });
-        isAuth();
+          isAuth();
       })
       .catch((error) => {
         setLoginFail(true);

@@ -4,6 +4,7 @@ const apiEmploye = {
     "active":"employee-active-account",
     "getAll":"get/employee",
     "get":"employee-request",
+    "getPage":"v2/employees?pageNo=",
     "post":"employee-request",
     "put":"employee-update-form",
     "delete":"employee-delete-list",
@@ -13,7 +14,9 @@ const apiEmploye = {
 const apiUser = {
     "login":"auth/login",
     "get":"user/user-account",
-    "getRoles":"/user/rolename-request",
+    "getRoles":"user/rolename-request",
+    "put":"user/update-user-account",
+    "profile":"user/user-photo"
     //"delete":"user/remove-role"
 }
 

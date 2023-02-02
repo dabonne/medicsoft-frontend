@@ -132,7 +132,10 @@ const InfoPatient = () => {
             <Link to="/dashboard/patient/details/dossiers-medicaux" className="d-inline-block my-2 text-black text-decoration-none">
               {
                 (location.includes("dossiers-medicaux")) && <>
-                <span><img src={back} alt="" /></span> <span className="text-bold">{" "+pageName}</span>
+                <span><img src={back} alt="" onClick={(e) => {
+                  
+                  setPageName("Dossier médical")
+                }}/></span> <span className="text-bold">{" "+pageName}</span>
                 </>
               }
               

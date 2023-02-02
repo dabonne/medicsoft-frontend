@@ -6,7 +6,9 @@ export const initialUser = {
     isAuth: false,
     roles: [],
     organisation: null,
+    organisationRef: null,
     organisations: [],
+    profile:"",
     name: null,
     token: null,
 }
@@ -20,8 +22,7 @@ export const AppContextProvider = ({children}) => {
     const usrLocal = getUser() || initialUser //recuperation de l'utilisateur dans localStorage
     const [usr, setUser] = useState(usrLocal)
     const handleAuthChange = (c) => {
-        console.log("context call")
-        console.log(c)
+        
         setUser(c)
         updateUser(c);
     }

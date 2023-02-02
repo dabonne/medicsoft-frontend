@@ -57,6 +57,7 @@ const Employe = () => {
     birthDate: "",
     employeeReference: "",
     username: "",
+    accountIsActive: false,
     roles: [],
   });
   const [notifyBg, setNotifyBg] = useState("");
@@ -64,6 +65,7 @@ const Employe = () => {
   const [notifyMessage, setNotifyMessage] = useState("");
   const [formValidate, setFormValidate] = useState("needs-validation");
   const [roles, setRoles] = useState([]);
+  const [pageNumber, setPageNumber] = useState(0);
   const [roleList, setRoleList] = useState([]);
   const [modalNotifyMsg, setModalNotifyMsg] = useState('')
   const header = {
@@ -75,17 +77,22 @@ const Employe = () => {
 
   useEffect(() => {
     requestEmploye
-      .get(apiEmploye.getAll, header)
+      .get(apiEmploye.getPage+""+pageNumber, header)
       .then((res) => {
-        setDatas(res.data.employeeResponseList);
-        setList(res.data.employeeResponseList);
+        //setDatas(res.data.employeeResponseList);
+        //setList(res.data.employeeResponseList);
+        console.log(res.data)
+        if(Object.keys(res.data).length !== 0){
+          setDatas(res.data.content);
+          setList(res.data.content);
+        }
         //console.log(res.data.employeeResponseList);
         getRoles();
       })
       .catch((error) => {
         //deconnect()
       });
-  }, [refresh]);
+  }, [refresh,pageNumber]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -189,14 +196,7 @@ const Employe = () => {
       });
   };
   const activeUserRoles = () => {
-    console.log({
-      username: userInfos.username,
-      email: userInfos.username,
-      firstName: userInfos.firstName,
-      lastName: userInfos.lastName,
-      roles: roles.map((role) => role.value),
-      employeeReference: userInfos.employeeReference,
-    });
+    
     requestEmploye
       .post(
         apiEmploye.active,
@@ -214,7 +214,7 @@ const Employe = () => {
         //get dataForm success
         console.log(res.data);
         setRefresh(refresh + 1);
-        setModalNotifyMsg("Le ou les droits on été très bien attribuer")
+        setModalNotifyMsg("Le(s) droit(s) ont été attribuer")
         notifyRef.current.click()
         setRoles([])
       })
@@ -228,20 +228,18 @@ const Employe = () => {
   };
 
   const disableAccount = () => {
-    console.log({ 
-      "employeeReference": userInfos.employeeReference,
-      "organisationId": Object.keys(user.organisations)[0],
-  })
+    
     requestEmploye
-      .put(apiEmploye.disableAccount, {data:{ 
+      .put(apiEmploye.disableAccount,{ 
         "employeeReference": userInfos.employeeReference,
-        "organisationId": Object.keys(user.organisations)[0],
-    }},header)
+        "organisationId": user.organisationRef,
+    },header)
       .then((res) => {
-        console.log("suppression ok");
-        setModalNotifyMsg("Suppression réussie !")
-        notifyRef.current.click()
+        //console.log("Compte bloquer ok");
         setRefresh(refresh + 1);
+        setModalNotifyMsg("Le compte a été bloquer !")
+        notifyRef.current.click()
+  
       })
       .catch((error) => {
         console.log(error);
@@ -252,13 +250,13 @@ const Employe = () => {
     console.log({ 
       "employeeReference": userInfos.employeeReference,
       "role": role,
-      "organisationId": Object.keys(user.organisations)[0],
+      "organisationId": user.organisationRef,
   })
     requestEmploye
       .delete(apiEmploye.deleteRole, {data:{ 
         "employeeReference": userInfos.employeeReference,
         "role": role,
-        "organisationId": Object.keys(user.organisations)[0],
+        "organisationId": user.organisationRef,
     }},header)
       .then((res) => {
         console.log("suppression ok");
@@ -320,6 +318,7 @@ const Employe = () => {
     userInfos.birthDate = data.birthDate;
     userInfos.fonction = "?";
     userInfos.username = data.email;
+    userInfos.accountIsActive = data.accountIsActive;
     userInfos.roles = data.roleList;
     userInfos.employeeReference = data.employeeReference;
     setRoles([]);
@@ -976,27 +975,37 @@ const Employe = () => {
                     <p className="fw-bold">Rôles et Droits</p>
                     {userInfos.roles.map((role, idx) => {
                       return (
-                        <>
-                        <button className="btn btn-gray me-1 my-1" key={idx}>
+                        <button className="btn btn-gray me-1 my-1" key={idx}
+                        data-bs-dismiss="modal"
+                        >
                           {role +" "} <span onClick={(e) =>{
                             e.preventDefault()
                             deleteRole(role)
                           }}>X</span>
                         </button>
-                        
-                        </>
                       );
                     })}
                     <div className="my-4">
-                    <button 
-                      className="btn btn-secondary me-1" 
-                      data-bs-toggle="modal"
-                      data-bs-target="#activeEmploye"
-                      >Ajouter un role</button>
+                    
 
-                      <button
+                      {
+                        userInfos.accountIsActive ? <>
+                        <button 
+                      className="btn btn-secondary me-1" 
+                      data-bs-dismiss="modal"
+                      onClick={(e) =>{
+                        e.preventDefault()
+                        var myModal = new Modal(
+                          document.getElementById("activeEmploye"),
+                          {}
+                        );
+                        myModal.show();
+                      }}
+                      >Ajouter un role</button>
+                        <button
                         type="button"
                         className="btn btn-danger"
+                        data-bs-dismiss="modal"
                         onClick={(e) =>{
                           e.preventDefault()
                           disableAccount()
@@ -1004,6 +1013,34 @@ const Employe = () => {
                       >
                         Bloquer le compte
                       </button>
+                        </> :<>
+                        <button
+                      type="button"
+                      className="btn btn-danger me-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteEmploye"
+                    >
+                      Supprimer
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      data-bs-dismiss="modal"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        /*var myModal = new Modal(
+                          document.getElementById("activeEmploye"),
+                          {}
+                        );
+                        myModal.show();*/
+                      }}
+                    >
+                      Réactiver le compte
+                    </button>
+                        </>
+                      
+                      }
+                      
                     </div>
                   </div>
                 ) : (
@@ -1011,8 +1048,15 @@ const Employe = () => {
                     <button
                       type="button"
                       className="btn btn-danger"
-                      data-bs-toggle="modal"
-                      data-bs-target="#deleteEmploye"
+                      data-bs-dismiss="modal"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        var myModal = new Modal(
+                          document.getElementById("deleteEmploye"),
+                          {}
+                        );
+                        myModal.show();
+                      }}
                     >
                       Supprimer
                     </button>
@@ -1128,10 +1172,14 @@ const Employe = () => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div 
+              className="d-inline-block my-1 mx-1"
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div 
+              className="d-inline-block my-1 mx-1"
+              >
               <img src={sui} alt="" />
             </div>
           </div>

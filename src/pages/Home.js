@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import hp from "../assets/imgs/home_profile.png";
 import homeBg from "../assets/imgs/home_bg_1.png";
 import grd from "../assets/imgs/gard.png";
@@ -7,11 +7,29 @@ import { Link } from "react-router-dom";
 import DPicker from "../components/DPicker";
 import { Calendar } from "react-calendar";
 import '../assets/css/Calendar.css';
+import requestUser from "../services/requestUser";
+import { apiUser } from "../services/api";
 
 const Home = () => {
   const authCtx = useContext(AppContext);
-  const { user } = authCtx;
+  const { user, onUserChange} = authCtx;
   const [value, onChange] = useState(new Date());
+
+  useEffect(() => {
+    requestUser
+          .get(apiUser.get+"/"+user.organisationRef,{
+            headers: { Authorization: `Bearer ${user.token}`, },
+          })
+          .then((res) => {
+            console.log(res.data.photo);
+            user.profile = "data:image/jpeg;base64,"+res.data.photo
+            onUserChange(user)
+            //console.log(res.data.employeeResponseList);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+  },[])
   return (
     <>
       <div className="row px-3">
@@ -45,14 +63,17 @@ const Home = () => {
                   {user.organisation}
                 </span>
                 <span className="d-block">
-                  <Link to="#" className="text-black">
-                    Changer d’organisation
-                  </Link>
+                  <span 
+                  className="text-bold text-decoration-underline"
+                  style={{cursor:"pointer"}}
+                  data-bs-toggle="modal"
+                  data-bs-target="#changeOrganisation"
+                  >Changer d’organisation</span>
                 </span>
               </div>
             </div>
             <div className="col-4">
-              <img width="100px" src={hp} alt="" />
+              <img className="rounded-circle" width="100px" src={user.profile !== '' ? user.profile: hp} alt="" />
             </div>
           </div>
         </div>
