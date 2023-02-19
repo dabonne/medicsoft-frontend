@@ -108,7 +108,7 @@ const Employe = () => {
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("L'employé a été ajoute avec succès")
+        setModalNotifyMsg("L'employé a été ajouté avec succès")
         closeRef.current.click()
         notifyRef.current.click()
         
@@ -134,10 +134,10 @@ const Employe = () => {
         configNotify(
           "success",
           "Modification réussi",
-          "Les informations ont bien été enrégistrées"
+          "Les informations ont été enrégistrées"
         );
         closeEditRef.current.click()
-        setModalNotifyMsg("Les informations ont été très bien modifier")
+        setModalNotifyMsg("Les informations ont été modifiées")
 
         notifyRef.current.click()
         
@@ -182,10 +182,10 @@ const Employe = () => {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => {
-        //get dataForm success
-        //console.log(res.data);
-        let list = res.data.map((data) => {
-          return { value: data, label: data };
+        
+        
+        let list = Object.keys(res.data).map((key) => {
+          return { value: key, label: res.data[key] };
         });
         //console.log(list)
         setRoleList(list);
@@ -214,7 +214,7 @@ const Employe = () => {
         //get dataForm success
         console.log(res.data);
         setRefresh(refresh + 1);
-        setModalNotifyMsg("Le(s) droit(s) ont été attribuer")
+        setModalNotifyMsg("Le(s) droit(s) ont été attribués")
         notifyRef.current.click()
         setRoles([])
       })
@@ -237,7 +237,7 @@ const Employe = () => {
       .then((res) => {
         //console.log("Compte bloquer ok");
         setRefresh(refresh + 1);
-        setModalNotifyMsg("Le compte a été bloquer !")
+        setModalNotifyMsg("Le compte a été bloqué !")
         notifyRef.current.click()
   
       })
@@ -247,11 +247,7 @@ const Employe = () => {
   }
 
   const deleteRole = (role) => {
-    console.log({ 
-      "employeeReference": userInfos.employeeReference,
-      "role": role,
-      "organisationId": user.organisationRef,
-  })
+    
     requestEmploye
       .delete(apiEmploye.deleteRole, {data:{ 
         "employeeReference": userInfos.employeeReference,

@@ -285,7 +285,7 @@ const Notebook = () => {
       )
       .then((res) => {
         console.log("creation ok");
-        setModalNotifyMsg("Ajoute réussi");
+        setModalNotifyMsg("L'ajout a réuss");
         agendaRef.current.click();
         notifyRef.current.click();
         setRefresh(refresh + 1);
@@ -302,19 +302,6 @@ const Notebook = () => {
   };
   const submitEditEvent = (e) => {
     e.preventDefault();
-    console.log({
-      title: titre,
-      startDate: startDay,
-      endDate: endDay,
-      startHour: startHours,
-      endHour: endHours,
-      //username: user.roles[0].organisation,
-      typeEvent: type,
-      organisationId: user.organisationRef,
-      description: desc,
-      referenceId: referenceId,
-    });
-
     requestAgenda
       .put(
         apiAgenda.put,

@@ -8,8 +8,7 @@ import user from "../../../assets/imgs/user.png";
 import print from "../../../assets/imgs/print.png";
 import { Route, Routes } from "react-router-dom";
 import AntecedentPersonnel from "../components/AntecedentPersonnel";
-import Imageries from "../components/DonneeCompteRendu";
-import ExamenSpecialise from "../components/ExamenSpecialise";
+
 import DossierMedicaux from "../components/DossierMedicaux";
 import DonneeCompteRendu from "../components/DonneeCompteRendu";
 
@@ -27,6 +26,30 @@ const DossierContainer = ({setLocation, setPageName}) => {
     "Compte rendu d’analyses biologiques",
     "Divers"
   ]
+  const medicalType = [
+    {
+      id: "PERSONNAL_FAMILY_HISTORY",
+      title: "Antécédents personnels et familiaux",
+    },
+    {
+      id: "IMAGERY",
+      title: "Compte rendu d’imagerie",
+      label: "Imagerie",
+    },
+    {
+      id: "SPECIALIZED_EXAM",
+      title: "Compte rendu d’examens spécialisés",
+    },
+    {
+      id: "BIOLOGIC_ANALYSE",
+      title: "Compte rendu d’analyses biologiques",
+    },
+    {
+      id: "VARIOUS",
+      title: "Divers",
+    },
+  ]
+
   setPageName(tabName[nameIdx])
 
   const onSearch = (e) => {
@@ -58,11 +81,11 @@ const DossierContainer = ({setLocation, setPageName}) => {
     <div className="container-fluid">
       <Routes>
         <Route path="/" element={<DossierMedicaux setNameIdx={setNameIdx} />} />
-        <Route path="/antecedent-personne" element={<AntecedentPersonnel setNameIdx={setNameIdx} />} />
-        <Route path="/imageries" element={<DonneeCompteRendu setNameIdx={setNameIdx} />} />
-        <Route path="/examens-specialises" element={<DonneeCompteRendu setNameIdx={setNameIdx} />} />
-        <Route path="/analyses-biologiques" element={<DonneeCompteRendu setNameIdx={setNameIdx} />} />
-        <Route path="/divers" element={<DonneeCompteRendu setNameIdx={setNameIdx} />} />
+        <Route path="/antecedent-personne" element={<AntecedentPersonnel type={medicalType[0]} setNameIdx={setNameIdx} />} />
+        <Route path="/imageries" element={<DonneeCompteRendu type={medicalType[1]} setNameIdx={setNameIdx} />} />
+        <Route path="/examens-specialises" element={<DonneeCompteRendu type={medicalType[2]} setNameIdx={setNameIdx} />} />
+        <Route path="/analyses-biologiques" element={<DonneeCompteRendu type={medicalType[3]} setNameIdx={setNameIdx} />} />
+        <Route path="/divers" element={<DonneeCompteRendu type={medicalType[4]} setNameIdx={setNameIdx} />} />
       </Routes>
     </div>
   );

@@ -39,7 +39,7 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${user.token}`, },
           })
           .then((res) => {
-            console.log(res.data.photo);
+            //console.log(res.data.photo);
             user.profile = "data:image/jpeg;base64,"+res.data.photo
             setUserImg("data:image/jpeg;base64,"+res.data.photo)
             onUserChange(user)
@@ -379,7 +379,7 @@ const Dashboard = () => {
                     required
                   >
                     <option value="">Choisir l'organisation</option>
-                    {Object.keys(user.organisations).map((key) => {
+                    {user.organisations && Object.keys(user.organisations).map((key) => {
                       return (
                         <option key={key} value={user.organisations[key]}>
                           {user.organisations[key]}

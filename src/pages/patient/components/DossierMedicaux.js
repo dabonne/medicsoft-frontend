@@ -20,7 +20,7 @@ const DossierMedicaux = () => {
             <span>IMC: </span>
             <span className="text-bold">24.65 KG/M²</span> <br />
             <span>
-              <Link to="#" className="text-black">
+              <Link to="/dashboard/patient/dossier-paramedical" className="text-black">
                 Voir le dossier paramédical
               </Link>{" "}
             </span>{" "}

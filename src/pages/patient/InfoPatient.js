@@ -1,22 +1,53 @@
-import React, { useEffect, useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-router-dom";
 import profile from "../../assets/imgs/profile.png";
 import back from "../../assets/imgs/bck.png";
 import RendezVous from "./pages/RendezVous";
 import Prescription from "./pages/Prescription";
 import CompteRendu from "./pages/CompteRendu";
 import DossierContainer from "./pages/DossierContainer";
+import requestPatient from "../../services/requestPatient";
+import { apiPatient } from "../../services/api";
+import { AppContext } from "../../services/context";
 
+const initPatient = {
+    "firstname": "",
+    "lastname": "",
+    "cni": "",
+    "age": "",
+    "gender": "",
+    "birthdate": "",
+    "phoneNumber": "",
+    "country": "Burkina Faso",
+    "city": "",
+    "weight": "",
+    "height": ""
+}
 const InfoPatient = () => {
+  const authCtx = useContext(AppContext);
+  const { user, onUserChange } = authCtx;
   const [datas, setDatas] = useState([]);
   const [pageName, setPageName] = useState("Dossier médical")
   const [location, setLocation] = useState(window.location.pathname);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
-
+  const [patient, setPatient] = useState(initPatient)
+ 
+  const header = {
+    headers: { Authorization: `${user.token}` },
+  };
   useEffect(() => {
-    setDatas([...Array(20).keys()]);
-    console.log(location.includes("dossiers-medicaux"))
+    
+    requestPatient
+      .get(apiPatient.get + "/" + user.cni, header)
+      .then((res) => {
+        setDatas(res.data);
+        //console.log(res.data);
+        setPatient(res.data)
+      })
+      .catch((error) => {
+        //deconnect()
+      });
   }, [location]);
 
   const onSearch = (e) => {
@@ -47,7 +78,7 @@ const InfoPatient = () => {
   return (
     <>
       <div className="row">
-        <h1 className="h2 text-bold">Jannie DOE</h1>
+        <h1 className="h2 text-bold">{}</h1>
       </div>
       <div className="row my-4">
         <div className="col-10 col-sm-8 mx-auto col-md-5 col-lg-3">
@@ -59,26 +90,26 @@ const InfoPatient = () => {
               className="d-block text-bold text-meduim mb-3"
               style={{ fontSize: "2rem" }}
             >
-              Jannie DOE
+              {patient.lastname + " " +patient.firstname}
             </span>
             <span className="d-block my-1">
               <span>ID Patient: </span>
               <span className="text-bold">P12902</span>
             </span>
             <span className="d-block my-1">
-              <span className="text-bold">23 ans . Femme</span>
+              <span className="text-bold">2{patient.age} ans . Femme</span>
             </span>
             <span className="d-block my-1">
               <span className="">Date de naissance: </span>
-              <span className="text-bold">10/12/2023</span>
+              <span className="text-bold">{patient.birthdate}</span>
             </span>
             <span className="d-block my-1">
               <span className="">Téléphone: </span>
-              <span className="text-bold">(00226) XX XX XX XX</span>
+              <span className="text-bold">(00226) {/*patient.phoneNumber*/ "xx xx xx xx"}</span>
             </span>
             <span className="d-block my-1">
-              <span className="">Ouagadougou, </span>
-              <span className="text-bold">BURKINA FASO</span>
+              <span className="">{patient.city}, </span>
+              <span className="text-bold">{patient.country}</span>
             </span>
             <span className="d-block mt-3">
               <Link to="#" className="text-black">

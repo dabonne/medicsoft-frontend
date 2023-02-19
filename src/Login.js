@@ -48,6 +48,7 @@ const Login = () => {
           profile:"",
           roles: res.data.roles,
           token: res.data.token,
+          cni:""
         });
           isAuth();
       })

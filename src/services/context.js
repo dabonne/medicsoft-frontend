@@ -11,16 +11,27 @@ export const initialUser = {
     profile:"",
     name: null,
     token: null,
+    cni: null
 }
+
+export const initDataShared = {}
 
 export const AppContext = createContext({
     user:initialUser,
+    dataShared:initDataShared,
+    onCniChange: (data) => {},
     onUserChange: (data) => {}
 })
 
 export const AppContextProvider = ({children}) => {
     const usrLocal = getUser() || initialUser //recuperation de l'utilisateur dans localStorage
     const [usr, setUser] = useState(usrLocal)
+    const [dataShared, setDataShared] = useState(initDataShared)
+    const handleDataSharedChange = (c) => {
+        //console.log("new data ")
+        //console.log(c)
+        setDataShared(c)
+    }
     const handleAuthChange = (c) => {
         
         setUser(c)
@@ -29,7 +40,9 @@ export const AppContextProvider = ({children}) => {
 
     const contextValue = {
         user: usr,
-        onUserChange:handleAuthChange
+        onUserChange:handleAuthChange,
+        dataShared: dataShared,
+        onDataSharedChange:handleDataSharedChange,
     }
 
     return(

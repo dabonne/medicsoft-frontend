@@ -5,6 +5,7 @@ import sang from "../assets/imgs/sang.png";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import InfoPatient from "./patient/InfoPatient";
 import ListPatient from "./patient/ListPatient";
+import DossierParamedical from "./patient/DossierParamedical";
 
 const Patient = () => {
   const [datas, setDatas] = useState([]);
@@ -52,6 +53,7 @@ const Patient = () => {
       <Routes>
         <Route path="/" element={<ListPatient />} />
         <Route path="details/*" element={<InfoPatient />} />
+        <Route path="dossier-paramedical/*" element={<DossierParamedical />} />
         
       </Routes>
     </>

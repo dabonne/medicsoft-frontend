@@ -6,27 +6,50 @@ import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
 import user from "../../../assets/imgs/user.png";
 import print from "../../../assets/imgs/print.png";
-import ModalMedicalAntecedent from "../../../components/ModalMedicalAntecedent";
+import { Route, Routes, useLocation } from "react-router-dom";
+import Dossier from "./DossierMedicaux";
+import Modal from "bootstrap/js/dist/modal";
 import requestPatient from "../../../services/requestPatient";
-import { apiMedical } from "../../../services/api";
+import { apiParamedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
+import ModalParamedical from "../../../components/ModalParamedical";
 import DeleteModal from "../../../components/DeleteModal";
 
-const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
-  const authCtx = useContext(AppContext);
-  const { user } = authCtx;
+const initSelected = {
+  idData: "",
+  idModale: "",
+  title: "",
+  callBack: () => {},
+};
+const TableParamedal = ({
+  label = ["", ""],
+  type = {},
+  unite = "",
+  setLocation = () => {},
+}) => {
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
+  const authCtx = useContext(AppContext);
+  const { user, onUserChange } = authCtx;
   const [editValue, setEditValue] = useState();
+  const [seletedData, setSelectedData] = useState(initSelected);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  setNameIdx(1);
+  const styles = {
+    width: "150px",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  };
   useEffect(() => {
     console.log(type);
     requestPatient
-      .get(apiMedical.getPersonalList + "/" + user.cni, header)
+      .get(
+        apiParamedical.get + "/" + user.cni + "?paramedicalType=" + type.id,
+        header
+      )
       .then((res) => {
         console.log(res.data);
         setDatas(res.data);
@@ -36,6 +59,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
       });
   }, []);
 
+  setLocation(window.location.pathname);
   const onSearch = (e) => {
     e.preventDefault();
     let str = e.target.value;
@@ -60,11 +84,15 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
 
     dd !== [] ? setList(dd) : setList(datas);
   };
+
+  const openModal = (id) => {
+    var myModal = new Modal(document.getElementById(id), {});
+    myModal.show();
+  };
   const onDelete = (id) => {
     //e.preventDefault();
-    console.log(id);
     requestPatient
-      .delete(apiMedical.deleteFamily + "/" + id)
+      .delete(apiParamedical.delete + "/" + id)
       .then((res) => {
         console.log("suppression ok");
         //setModalNotifyMsg("Suppression réussie !")
@@ -105,11 +133,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
-          <div className="btn btn-secondary me-2">Synthèse</div>
-          <button 
-            className="btn btn-primary" 
-            data-bs-toggle="modal" 
-            data-bs-target={"#modalEdit" + type.id}>Ajouter</button>
+          <button className="btn btn-primary">Ajouter</button>
         </div>
       </div>
 
@@ -118,11 +142,11 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
           <thead>
             <tr className="align-middle">
               <th scope="col" className="border-raduis-left">
-                Antécédent ID
+                {label[0]} ID
               </th>
-              <th scope="col">Nom de maladie</th>
-              <th scope="col">Période</th>
-              <th scope="col">Lien de parenté</th>
+              <th scope="col">{label[1]}</th>
+              <th scope="col">Date d’élobaration</th>
+              <th scope="col">Auteur</th>
               <th scope="col" className="text-center">
                 Actions
               </th>
@@ -134,55 +158,65 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
               return (
                 <tr key={idx}>
                   <td>
-                    <span className="text-bold">PRESC-0218374</span>
+                    <span className="text-bold">RAPP-0218374</span>
                   </td>
                   <td>
-                    <span className="text-bold">{data.disease}</span>
+                    <div className="text-bold" style={styles}>
+                      {data.value + " " + unite}
+                    </div>
                   </td>
                   <td>
-                    <span className="text-bold">{data.startDate} - {data.endDate}</span>
+                    <span className="text-bold">{data.dateElaboration}</span>
                   </td>
                   <td>
-                  {data.parent}
+                    <div className="d-inline-block me-2 align-middle">
+                      <img src={user} alt="" />
+                    </div>
+                    <div className="d-inline-block align-middle">
+                      <span className="text-bold">{data.author}</span>
+                      <br />
+                      <span>Psychiatre</span>
+                    </div>
                   </td>
                   <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Éditer le rapport"
-                          data-bs-toggle="modal"
-                          data-bs-target={"#modalEdit" + type.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setEditValue(data)
-                            //setDelete(["" + data.employeeReference]);
-                          }}
-                          src={edit}
-                          alt=""
-                        />
-                      </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Supprimer le rapport"
-                          data-bs-toggle="modal"
-                          data-bs-target={"#deleteData"+data.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            setEditValue(data)
-                          }}
-                          src={del}
-                          alt=""
-                        />
-                      </div>
-                      <DeleteModal
-                        id={data.id}
-                        modal={"deleteData"+data.id}
-                        title={"Supprimer les données"}
-                        data={editValue}
-                        onDelete={onDelete}
+                    <div className="d-inline-block mx-1">
+                      <img
+                        title="Éditer le rapport"
+                        data-bs-toggle="modal"
+                        data-bs-target={"#modalEdit" + type.id}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditValue({ id: data.id, content: data.value });
+                        }}
+                        src={edit}
+                        alt=""
                       />
                     </div>
+                    <div className="d-inline-block mx-1">
+                      <img
+                        title="Supprimer le rapport"
+                        data-bs-toggle="modal"
+                        data-bs-target={"#deleteData"}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          initSelected.idData = data.id;
+                          initSelected.idModale = "delete" + type.title;
+                          initSelected.title = type.title;
+                          initSelected.callBack = onDelete;
+                          setSelectedData(initSelected);
+                          //openModal("deleteData")
+                          //setDelete(["" + data.employeeReference]);
+                        }}
+                        src={del}
+                        alt=""
+                      />
+                    </div>
+                    <DeleteModal
+                      id={data.id}
+                      modal={"deleteData"}
+                      title={"Supprimer " + type.title}
+                      onDelete={onDelete}
+                    />
                   </td>
                 </tr>
               );
@@ -190,16 +224,15 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
           </tbody>
         </table>
       </div>
-
-      <ModalMedicalAntecedent
+      <ModalParamedical
         id={"modalEdit" + type.id}
-        title={type.title}
         type={type.id}
+        labelInput={type.label}
+        placeholderInput={type.placeholder}
         oldValue={editValue}
-        setRefresh={() => {}}
       />
     </div>
   );
 };
 
-export default AntecedentPersonnel;
+export default TableParamedal;
