@@ -42,7 +42,7 @@ const InfoPatient = () => {
       .get(apiPatient.get + "/" + user.cni, header)
       .then((res) => {
         setDatas(res.data);
-        //console.log(res.data);
+        console.log(res.data);
         setPatient(res.data)
       })
       .catch((error) => {
@@ -97,7 +97,7 @@ const InfoPatient = () => {
               <span className="text-bold">P12902</span>
             </span>
             <span className="d-block my-1">
-              <span className="text-bold">2{patient.age} ans . Femme</span>
+              <span className="text-bold">{patient.age} ans . {patient.gender}</span>
             </span>
             <span className="d-block my-1">
               <span className="">Date de naissance: </span>
@@ -105,7 +105,7 @@ const InfoPatient = () => {
             </span>
             <span className="d-block my-1">
               <span className="">Téléphone: </span>
-              <span className="text-bold">(00226) {/*patient.phoneNumber*/ "xx xx xx xx"}</span>
+              <span className="text-bold">(00226) {patient.phoneNumber}</span>
             </span>
             <span className="d-block my-1">
               <span className="">{patient.city}, </span>

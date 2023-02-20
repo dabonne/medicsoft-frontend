@@ -25,6 +25,10 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
   setNameIdx(1);
   useEffect(() => {
     console.log(type);
+    get()
+  }, []);
+
+  const get = () => {
     requestPatient
       .get(apiMedical.getPersonalList + "/" + user.cni, header)
       .then((res) => {
@@ -34,8 +38,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
-
+  }
   const onSearch = (e) => {
     e.preventDefault();
     let str = e.target.value;
@@ -196,7 +199,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
         title={type.title}
         type={type.id}
         oldValue={editValue}
-        setRefresh={() => {}}
+        refresh={get}
       />
     </div>
   );

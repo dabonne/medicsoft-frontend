@@ -6,7 +6,8 @@ import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
 import user from "../../../assets/imgs/user.png";
 import print from "../../../assets/imgs/print.png";
-import { Route, Routes, useLocation } from "react-router-dom";
+import bck from "../../../assets/imgs/bck.png";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import Dossier from "./DossierMedicaux";
 import Modal from "bootstrap/js/dist/modal";
 import requestPatient from "../../../services/requestPatient";
@@ -45,6 +46,10 @@ const TableParamedal = ({
   };
   useEffect(() => {
     console.log(type);
+    get()
+  }, []);
+
+  const get = () => {
     requestPatient
       .get(
         apiParamedical.get + "/" + user.cni + "?paramedicalType=" + type.id,
@@ -57,7 +62,7 @@ const TableParamedal = ({
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }
 
   setLocation(window.location.pathname);
   const onSearch = (e) => {
@@ -106,6 +111,9 @@ const TableParamedal = ({
   };
   return (
     <div className="container-fluid">
+      <div className="row">
+        <Link className="text-decoration-none text-black" to="/dashboard/patient/dossier-paramedical/"><img src={bck} alt="" /> Retour</Link>
+      </div>
       <div className="row my-3">
         <div className="col-9">
           <div className="d-inline-block">
@@ -133,7 +141,7 @@ const TableParamedal = ({
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
-          <button className="btn btn-primary">Ajouter</button>
+          <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target={"#modalEdit" + type.id}>Ajouter</button>
         </div>
       </div>
 
@@ -196,7 +204,7 @@ const TableParamedal = ({
                       <img
                         title="Supprimer le rapport"
                         data-bs-toggle="modal"
-                        data-bs-target={"#deleteData"}
+                        data-bs-target={"#deleteData"+data.id}
                         onClick={(e) => {
                           e.preventDefault();
                           initSelected.idData = data.id;
@@ -213,7 +221,7 @@ const TableParamedal = ({
                     </div>
                     <DeleteModal
                       id={data.id}
-                      modal={"deleteData"}
+                      modal={"deleteData"+data.id}
                       title={"Supprimer " + type.title}
                       onDelete={onDelete}
                     />
@@ -230,6 +238,7 @@ const TableParamedal = ({
         labelInput={type.label}
         placeholderInput={type.placeholder}
         oldValue={editValue}
+        refresh={get}
       />
     </div>
   );

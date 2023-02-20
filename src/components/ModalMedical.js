@@ -14,7 +14,7 @@ const initMedical = {
   "detail": ""
 };
 
-const ModalMedical = ({ id,type, title, setRefresh = () => {}, oldValue={id:"", entitled:"", content:""}}) => {
+const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", entitled:"", content:""}}) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [medical, setMedical] = useState(initMedical);
@@ -55,16 +55,17 @@ const ModalMedical = ({ id,type, title, setRefresh = () => {}, oldValue={id:"", 
       .post(apiMedical.post+"/"+user.organisationRef, initMedical, header)
       .then((res) => {
         console.log("enregistrement ok");
-        setRefresh(0)
+        
 
         configNotify(
           "success",
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("L'employé a été ajouté avec succès");
+        setModalNotifyMsg("Les informations ont bien été enrégistrées");
         closeRef.current.click();
         notifyRef.current.click();
+        refresh()
       })
       .catch((error) => {
         console.log(error);
@@ -96,9 +97,10 @@ const ModalMedical = ({ id,type, title, setRefresh = () => {}, oldValue={id:"", 
           "Modification réussi",
           "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg("Les informations ont bien été modifiées avec succès");
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         closeRef.current.click();
         notifyRef.current.click();
+        refresh()
       })
       .catch((error) => {
         console.log(error);
@@ -243,6 +245,46 @@ const ModalMedical = ({ id,type, title, setRefresh = () => {}, oldValue={id:"", 
           </div>
         </div>
       </div>
+      <div className="modal fade" id="notifyRef">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">{modalNotifyMsg}</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input
+        type="hidden"
+        ref={notifyRef}
+        data-bs-toggle="modal"
+        data-bs-target="#notifyRef"
+        onClick={(e) => {
+          e.preventDefault();
+          setNotifyBg("");
+        }}
+      />
     </>
   );
 };

@@ -13,7 +13,14 @@ const initParamedical = {
   dateElaborate: "",
 };
 
-const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:"", content:""}}) => {
+const ModalParamedical = ({
+  id,
+  type,
+  labelInput,
+  placeholderInput,
+  oldValue = { id: "", content: "" },
+  refresh = () => {},
+}) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [paramedical, setParamedical] = useState("");
@@ -30,24 +37,28 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
   };
 
   useEffect(() => {
-    console.log(oldValue.content)
-    if(oldValue.content !== ""){
+   
+    if (oldValue.content !== "") {
       initParamedical.value = oldValue.content;
-      setParamedical(initParamedical.value)
+      setParamedical(initParamedical.value);
     }
-  },[oldValue])
+  }, [oldValue]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    initParamedical.patientCni = user.cni
-    initParamedical.paramedicalType = type
-    initParamedical.dateElaborate = formatDate(new Date())
-    initParamedical.value = paramedical
-    console.log(initParamedical)
+    initParamedical.patientCni = user.cni;
+    initParamedical.paramedicalType = type;
+    initParamedical.dateElaborate = formatDate(new Date());
+    initParamedical.value = paramedical;
+    console.log(initParamedical);
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
     requestPatient
-      .post(apiParamedical.post+"/"+user.organisationRef, initParamedical, header)
+      .post(
+        apiParamedical.post + "/" + user.organisationRef,
+        initParamedical,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -56,9 +67,10 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("L'employé a été ajouté avec succès");
+        setModalNotifyMsg("Les informations ont bien été enrégistrées");
         closeRef.current.click();
         notifyRef.current.click();
+        refresh()
       })
       .catch((error) => {
         console.log(error);
@@ -72,16 +84,25 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    initParamedical.patientCni = user.cni
-    initParamedical.paramedicalType = type
-    initParamedical.dateElaborate = formatDate(new Date())
-    initParamedical.value = paramedical
-   
-    console.log(initParamedical)
+    initParamedical.patientCni = user.cni;
+    initParamedical.paramedicalType = type;
+    initParamedical.dateElaborate = formatDate(new Date());
+    initParamedical.value = paramedical;
+
+    console.log(initParamedical);
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
     requestPatient
-      .put(apiParamedical.put+"/"+oldValue.id+"?value="+initParamedical.value+"&date="+initParamedical.dateElaborate, header)
+      .put(
+        apiParamedical.put +
+          "/" +
+          oldValue.id +
+          "?value=" +
+          initParamedical.value +
+          "&date=" +
+          initParamedical.dateElaborate,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -90,9 +111,12 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
           "Modification réussi",
           "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg("Les informations ont bien été modifiées avec succès");
+        setModalNotifyMsg(
+          "Les informations ont bien été modifiées"
+        );
         closeRef.current.click();
         notifyRef.current.click();
+        refresh()
       })
       .catch((error) => {
         console.log(error);
@@ -104,13 +128,12 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
       });
   };
   const handleInputChange = (e) => {
-    e.preventDefault()
-    initParamedical.patientCni = user.cni
-    initParamedical.paramedicalType = type
-    initParamedical.dateElaborate = new Date()
-    initParamedical.value = paramedical
-    
-  }
+    e.preventDefault();
+    initParamedical.patientCni = user.cni;
+    initParamedical.paramedicalType = type;
+    initParamedical.dateElaborate = new Date();
+    initParamedical.value = paramedical;
+  };
 
   const configNotify = (bg, title, message) => {
     setNotifyBg(bg);
@@ -144,8 +167,8 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
       let weekday = today.toLocaleDateString("fr-FR", { weekday: "long" });
       let hours = today.getHours();
       let minutes = today.getMinutes();
-      hours = hours < 10 ? "0"+hours : hours
-      minutes = minutes < 10 ? "0"+minutes : minutes
+      hours = hours < 10 ? "0" + hours : hours;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
       return { weekday, dayNumber, month, year, hours, minutes };
     }
 
@@ -161,8 +184,11 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
   };
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
-    const month = date.getMonth() < 10 ? 0 + "" + (date.getMonth() + 1) : (date.getMonth() + 1);
-    console.log(date.getFullYear() + "-" + month + "-" + day)
+    const month =
+      date.getMonth() < 10
+        ? 0 + "" + (date.getMonth() + 1)
+        : date.getMonth() + 1;
+    console.log(date.getFullYear() + "-" + month + "-" + day);
     return date.getFullYear() + "-" + month + "-" + day;
   };
   return (
@@ -188,7 +214,11 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
                   message={notifyMessage}
                 />
               ) : null}
-              <form className={formValidate} onSubmit={oldValue.id != "" ? handleEditSubmit : handleSubmit} noValidate>
+              <form
+                className={formValidate}
+                onSubmit={oldValue.id != "" ? handleEditSubmit : handleSubmit}
+                noValidate
+              >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     {labelInput}
@@ -230,6 +260,46 @@ const ModalParamedical = ({ id,type, labelInput, placeholderInput, oldValue={id:
           </div>
         </div>
       </div>
+      <div className="modal fade" id="notifyRef">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">{modalNotifyMsg}</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input
+        type="hidden"
+        ref={notifyRef}
+        data-bs-toggle="modal"
+        data-bs-target="#notifyRef"
+        onClick={(e) => {
+          e.preventDefault();
+          setNotifyBg("");
+        }}
+      />
     </>
   );
 };

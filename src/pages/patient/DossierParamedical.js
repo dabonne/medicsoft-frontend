@@ -99,6 +99,20 @@ const DossierParamedical = () => {
       label: "Poids",
       placeholder: "Entrer le poids en Kg",
     },
+    {
+      id: "HEIGHT",
+      img: poids,
+      title: "Taille",
+      label: "Taille",
+      placeholder: "Entrer la taille en m",
+    },
+    {
+      id: "BLOOD_GROUP",
+      img: poids,
+      title: "Groupe Sanguin",
+      label: "Groupe Sanguin",
+      placeholder: "Entrer le Groupe Sanguin",
+    },
   ];
 
   const paramedicalType = [
@@ -171,7 +185,7 @@ const DossierParamedical = () => {
               <span className="text-bold">P12902</span>
             </span>
             <span className="d-block my-1">
-              <span className="text-bold">{patient.age} ans . Femme</span>
+              <span className="text-bold">{patient.age} ans . {patient.gender}</span>
             </span>
             <span className="d-block my-1">
               <span className="">Date de naissance: </span>
@@ -180,7 +194,7 @@ const DossierParamedical = () => {
             <span className="d-block my-1">
               <span className="">Téléphone: </span>
               <span className="text-bold">
-                (00226) {/*patient.phoneNumber*/ "xx xx xx xx"}
+                (00226) {patient.phoneNumber}
               </span>
             </span>
             <span className="d-block my-1">
@@ -204,6 +218,8 @@ const DossierParamedical = () => {
             <Route path="pression" element={<TableParamedal unite="mmHg" label={['Pression','Pression A.']} type={paramedicalButton[4]}/>} />
             <Route path="temperature" element={<TableParamedal unite="degré C" label={['Température','Température']} type={paramedicalButton[5]}/>} />
             <Route path="poids" element={<TableParamedal unite="Kg" label={['Poids','Poids']} type={paramedicalButton[6]}/>} />
+            <Route path="taille" element={<TableParamedal unite="m" label={['Taille','Taille']} type={paramedicalButton[7]}/>} />
+            <Route path="groupe-sanguin" element={<TableParamedal unite="" label={['Groupe sanguin','Groupe sanguin']} type={paramedicalButton[8]}/>} />
           </Routes>
         </div>
       </div>

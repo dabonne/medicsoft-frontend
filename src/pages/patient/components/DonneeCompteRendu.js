@@ -33,15 +33,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   };
   useEffect(() => {
     console.log(type);
-    requestPatient
-      .get(apiMedical.get + "/" + user.cni + "?medicalType=" + type.id, header)
-      .then((res) => {
-        console.log(res.data);
-        setDatas(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    get()
   }, [refresh]);
 
   if (window.location.pathname.includes("imageries")) {
@@ -57,6 +49,17 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
     setNameIdx(5);
   }
 
+  const get = () => {
+    requestPatient
+      .get(apiMedical.get + "/" + user.cni + "?medicalType=" + type.id, header)
+      .then((res) => {
+        console.log(res.data);
+        setDatas(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
   const onSearch = (e) => {
     e.preventDefault();
     let str = e.target.value;
@@ -177,7 +180,9 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                   </td>
                   <td className="text-center">
                     <div className="btn-group">
-                      <div className="d-inline-block mx-1">
+                      {
+                        /**
+                         * <div className="d-inline-block mx-1">
                         <img
                           title="Voir la prescription"
                           data-bs-toggle="modal"
@@ -191,6 +196,8 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                           alt=""
                         />
                       </div>
+                         */
+                      }
                       <div className="d-inline-block mx-1">
                         <img
                           title="Éditer le rapport"
@@ -243,7 +250,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         title={type.title}
         type={type.id}
         oldValue={editValue}
-        setRefresh={setRefresh}
+        refresh={get}
       />
     </div>
   );

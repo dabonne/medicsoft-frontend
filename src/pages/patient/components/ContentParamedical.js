@@ -106,6 +106,22 @@ const ContentParamedical = () => {
       placeholder: "Entrer la saturation en Sao2",
       link:"saturation"
     },
+    {
+      id: "HEIGHT",
+      img: poids,
+      title: "Taille",
+      label: "Taille",
+      placeholder: "Entrer la taille en m",
+      link:"taille"
+    },
+    {
+      id: "BLOOD_GROUP",
+      img: poids,
+      title: "Groupe Sanguin",
+      label: "Groupe Sanguin",
+      placeholder: "Entrer le Groupe Sanguin",
+      link:"groupe-sanguin"
+    },
   ];
   const [patient, setPatient] = useState(initPatient);
   useEffect(() => {

@@ -1,24 +1,48 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { apiPatient } from "../../../services/api";
+import { AppContext } from "../../../services/context";
+import requestPatient from "../../../services/requestPatient";
 
 const DossierMedicaux = () => {
+  const authCtx = useContext(AppContext)
+  const {user} = authCtx
+  const [data, setData] = useState("")
+  const header = {
+    headers: { Authorization: `${user.token}` },
+  };
+
+  useEffect(() => {
+    
+    requestPatient
+      .get(apiPatient.get + "/" + user.cni, header)
+      .then((res) => {
+        setData(res.data);
+        console.log(res.data);
+        
+      })
+      .catch((error) => {
+        //deconnect()
+      });
+  }, []);
   return (
     <>
       <div className="row my-3">
         <div className="col-12 col-md-6">
           <div className="d-inline-block me-3 text-bold text-meduim align-top">
-            <span>Jannie DOE</span>
+            <span>{data.lastname +" "+ data.firstname}</span>
           </div>
           <div className="d-inline-block">
-            <span className="text-bold">23 ans. Femme</span> <br />
+            <span className="text-bold">{data.age} ans. {data.gender}</span> <br />
             <span>Date de naissance: </span>
-            <span className="text-bold">12/12/1999</span> <br />
+            <span className="text-bold">{data.birthdate}</span> <br />
             <span>Poids: </span>
-            <span className="text-bold">89kg</span> <br />
+            <span className="text-bold">{data.weight}kg</span> <br />
             <span>Taille: </span>
-            <span className="text-bold">1m 90</span> <br />
+            <span className="text-bold">{data.height}m</span> <br />
             <span>IMC: </span>
-            <span className="text-bold">24.65 KG/M²</span> <br />
+            <span className="text-bold">{data.imc} KG/M²</span> <br />
             <span>
               <Link to="/dashboard/patient/dossier-paramedical" className="text-black">
                 Voir le dossier paramédical

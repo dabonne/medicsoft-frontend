@@ -24,8 +24,10 @@ const initPatient = {
   countryMinor: "",
   cityMinor: "",
   cni: "",
+  gender:"",
   cities: {},
   countries: {},
+  genders:{},
   mineur: false,
 };
 
@@ -56,7 +58,7 @@ const ListPatient = () => {
       .get(apiPatient.getAll + "/" + user.organisationRef, header)
       .then((res) => {
         setDatas(res.data);
-        console.log(res.data);
+        console.table(res.data);
       })
       .catch((error) => {
         //deconnect()
@@ -70,14 +72,14 @@ const ListPatient = () => {
       .get(apiPatient.getData)
       .then((res) => {
         //get dataForm success
-        //console.log(user.organisationRef)
-        setPatient((prevValues) => ({
-          ...prevValues,
-          ["organisationId"]: user.organisationRef,
-          ["countries"]: res.data.countries,
-          ["cities"]: res.data.cities,
-        }));
-        console.log(patient);
+        console.log(res.data)
+        initPatient.organisationId = user.organisationRef
+        initPatient.countries = res.data.countries
+        initPatient.cities = res.data.cities
+        initPatient.genders = res.data.genders
+
+        setPatient(initPatient)
+        //console.log(patient);
         setFormValidate("needs-validation");
         configNotify("", "", "");
       })
@@ -237,11 +239,11 @@ const ListPatient = () => {
                     <span className="text-bold">P12902</span>
                   </span>
                   <span className="d-block my-1 text-center">
-                    <span className="text-bold">{data.age} ans . Femme</span>
+                    <span className="text-bold">{data.age} ans . {data.gender}</span>
                   </span>
                   <span className="d-block my-1 text-center">
                     <span className="text-bold text-meduim">
-                      <img src={sang} alt="" /> O+
+                      <img src={sang} alt="" /> {data.bloodGroup}
                     </span>
                   </span>
                 </div>
@@ -397,6 +399,32 @@ const ListPatient = () => {
                   </select>
                   <div className="invalid-feedback">
                     Veuillez Choisir une classification
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="clst" className="form-label">
+                    Ville
+                  </label>
+                  <select
+                    id="clst"
+                    className="form-select"
+                    value={patient.gender}
+                    onChange={(e) => {
+                      handleInputChange("gender", e);
+                    }}
+                    required
+                  >
+                    <option value="">Choisir le genre</option>
+                    {Object.keys(patient.genders).map((key) => {
+                      return (
+                        <option key={key} value={key}>
+                          {patient.genders[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir un genre
                   </div>
                 </div>
                 <div className="mb-3">
