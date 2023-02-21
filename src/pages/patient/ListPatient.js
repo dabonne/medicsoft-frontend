@@ -25,9 +25,11 @@ const initPatient = {
   cityMinor: "",
   cni: "",
   gender:"",
+  linkParental:"",
   cities: {},
   countries: {},
   genders:{},
+  parental:{},
   mineur: false,
 };
 
@@ -77,6 +79,7 @@ const ListPatient = () => {
         initPatient.countries = res.data.countries
         initPatient.cities = res.data.cities
         initPatient.genders = res.data.genders
+        initPatient.parental = res.data.parental
 
         setPatient(initPatient)
         //console.log(patient);
@@ -403,7 +406,7 @@ const ListPatient = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="clst" className="form-label">
-                    Ville
+                    Genre
                   </label>
                   <select
                     id="clst"
@@ -539,6 +542,32 @@ const ListPatient = () => {
                   />
                   <div className="invalid-feedback">
                     Veuillez entrer le numéro CNI du parent
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="clst" className="form-label">
+                    Lien de parenté
+                  </label>
+                  <select
+                    id="clst"
+                    className="form-select"
+                    value={patient.linkParental}
+                    onChange={(e) => {
+                      handleInputChange("linkParental", e);
+                    }}
+                    required
+                  >
+                    <option value="">Choisir le lien</option>
+                    {Object.keys(patient.parental).map((key) => {
+                      return (
+                        <option key={key} value={key}>
+                          {patient.parental[key]}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="invalid-feedback">
+                    Veuillez Choisir le lien de parenté
                   </div>
                 </div>
                 <div className="mb-3">

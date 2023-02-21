@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import back from "../../../assets/imgs/back.png";
 import sui from "../../../assets/imgs/sui.png";
 import view from "../../../assets/imgs/view.png";
@@ -12,21 +12,23 @@ import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 
-const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
+const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
   const [editValue, setEditValue] = useState();
+  const [refresh, setRefresh] = useState(0);
+  const notify = useRef();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
   setNameIdx(1);
   useEffect(() => {
     console.log(type);
-    get()
-  }, []);
+    get();
+  }, [refresh]);
 
   const get = () => {
     requestPatient
@@ -38,7 +40,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
   const onSearch = (e) => {
     e.preventDefault();
     let str = e.target.value;
@@ -70,10 +72,11 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
       .delete(apiMedical.deleteFamily + "/" + id)
       .then((res) => {
         console.log("suppression ok");
+        get();
         //setModalNotifyMsg("Suppression réussie !")
-        //notifyRef.current.click()
+        notify.current.click();
         //setDelete([]);
-        //setRefresh(refresh + 1);
+        setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
@@ -109,10 +112,13 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
           <div className="btn btn-secondary me-2">Synthèse</div>
-          <button 
-            className="btn btn-primary" 
-            data-bs-toggle="modal" 
-            data-bs-target={"#modalEdit" + type.id}>Ajouter</button>
+          <button
+            className="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target={"#modalEdit" + type.id}
+          >
+            Ajouter
+          </button>
         </div>
       </div>
 
@@ -125,7 +131,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
               </th>
               <th scope="col">Nom de maladie</th>
               <th scope="col">Période</th>
-              <th scope="col">Lien de parenté</th>
+              {/*<th scope="col">Lien de parenté</th>*/}
               <th scope="col" className="text-center">
                 Actions
               </th>
@@ -143,11 +149,13 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
                     <span className="text-bold">{data.disease}</span>
                   </td>
                   <td>
-                    <span className="text-bold">{data.startDate} - {data.endDate}</span>
+                    <span className="text-bold">
+                      {data.startDate} - {data.endDate}
+                    </span>
                   </td>
-                  <td>
+                  {/*<td>
                   {data.parent}
-                  </td>
+                  </td>*/}
                   <td className="text-center">
                     <div className="btn-group">
                       <div className="d-inline-block mx-1">
@@ -157,7 +165,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
                           data-bs-target={"#modalEdit" + type.id}
                           onClick={(e) => {
                             e.preventDefault();
-                            setEditValue(data)
+                            setEditValue(data);
                             //setDelete(["" + data.employeeReference]);
                           }}
                           src={edit}
@@ -168,11 +176,11 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
                         <img
                           title="Supprimer le rapport"
                           data-bs-toggle="modal"
-                          data-bs-target={"#deleteData"+data.id}
+                          data-bs-target={"#deleteData" + data.id}
                           onClick={(e) => {
                             e.preventDefault();
                             //setDelete(["" + data.employeeReference]);
-                            setEditValue(data)
+                            setEditValue(data);
                           }}
                           src={del}
                           alt=""
@@ -180,7 +188,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
                       </div>
                       <DeleteModal
                         id={data.id}
-                        modal={"deleteData"+data.id}
+                        modal={"deleteData" + data.id}
                         title={"Supprimer les données"}
                         data={editValue}
                         onDelete={onDelete}
@@ -200,6 +208,46 @@ const AntecedentPersonnel = ({ setNameIdx, type = {}}) => {
         type={type.id}
         oldValue={editValue}
         refresh={get}
+      />
+
+      <div className="modal fade" id="notify">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">Suppression réussie !</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  //setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input
+        type="hidden"
+        ref={notify}
+        data-bs-toggle="modal"
+        data-bs-target="#notify"
+        onClick={(e) => {
+          e.preventDefault();
+        }}
       />
     </div>
   );

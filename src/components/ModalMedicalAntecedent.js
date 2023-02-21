@@ -67,7 +67,7 @@ const ModalMedicalAntecedent = ({
     initMedical.isDiseaseGenetic = isDiseaseGenetic
     initMedical.startDate = startDate;
     initMedical.endDate = endDate;
-    initMedical.parent = parent;
+    initMedical.parent = "PERSONAL";
     console.log(initMedical);
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
@@ -104,7 +104,7 @@ const ModalMedicalAntecedent = ({
     initMedical.isDiseaseGenetic = isDiseaseGenetic
     initMedical.startDate = startDate;
     initMedical.endDate = endDate;
-    initMedical.parent = parent;
+    initMedical.parent = "PERSONAL";
     console.log(initMedical);
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
@@ -143,6 +143,7 @@ const ModalMedicalAntecedent = ({
       .get(apiMedical.getPersonalForm, header)
       .then((res) => {
         setList(res.data.parents)
+        console.log(res.data)
       })
       .catch((error) => {
         console.log(error);
@@ -314,7 +315,7 @@ const ModalMedicalAntecedent = ({
                   />
                   <div className="invalid-feedback">Veuillez entrer un nom</div>
                 </div>
-                <div className="mb-3 mt-3">
+                {/*<div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                   Parent (facultatif)
                   </label>
@@ -333,7 +334,7 @@ const ModalMedicalAntecedent = ({
                     }
                   </select>
                   <div className="invalid-feedback">Veuillez entrer un nom</div>
-                </div>
+                </div>*/}
 
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button

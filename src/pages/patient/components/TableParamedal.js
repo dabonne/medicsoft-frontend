@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import back from "../../../assets/imgs/back.png";
 import sui from "../../../assets/imgs/sui.png";
 import view from "../../../assets/imgs/view.png";
@@ -34,7 +34,9 @@ const TableParamedal = ({
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
   const [editValue, setEditValue] = useState();
+  const [refresh, setRefresh] = useState(0)
   const [seletedData, setSelectedData] = useState(initSelected);
+  const notify = useRef()
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -47,7 +49,7 @@ const TableParamedal = ({
   useEffect(() => {
     console.log(type);
     get()
-  }, []);
+  }, [refresh]);
 
   const get = () => {
     requestPatient
@@ -100,10 +102,11 @@ const TableParamedal = ({
       .delete(apiParamedical.delete + "/" + id)
       .then((res) => {
         console.log("suppression ok");
+        
         //setModalNotifyMsg("Suppression réussie !")
-        //notifyRef.current.click()
+        notify.current.click()
         //setDelete([]);
-        //setRefresh(refresh + 1);
+        setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
@@ -153,6 +156,9 @@ const TableParamedal = ({
                 {label[0]} ID
               </th>
               <th scope="col">{label[1]}</th>
+              {
+                    (type.id === "ARTERIAL_PRESSURE") && <th scope="col">Pression A. Diastolique</th>
+                    }
               <th scope="col">Date d’élobaration</th>
               <th scope="col">Auteur</th>
               <th scope="col" className="text-center">
@@ -173,6 +179,14 @@ const TableParamedal = ({
                       {data.value + " " + unite}
                     </div>
                   </td>
+                  {
+                    (type.id === "ARTERIAL_PRESSURE") &&
+                    <td>
+                    <div className="text-bold" style={styles}>
+                      {data.arterialPressure + " " + unite}
+                    </div>
+                  </td>
+                  }
                   <td>
                     <span className="text-bold">{data.dateElaboration}</span>
                   </td>
@@ -189,12 +203,12 @@ const TableParamedal = ({
                   <td className="text-center">
                     <div className="d-inline-block mx-1">
                       <img
-                        title="Éditer le rapport"
+                        title="Éditer les données"
                         data-bs-toggle="modal"
                         data-bs-target={"#modalEdit" + type.id}
                         onClick={(e) => {
                           e.preventDefault();
-                          setEditValue({ id: data.id, content: data.value });
+                          setEditValue({ id: data.id, content: data.value, pressDia: data.arterialPressure });
                         }}
                         src={edit}
                         alt=""
@@ -202,7 +216,7 @@ const TableParamedal = ({
                     </div>
                     <div className="d-inline-block mx-1">
                       <img
-                        title="Supprimer le rapport"
+                        title="Supprimer les données"
                         data-bs-toggle="modal"
                         data-bs-target={"#deleteData"+data.id}
                         onClick={(e) => {
@@ -239,6 +253,45 @@ const TableParamedal = ({
         placeholderInput={type.placeholder}
         oldValue={editValue}
         refresh={get}
+      />
+      <div className="modal fade" id="notify">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">Suppression réussie !</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  //setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input
+        type="hidden"
+        ref={notify}
+        data-bs-toggle="modal"
+        data-bs-target="#notify"
+        onClick={(e) => {
+          e.preventDefault();
+        }}
       />
     </div>
   );

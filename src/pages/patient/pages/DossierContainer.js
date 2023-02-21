@@ -46,7 +46,7 @@ const DossierContainer = ({setLocation, setPageName}) => {
     },
     {
       id: "VARIOUS",
-      title: "Divers",
+      title: "Résumé consultation",
     },
   ]
 
@@ -85,7 +85,7 @@ const DossierContainer = ({setLocation, setPageName}) => {
         <Route path="/imageries" element={<DonneeCompteRendu type={medicalType[1]} setNameIdx={setNameIdx} />} />
         <Route path="/examens-specialises" element={<DonneeCompteRendu type={medicalType[2]} setNameIdx={setNameIdx} />} />
         <Route path="/analyses-biologiques" element={<DonneeCompteRendu type={medicalType[3]} setNameIdx={setNameIdx} />} />
-        <Route path="/divers" element={<DonneeCompteRendu type={medicalType[4]} setNameIdx={setNameIdx} />} />
+        <Route path="/resume-consultation" element={<DonneeCompteRendu type={medicalType[4]} setNameIdx={setNameIdx} />} />
       </Routes>
     </div>
   );

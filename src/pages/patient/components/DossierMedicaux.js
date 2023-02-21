@@ -108,11 +108,12 @@ const DossierMedicaux = () => {
         </div>
         <div className="col">
           <Link
-            to="divers"
+            to="resume-consultation"
             className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
           >
             <div className="text-center">
-              <span className="text-bold">Divers</span> <br />
+              <span className="text-bold">Résumé</span> <br />
+              <span className="text-bold">consultation</span> <br />
             </div>
           </Link>
         </div>

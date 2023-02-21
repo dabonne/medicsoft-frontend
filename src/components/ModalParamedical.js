@@ -11,6 +11,7 @@ const initParamedical = {
   value: "",
   paramedicalType: "",
   dateElaborate: "",
+  arterialPressure: ""
 };
 
 const ModalParamedical = ({
@@ -18,12 +19,13 @@ const ModalParamedical = ({
   type,
   labelInput,
   placeholderInput,
-  oldValue = { id: "", content: "" },
+  oldValue = { id: "", content: "", pressDia : ""},
   refresh = () => {},
 }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [paramedical, setParamedical] = useState("");
+  const [pressionDia, setPressionDia] = useState("");
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
@@ -41,6 +43,7 @@ const ModalParamedical = ({
     if (oldValue.content !== "") {
       initParamedical.value = oldValue.content;
       setParamedical(initParamedical.value);
+      setPressionDia(oldValue.pressDia)
     }
   }, [oldValue]);
 
@@ -50,9 +53,11 @@ const ModalParamedical = ({
     initParamedical.paramedicalType = type;
     initParamedical.dateElaborate = formatDate(new Date());
     initParamedical.value = paramedical;
+    initParamedical.arterialPressure = pressionDia;
     console.log(initParamedical);
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
+    setModalNotifyMsg("Les informations ont bien été enrégistrées");
     requestPatient
       .post(
         apiParamedical.post + "/" + user.organisationRef,
@@ -67,7 +72,7 @@ const ModalParamedical = ({
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("Les informations ont bien été enrégistrées");
+        
         closeRef.current.click();
         notifyRef.current.click();
         refresh()
@@ -88,6 +93,7 @@ const ModalParamedical = ({
     initParamedical.paramedicalType = type;
     initParamedical.dateElaborate = formatDate(new Date());
     initParamedical.value = paramedical;
+    initParamedical.arterialPressure = pressionDia;
 
     console.log(initParamedical);
     configNotify("loading", "", "Modification des données en cours...");
@@ -100,7 +106,9 @@ const ModalParamedical = ({
           "?value=" +
           initParamedical.value +
           "&date=" +
-          initParamedical.dateElaborate,
+          initParamedical.dateElaborate +
+          "&arterialPressure=" +
+          initParamedical.arterialPressure,
         header
       )
       .then((res) => {
@@ -223,17 +231,53 @@ const ModalParamedical = ({
                   <label htmlFor="lname" className="form-label">
                     {labelInput}
                   </label>
-                  <input
+                  {type === "TRANSMISSION" ?<>
+                  <textarea
                     type="text"
                     className="form-control"
                     id="lname"
                     placeholder={placeholderInput}
                     value={paramedical}
-                    onChange={(e) => setParamedical(e.target.value)}
+                    onChange={(e) => {
+                      if(e.target.value.length <= 500){
+                        setParamedical(e.target.value)
+                      }
+                    }}
+                    rows="6"
+                    required
+                  ></textarea>
+                  <div>{paramedical.length +"/"+500}</div>
+                  </> : <input
+                  type="text"
+                  className="form-control"
+                  id="lname"
+                  placeholder={placeholderInput}
+                  value={paramedical}
+                  onChange={(e) => setParamedical(e.target.value)}
+                  required
+                />
+                }
+                  <div className="invalid-feedback">Veuillez entrer un nom</div>
+                </div>
+                
+
+                { (labelInput === "Pression artérielle systolique") &&
+                  <div className="mb-3 mt-3">
+                  <label htmlFor="lname" className="form-label">
+                    Pression artérielle diastolique
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="lname"
+                    placeholder={placeholderInput}
+                    value={pressionDia}
+                    onChange={(e) => setPressionDia(e.target.value)}
                     required
                   />
                   <div className="invalid-feedback">Veuillez entrer un nom</div>
                 </div>
+                }
 
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
@@ -281,7 +325,7 @@ const ModalParamedical = ({
                 data-bs-dismiss="modal"
                 onClick={(e) => {
                   e.preventDefault();
-                  setModalNotifyMsg("");
+                  //setModalNotifyMsg("");
                 }}
               >
                 Ok

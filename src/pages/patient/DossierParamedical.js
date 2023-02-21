@@ -81,8 +81,8 @@ const DossierParamedical = () => {
     {
       id: "ARTERIAL_PRESSURE",
       img: pression,
-      title: "Pression artérielle",
-      label: "Pression artérielle",
+      title: "Pression artérielle systolique",
+      label: "Pression artérielle systolique",
       placeholder: "Entrer la pression artérielle en mmHg",
     },
     {
@@ -166,7 +166,7 @@ const DossierParamedical = () => {
   return (
     <>
       <div className="row">
-        <h1 className="h2 text-bold">Dossier paramédical de Jannie DOE</h1>
+        <h1 className="h2 text-bold">Dossier paramédical de {patient.lastname + " " + patient.firstname}</h1>
       </div>
       <div className="row my-4">
         <div className="col-10 col-sm-8 mx-auto col-md-5 col-lg-3">
@@ -214,9 +214,9 @@ const DossierParamedical = () => {
             <Route path="transmissions" element={<TableParamedal unite="" label={['Note','Note']} type={paramedicalButton[0]}/>} />
             <Route path="frequence" element={<TableParamedal unite="bpm" label={['Fréquence','Fréquence c.']} type={paramedicalButton[1]}/>} />
             <Route path="glycemie" element={<TableParamedal unite="mg/dL" label={['Glycémie','Glycémie']} type={paramedicalButton[2]}/>} />
-            <Route path="saturation" element={<TableParamedal unite="SaO2" label={['Saturation','Saturation']} type={paramedicalButton[3]}/>} />
-            <Route path="pression" element={<TableParamedal unite="mmHg" label={['Pression','Pression A.']} type={paramedicalButton[4]}/>} />
-            <Route path="temperature" element={<TableParamedal unite="degré C" label={['Température','Température']} type={paramedicalButton[5]}/>} />
+            <Route path="saturation" element={<TableParamedal unite="% SaO2" label={['Saturation','Saturation']} type={paramedicalButton[3]}/>} />
+            <Route path="pression" element={<TableParamedal unite="mmHg" label={['Pression','Pression A. Systolique']} type={paramedicalButton[4]}/>} />
+            <Route path="temperature" element={<TableParamedal unite="°C" label={['Température','Température']} type={paramedicalButton[5]}/>} />
             <Route path="poids" element={<TableParamedal unite="Kg" label={['Poids','Poids']} type={paramedicalButton[6]}/>} />
             <Route path="taille" element={<TableParamedal unite="m" label={['Taille','Taille']} type={paramedicalButton[7]}/>} />
             <Route path="groupe-sanguin" element={<TableParamedal unite="" label={['Groupe sanguin','Groupe sanguin']} type={paramedicalButton[8]}/>} />

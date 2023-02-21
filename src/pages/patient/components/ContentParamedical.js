@@ -15,6 +15,7 @@ import satur from "../../../assets/imgs/satur.png";
 import tmp from "../../../assets/imgs/tmp.png";
 import glyc from "../../../assets/imgs/glyc.png";
 import freq from "../../../assets/imgs/freq.png";
+import bck from "../../../assets/imgs/bck.png";
 
 
 import ButtonParamedical from "../../../components/ButtonParamedical";
@@ -78,7 +79,7 @@ const ContentParamedical = () => {
       id: "ARTERIAL_PRESSURE",
       img: pression,
       title: "Pression artérielle",
-      label: "Pression artérielle",
+      label: "Pression artérielle systolique",
       placeholder: "Entrer la pression artérielle en mmHg",
       link:"pression"
     },
@@ -166,6 +167,9 @@ const ContentParamedical = () => {
     <>
       <div className="d-flex">
         <div className="me-auto">
+        <div className="row">
+        <Link className="text-decoration-none text-black" to="/dashboard/patient/details/dossiers-medicaux"><img src={bck} alt="" /> Retour</Link>
+      </div>
           <div className="me-3 text-bold text-meduim align-top">
             <span>{patient.lastname + " " + patient.firstname}</span>
           </div>

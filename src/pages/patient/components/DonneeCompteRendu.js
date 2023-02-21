@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import back from "../../../assets/imgs/back.png";
 import sui from "../../../assets/imgs/sui.png";
 import view from "../../../assets/imgs/view.png";
@@ -31,9 +31,11 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+
+  const notify = useRef();
   useEffect(() => {
-    console.log(type);
-    get()
+    //console.log(type);
+    get();
   }, [refresh]);
 
   if (window.location.pathname.includes("imageries")) {
@@ -59,7 +61,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
   const onSearch = (e) => {
     e.preventDefault();
     let str = e.target.value;
@@ -91,10 +93,11 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
       .delete(apiMedical.delete + "/" + id)
       .then((res) => {
         console.log("suppression ok");
+        setRefresh(refresh + 1);
+
         //setModalNotifyMsg("Suppression réussie !")
-        //notifyRef.current.click()
+        notify.current.click();
         //setDelete([]);
-        //setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
@@ -180,8 +183,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                   </td>
                   <td className="text-center">
                     <div className="btn-group">
-                      {
-                        /**
+                      {/**
                          * <div className="d-inline-block mx-1">
                         <img
                           title="Voir la prescription"
@@ -196,11 +198,10 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                           alt=""
                         />
                       </div>
-                         */
-                      }
+                         */}
                       <div className="d-inline-block mx-1">
                         <img
-                          title="Éditer le rapport"
+                          title="Éditer les données"
                           data-bs-toggle="modal"
                           data-bs-target={"#modalEdit" + type.id}
                           onClick={(e) => {
@@ -217,9 +218,9 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
-                          title="Supprimer le rapport"
+                          title="Supprimer les données"
                           data-bs-toggle="modal"
-                          data-bs-target={"#deleteData"+data.id}
+                          data-bs-target={"#deleteData" + data.id}
                           onClick={(e) => {
                             e.preventDefault();
                             initSelected.idData = data.id;
@@ -232,7 +233,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                       </div>
                       <DeleteModal
                         id={data.id}
-                        modal={"deleteData"+data.id}
+                        modal={"deleteData" + data.id}
                         title={"Supprimer " + seletedData.title}
                         data={seletedData}
                         onDelete={onDelete}
@@ -251,6 +252,46 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         type={type.id}
         oldValue={editValue}
         refresh={get}
+      />
+
+      <div className="modal fade" id="notify">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">Suppression réussie !</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  //setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input
+        type="hidden"
+        ref={notify}
+        data-bs-toggle="modal"
+        data-bs-target="#notify"
+        onClick={(e) => {
+          e.preventDefault();
+        }}
       />
     </div>
   );

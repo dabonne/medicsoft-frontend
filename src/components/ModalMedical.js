@@ -202,22 +202,28 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
                     onChange={(e)=>setEntitled(e.target.value)}
                     required
                   />
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
+                  <div className="invalid-feedback">Veuillez entrer un intitulé</div>
                 </div>
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Détails
                   </label>
-                  <input
+                  <textarea
                     type="text"
                     className="form-control"
                     id="lname"
                     placeholder="Ecrire..."
+                    rows="6"
                     value={detail}
-                    onChange={(e) => setDetail(e.target.value)}
+                    onChange={(e) => {
+                      if(e.target.value.length <= 500){
+                        setDetail(e.target.value)
+                      }
+                    }}
                     required
-                  />
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
+                  ></textarea>
+                  <div>{detail.length +"/"+500}</div>
+                  <div className="invalid-feedback">Veuillez entrer un détails</div>
                 </div>
 
                 <div className="modal-footer d-flex justify-content-start border-0">
