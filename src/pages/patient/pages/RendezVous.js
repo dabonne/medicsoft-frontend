@@ -11,6 +11,12 @@ const RendezVous = ({setLocation}) => {
     const [datas, setDatas] = useState([]);
     const [search, setSearch] = useState("");
     const [list, setList] = useState("");
+    const doctor = [
+      {name:"Sawadogo Jean Brice", sp:"Pediatre"},
+      {name:"Coulibaly Philippe", sp:"Psychiatre"},
+      {name:"Dembele Hoda", sp:"Cardiologue"},
+      {name:"Bazongo Bonou", sp:"Pediatre"},
+    ]
     setLocation(window.location.pathname)
     const onSearch = (e) => {
         e.preventDefault();
@@ -82,7 +88,7 @@ const RendezVous = ({setLocation}) => {
             </tr>
           </thead>
           <tbody>
-            {[...Array(9).keys()].map((data, idx) => {
+            {[...Array(4).keys()].map((data, idx) => {
               //data.checkValue = false
               return (
                 <tr key={idx}>
@@ -91,9 +97,9 @@ const RendezVous = ({setLocation}) => {
                       <img src={user} alt="" />
                     </div>
                     <div className="d-inline-block align-middle">
-                      <span className="text-bold">Dr. Jannette DOE</span>
+                      <span className="text-bold">Dr. {doctor[idx].name}</span>
                       <br />
-                      <span>Psychiatre</span>
+                      <span>{doctor[idx].sp}</span>
                     </div>
                   </td>
                   <td>

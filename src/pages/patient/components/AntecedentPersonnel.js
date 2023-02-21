@@ -160,7 +160,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
                     <div className="btn-group">
                       <div className="d-inline-block mx-1">
                         <img
-                          title="Éditer le rapport"
+                          title="Éditer les données"
                           data-bs-toggle="modal"
                           data-bs-target={"#modalEdit" + type.id}
                           onClick={(e) => {
@@ -174,7 +174,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
                       </div>
                       <div className="d-inline-block mx-1">
                         <img
-                          title="Supprimer le rapport"
+                          title="Supprimer les données"
                           data-bs-toggle="modal"
                           data-bs-target={"#deleteData" + data.id}
                           onClick={(e) => {
