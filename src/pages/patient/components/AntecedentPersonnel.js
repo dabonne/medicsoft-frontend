@@ -150,7 +150,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
                   </td>
                   <td>
                     <span className="text-bold">
-                      {data.startDate} - {data.endDate}
+                      {data.startDate}
                     </span>
                   </td>
                   {/*<td>

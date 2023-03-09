@@ -3,36 +3,44 @@ import add from "../assets/imgs/add.png";
 import FormNotify from "./FormNotify";
 import { useContext, useEffect, useRef, useState } from "react";
 import requestPatient from "../services/requestPatient";
-import { apiMedical, apiParamedical } from "../services/api";
+import { apiParamedical } from "../services/api";
 import { AppContext } from "../services/context";
+import InputField from "./InputField";
 
-const initMedical = {
-  cni: "",
-  disease: "",
-  isDiseaseGenetic: true,
-  startDate: "",
-  endDate: "",
-  parent: ""
-}
+const initParamedical = {
+  patientCni: "",
+  value: "",
+  paramedicalType: "",
+  dateElaborate: "",
+  arterialPressure: "",
+};
 
-const ModalMedicalAntecedent = ({
+const initData = {
+  TRANSMISSION: "",
+  WEIGHT: "",
+  BODY_TEMPERATURE: "",
+  ARTERIAL_PRESSURE1: "",
+  ARTERIAL_PRESSURE2: "",
+  CARDIAC_FREQUENCY: "",
+  BLOOD_SUGAR: "",
+  OXYGEN_SATURATION: "",
+  HEIGHT: "",
+  BLOOD_GROUP: "",
+};
+
+const ModalParamedicalMutiple = ({
   id,
   type,
-  title,
+  labelInput,
+  placeholderInput,
+  oldValue = { id: "", content: "", pressDia: "" },
   refresh = () => {},
-  oldValue = { id: "", startDate: "", endDate: "", parent:"" },
 }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
-  const [medical, setMedical] = useState(initMedical);
-
-  const [disease, setDisease] = useState("");
-  const [isDiseaseGenetic, setIsDiseaseGenetic] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [parent, setParent] = useState("");
-  const [list, setList] = useState({})
-
+  const [paramedical, setParamedical] = useState(initData);
+  const [pressionDia, setPressionDia] = useState("");
+  const [list, setList] = useState([]);
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
@@ -46,43 +54,68 @@ const ModalMedicalAntecedent = ({
   };
 
   useEffect(() => {
-    getForm()
-    if(oldValue.disease !=""){
-      setDisease(oldValue.disease)
-      setStartDate(oldValue.startDate)
-      setEndDate(oldValue.endDate)
-      Object.keys(list).map((key) => {
-        if(list[key] === oldValue.parent){
-          setParent(key)
-        }
-      })
+    if (oldValue.content !== "") {
+      initParamedical.value = oldValue.content;
+      setParamedical(initParamedical.value);
+      setPressionDia(oldValue.pressDia);
     }
-    
-  }, [oldValue.disease]);
+  }, [oldValue]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    initMedical.cni = user.cni;
-    initMedical.disease = disease;
-    initMedical.isDiseaseGenetic = isDiseaseGenetic
-    initMedical.startDate = startDate;
-    initMedical.endDate = startDate;
-    initMedical.parent = "PERSONAL";
-    console.log(initMedical);
+    var first = 0;
+    const date = formatDate(new Date());
+
+    const data = Object.keys(paramedical).map((key) => {
+      return key;
+    });
+    data.map((key) => {
+      //console.log(paramedical)
+      if (
+        key == "ARTERIAL_PRESSURE1" ||
+        (key == "ARTERIAL_PRESSURE2" && first === 0)
+      ) {
+        list.push({
+          patientCni: user.cni,
+          paramedicalType: "ARTERIAL_PRESSURE",
+          dateElaborate: date,
+          value: paramedical["ARTERIAL_PRESSURE1"],
+          arterialPressure: paramedical["ARTERIAL_PRESSURE2"],
+        });
+        first = 1;
+        
+      }else{
+        if(key !=="ARTERIAL_PRESSURE2"){
+          list.push({
+            patientCni: user.cni,
+            paramedicalType: key,
+            dateElaborate: date,
+            value: paramedical[key],
+            arterialPressure: "",
+          });
+        }
+        
+      } 
+    });
+    console.log(list);
     configNotify("loading", "", "Ajout des données en cours...");
-    //console.log(jsData)
+    console.log(header)
+    setModalNotifyMsg("Les informations ont bien été enrégistrées");
     requestPatient
-      .post(apiMedical.postFamily + "/" + user.organisationRef, initMedical, header)
+      .post(
+        apiParamedical.postMulti + "/" + user.organisationRef,
+        list,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
-        
 
         configNotify(
           "success",
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("Les informations ont bien été enrégistrées");
+
         closeRef.current.click();
         notifyRef.current.click();
         refresh();
@@ -91,26 +124,31 @@ const ModalMedicalAntecedent = ({
         console.log(error);
         configNotify(
           "danger",
-          "Oups !",
-          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+          "Ouppss!!",
+          "Une erreur est survenue, veuillez reesayer plus tard..."
         );
       });
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    initMedical.cni = user.cni;
-    initMedical.disease = disease;
-    initMedical.isDiseaseGenetic = isDiseaseGenetic
-    initMedical.startDate = startDate;
-    initMedical.endDate = startDate;
-    initMedical.parent = "PERSONAL";
-    console.log(initMedical);
+
+    console.log(initParamedical);
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
     requestPatient
       .put(
-        apiMedical.putFamily +"/" + oldValue.id, initMedical,header)
+        apiParamedical.put +
+          "/" +
+          oldValue.id +
+          "?value=" +
+          initParamedical.value +
+          "&date=" +
+          initParamedical.dateElaborate +
+          "&arterialPressure=" +
+          initParamedical.arterialPressure,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -119,9 +157,7 @@ const ModalMedicalAntecedent = ({
           "Modification réussi",
           "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg(
-          "Les informations ont bien été modifiées"
-        );
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         closeRef.current.click();
         notifyRef.current.click();
         refresh();
@@ -130,25 +166,17 @@ const ModalMedicalAntecedent = ({
         console.log(error);
         configNotify(
           "danger",
-          "Oups !",
-          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+          "Ouppss!!",
+          "Une erreur est survenue, veuillez reesayer plus tard..."
         );
       });
   };
-
-  const getForm = () => {
-    
-    //console.log(jsData)
-    requestPatient
-      .get(apiMedical.getPersonalForm, header)
-      .then((res) => {
-        setList(res.data.parents)
-        console.log(res.data)
-      })
-      .catch((error) => {
-        console.log(error);
-        
-      });
+  const handleInputChange = (e) => {
+    e.preventDefault();
+    initParamedical.patientCni = user.cni;
+    initParamedical.paramedicalType = type;
+    initParamedical.dateElaborate = new Date();
+    initParamedical.value = paramedical;
   };
 
   const configNotify = (bg, title, message) => {
@@ -207,13 +235,25 @@ const ModalMedicalAntecedent = ({
     console.log(date.getFullYear() + "-" + month + "-" + day);
     return date.getFullYear() + "-" + month + "-" + day;
   };
+
+  const onChange = (name, value) => {
+    console.log(name, value);
+    setParamedical({
+      ...paramedical,
+      [name]: value,
+    });
+
+    console.log(paramedical);
+  };
   return (
     <>
       <div className="modal fade" id={id}>
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim">{title}</h4>
+              <h4 className="modal-title text-meduim">
+                Actuellement: <span className="text-bold">{getDate()}</span>
+              </h4>
               <button
                 type="button"
                 className="btn-close"
@@ -233,111 +273,103 @@ const ModalMedicalAntecedent = ({
                 onSubmit={oldValue.id != "" ? handleEditSubmit : handleSubmit}
                 noValidate
               >
+                <InputField
+                  type={"text"}
+                  label="Poid"
+                  name={"WEIGHT"}
+                  value={paramedical.WEIGHT}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Température corporelle"
+                  name={"BODY_TEMPERATURE"}
+                  value={paramedical.BODY_TEMPERATURE}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Pression artérielle systolique"
+                  name={"ARTERIAL_PRESSURE1"}
+                  value={paramedical.ARTERIAL_PRESSURE1}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Pression artérielle diastolique"
+                  name={"ARTERIAL_PRESSURE2"}
+                  value={paramedical.ARTERIAL_PRESSURE2}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Fréquence cardiaque"
+                  name={"CARDIAC_FREQUENCY"}
+                  value={paramedical.CARDIAC_FREQUENCY}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Glycémie"
+                  name={"BLOOD_SUGAR"}
+                  value={paramedical.BLOOD_SUGAR}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Saturation en oxygène"
+                  name={"OXYGEN_SATURATION"}
+                  value={paramedical.OXYGEN_SATURATION}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Taille"
+                  name={"HEIGHT"}
+                  value={paramedical.HEIGHT}
+                  onChange={onChange}
+                />
+                <InputField
+                  type={"text"}
+                  label="Groupe Sanguin"
+                  name={"BLOOD_GROUP"}
+                  value={paramedical.BLOOD_GROUP}
+                  onChange={onChange}
+                />
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
-                    Nom de la maladie
+                    {labelInput}
                   </label>
-                  <input
+                  <textarea
                     type="text"
                     className="form-control"
                     id="lname"
-                    placeholder="Entrer le nom de la maladie"
-                    value={disease}
-                    onChange={(e) => setDisease(e.target.value)}
+                    placeholder={"Transmission"}
+                    value={paramedical.TRANSMISSION}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 500) {
+                        setParamedical({
+                          ...paramedical,
+                          TRANSMISSION: e.target.value,
+                        });
+                      }
+                    }}
+                    rows="6"
                     required
-                  />
-                  <div className="invalid-feedback">Veuillez entrer le nom de la maladie</div>
-                </div>
-                <div className="mb-3 mt-3 d-flex">
-                  <div className="form-label me-auto">
-                    Est-ce une maladie génétique ?
-                  </div>
-                  <div>
-                    <div class="form-check d-inline-block mx-1">
-                      <input
-                        type="radio"
-                        class="form-check-input"
-                        id="radio1"
-                        name="radio"
-                        value="oui"
-                        onChange={() =>{
-                          setIsDiseaseGenetic(true)
-                        }}
-                        
-                      />
-                      
-                      <label class="form-check-label" for="radio1">Oui</label>
-                    </div>
-                    <div class="form-check d-inline-block mx-1">
-                      <input
-                        type="radio"
-                        class="form-check-input"
-                        id="radio2"
-                        name="radio"
-                        value="non"
-                        onChange={() =>{
-                          setIsDiseaseGenetic(false)
-                        }}
-                      />
-                      <label class="form-check-label" for="radio2">Non</label>
-                    </div>
-                  </div>
-                  <div className="invalid-feedback">Veuillez entrer le nom de la maladie</div>
-                </div>
+                  ></textarea>
+                  <div>{paramedical.TRANSMISSION.length + "/" + 500}</div>
 
-                <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                    Date de début
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer la date de début"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    min="1960-01-01" 
-                    max="2100-12-31"
-                    required
-                  />
-                  <div className="invalid-feedback">Veuillez entrer une date valide</div>
-                </div>
-                {/*<div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                  Date de fin
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer la date de fin"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    required
-                  />
                   <div className="invalid-feedback">Veuillez entrer un nom</div>
                 </div>
-                <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                  Parent (facultatif)
-                  </label>
-                  <select
-                    className="form-select"
-                    value={parent}
-                    onChange={(e) => setParent(e.target.value)}
-                  >
-                    <option>Choisir le lien de parenté</option>
-                    {
-                      Object.keys(list).map((key) =>{
-                        return(
-                          <option key={key} value={key}>{list[key]}</option>
-                        )
-                      })
-                    }
-                  </select>
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
-                </div>*/}
 
+                <input
+                  type="text"
+                  className="form-control"
+                  id="lname"
+                  placeholder={placeholderInput}
+                  value={"paramedical"}
+                  required
+                />
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     className="btn btn-danger"
@@ -384,7 +416,7 @@ const ModalMedicalAntecedent = ({
                 data-bs-dismiss="modal"
                 onClick={(e) => {
                   e.preventDefault();
-                  setModalNotifyMsg("");
+                  //setModalNotifyMsg("");
                 }}
               >
                 Ok
@@ -407,4 +439,4 @@ const ModalMedicalAntecedent = ({
   );
 };
 
-export default ModalMedicalAntecedent;
+export default ModalParamedicalMutiple;

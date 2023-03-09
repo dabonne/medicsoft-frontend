@@ -39,6 +39,7 @@ const apiPatient = {
 
 const apiParamedical = {
     "post":"add-paramedical",
+    "postMulti":"add-multiple-paramedical",
     "get":"paramedicals",
     "put":"update-paramedical",
     "delete":"delete-paramedical"

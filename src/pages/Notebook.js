@@ -168,9 +168,12 @@ const Notebook = () => {
     myModal.show();
   }, []);
 
-  const employeEvent = (e, list) =>{
+  const employeEvent = (e, list) => {
     requestAgenda
-      .get(apiAgenda.agendaEmployee + "/"+e+"/" + user.organisationRef, header)
+      .get(
+        apiAgenda.agendaEmployee + "/" + e + "/" + user.organisationRef,
+        header
+      )
       .then((res) => {
         console.log(res.data);
         //setEmployeList(res.data.employees);
@@ -192,7 +195,7 @@ const Notebook = () => {
         getAgendaData();
       })
       .catch((error) => {});
-  }
+  };
 
   const setDetailEvent = (e) => {
     setIndexEvent(e.idx);
@@ -208,12 +211,14 @@ const Notebook = () => {
 
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
-    const month = date.getMonth() < 10 ? 0 + "" + (date.getMonth() + 1) : (date.getMonth() + 1);
-    console.log(date.getFullYear() + "-" + month + "-" + day)
+    const month =
+      date.getMonth() < 10
+        ? 0 + "" + (date.getMonth() + 1)
+        : date.getMonth() + 1;
+    console.log(date.getFullYear() + "-" + month + "-" + day);
     return date.getFullYear() + "-" + month + "-" + day;
   };
   const createEvent = (e) => {
-    
     setStartDay(formatDate(e.start));
     setEndDay(formatDate(e.end));
     setStartHours(e.start.toLocaleTimeString());
@@ -399,11 +404,16 @@ const Notebook = () => {
                     onSelectSlot={createEvent}
                     selectable
                     messages={message}
-                    views={["day", "week", "month"]}
+                    views={["day", "week", "month","today"]}
                     onNavigate={handleNavigation}
                     components={{
                       event: EventComponent({ myEventsList, change }),
-                      toolbar: CustomToolbar({ myEventsList, change, employeList, employeEvent }),
+                      toolbar: CustomToolbar({
+                        myEventsList,
+                        change,
+                        employeList,
+                        employeEvent,
+                      }),
                     }}
                   />
                 </div>
@@ -1044,8 +1054,8 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
   return class BaseToolBar extends Toolbar {
     constructor(props) {
       super(props);
-      this.state={employeeReference: ""}
-      this.getEmployeAgenda = this.getEmployeAgenda.bind(this)
+      this.state = { employeeReference: "" };
+      this.getEmployeAgenda = this.getEmployeAgenda.bind(this);
     }
 
     shouldComponentUpdate() {
@@ -1059,27 +1069,35 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
     };
 
     getEmployeAgenda = (e) => {
-      e.preventDefault()
-      this.setState({employeeReference: e.target.value})
-      employeEvent(e.target.value, employeList)
-      console.log(e.target.value)
-    }
+      e.preventDefault();
+      this.setState({ employeeReference: e.target.value });
+      employeEvent(e.target.value, employeList);
+      console.log(e.target.value);
+    };
     render() {
       return (
         <div className="row py-2">
           <div className="col-12 col-sm my-1">
-            <div className="d-inline-block  me-2">
-            <div className="border-radius bg-secondary border-0 px-0">
-            
-
-              <span className="btn" onClick={() => this.handleNamvigate(this, "PREV")}><img src={bk} alt="" /></span>
-              {this.props.label}
-              <span className="btn" onClick={() => this.handleNamvigate(this, "NEXT")}><img src={sv} alt="" /></span>
-            </div>
+            <div className="d-inline-block  mb-3 me-2">
+              <div className="border-radius bg-secondary border-0 px-0">
+                <span
+                  className="btn"
+                  onClick={() => this.handleNamvigate(this, "PREV")}
+                >
+                  <img src={bk} alt="" />
+                </span>
+                {this.props.label}
+                <span
+                  className="btn"
+                  onClick={() => this.handleNamvigate(this, "NEXT")}
+                >
+                  <img src={sv} alt="" />
+                </span>
+              </div>
             </div>
             <div
               defaultValue={"week"}
-              className="d-inline-block bg-secondary border-radius border-0 p-0 text-bold"
+              className="d-inline-block bg-secondary border-radius border-0 p-0 text-bold mb-3"
             >
               <div
                 type="button"
@@ -1138,6 +1156,17 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
                 Mois
               </div>
             </div>
+            <div className="d-inline-block mb-3 ms-2">
+              <div className="border-radius bg-secondary border-0 px-0">
+                
+                <span
+                  className="btn"
+                  onClick={() => this.handleNamvigate(this, "TODAY")}
+                >
+                 <span className="fw-bold">{(new Date().getDate() <10)? "0" + new Date().getDate() : new Date().getDate()} </span>Aujourd'hui
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="col-12 col-sm d-flex justify-content-end my-1">
@@ -1145,9 +1174,8 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
               <select
                 id="clst"
                 className="form-select"
-                value={""+this.state.employeeReference}
-                onChange={(e) => this.getEmployeAgenda(e)
-                }
+                value={"" + this.state.employeeReference}
+                onChange={(e) => this.getEmployeAgenda(e)}
                 style={{ height: "40px" }}
                 required
               >
@@ -1161,7 +1189,6 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
                 })}
               </select>
             </div>
-            
           </div>
           {/*
             <>
@@ -1210,8 +1237,7 @@ var CustomToolbar = ({ handleChange, employeList = [], employeEvent }) => {
                   </option>
                 </select>
               </div>
-            </>*/
-          }
+            </>*/}
         </div>
       );
     }

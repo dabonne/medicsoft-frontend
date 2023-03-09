@@ -23,6 +23,7 @@ import ModalParamedical from "../../../components/ModalParamedical";
 import { AppContext } from "../../../services/context";
 import requestPatient from "../../../services/requestPatient";
 import { apiPatient } from "../../../services/api";
+import ModalParamedicalMutiple from "../../../components/ModalParamedicalMutiple";
 
 const initPatient = {
   firstname: "",
@@ -186,6 +187,7 @@ const ContentParamedical = () => {
           </div>
         </div>
         <div>
+          <button className="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target={"#modalMul"}>Ajouter</button>
           <button className="btn btn-primary">Exporter le dossier</button>
         </div>
       </div>
@@ -202,6 +204,12 @@ const ContentParamedical = () => {
           </div>
         );
       })}
+      <ModalParamedicalMutiple
+              id={"modalMul"}
+              type={""}
+              labelInput={""}
+              placeholderInput={""}
+            />
     </>
   );
 };
