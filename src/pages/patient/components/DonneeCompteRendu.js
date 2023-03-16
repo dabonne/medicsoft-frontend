@@ -11,6 +11,7 @@ import requestPatient from "../../../services/requestPatient";
 import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
+import requestDoctor from "../../../services/requestDoctor";
 
 const initSelected = {
   idData: "",
@@ -24,7 +25,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
-  const [list, setList] = useState("");
+  const [list, setList] = useState([]);
   const [editValue, setEditValue] = useState();
   const [refresh, setRefresh] = useState(0);
   const [seletedData, setSelectedData] = useState(initSelected);
@@ -34,7 +35,8 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
 
   const notify = useRef();
   useEffect(() => {
-    //console.log(type);
+    console.log(type);
+    getListe()
     get();
   }, [refresh]);
 
@@ -51,6 +53,28 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
     setNameIdx(5);
   }
 
+  const getListe = () => {
+    console.log(type)
+    var url = ""
+    if(type.id==="IMAGERY"){
+      url = apiMedical.getListImagery
+    }
+    if(type.id==="BIOLOGIC_ANALYSE"){
+      url = apiMedical.getListBiology
+    }
+    if(type.id==="SPECIALIZED_EXAM"){
+      url = apiMedical.getListExamen
+    }
+    url !== "" && requestDoctor
+      .get(url, header)
+      .then((res) => {
+        //console.log(res.data);
+        setList(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const get = () => {
     requestPatient
       .get(apiMedical.get + "/" + user.cni + "?medicalType=" + type.id, header)
@@ -252,6 +276,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         type={type.id}
         oldValue={editValue}
         refresh={get}
+        list = {list}
       />
 
       <div className="modal fade" id="notify">

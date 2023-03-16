@@ -14,7 +14,7 @@ const initMedical = {
   "detail": ""
 };
 
-const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", entitled:"", content:""}}) => {
+const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue={id:"", entitled:"", content:""}}) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [medical, setMedical] = useState(initMedical);
@@ -39,7 +39,9 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
       setEntitled(initMedical.entitled)
       setDetail(initMedical.detail)
     }
-  },[oldValue])
+    //console.log(list )
+    //console.log(list.length !== 0)
+  },[oldValue, list])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -71,8 +73,8 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
       });
   };
@@ -106,8 +108,8 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
       });
   };
@@ -120,6 +122,8 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
   const fValidate = (cl) => {
     setFormValidate(cl);
   };
+
+  
   const getDate = () => {
     const mois = [
       "janvier",
@@ -193,7 +197,22 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
                   <label htmlFor="lname" className="form-label">
                     Intitulé
                   </label>
-                  <input
+                  {
+                    list.length !== 0 ? <select
+                    type="select"
+                    className="form-select"
+                    value={entitled}
+                    onChange={(e)=>setEntitled(e.target.value)}
+                    required
+                    >
+                      <option>Sélectionnez l'intitule du compte rendu</option>
+                      {
+                        list.map((data) => {
+
+                          return <option key={data.uuid} value={data.uuid}>{data.label}</option>
+                        })
+                      }
+                    </select> : <input
                     type="text"
                     className="form-control"
                     id="lname"
@@ -202,6 +221,7 @@ const ModalMedical = ({ id,type, title, refresh = () => {}, oldValue={id:"", ent
                     onChange={(e)=>setEntitled(e.target.value)}
                     required
                   />
+                  }
                   <div className="invalid-feedback">Veuillez entrer un intitulé</div>
                 </div>
                 <div className="mb-3 mt-3">

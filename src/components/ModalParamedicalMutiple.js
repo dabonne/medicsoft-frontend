@@ -1,19 +1,11 @@
-import view from "../assets/imgs/view.png";
-import add from "../assets/imgs/add.png";
 import FormNotify from "./FormNotify";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import requestPatient from "../services/requestPatient";
 import { apiParamedical } from "../services/api";
 import { AppContext } from "../services/context";
 import InputField from "./InputField";
-
-const initParamedical = {
-  patientCni: "",
-  value: "",
-  paramedicalType: "",
-  dateElaborate: "",
-  arterialPressure: "",
-};
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const initData = {
   TRANSMISSION: "",
@@ -28,85 +20,115 @@ const initData = {
   BLOOD_GROUP: "",
 };
 
+export const validateData = Yup.object({
+  TRANSMISSION: Yup.string()
+    //.required("Le champ est obligatoire")
+    .max(500, "Le texte ne doit pas dépasser 500 caractères"),
+  //.required("Required"),
+  WEIGHT: Yup.number()
+    .typeError("Le poid doit être un nombre")
+    //.required("Le poids est requis")
+    .positive("Le poids doit être positif")
+    .max(1000, "Le poids doit être inférieur ou égal à 1000"),
+  BODY_TEMPERATURE: Yup.number()
+    .typeError("La température doit être un nombre")
+    .min(35, "La température doit être supérieur ou égale à 35")
+    .max(42, "La température doit être inférieur ou égale à 42"),
+  //.required("La température n'est pas valide"),
+  ARTERIAL_PRESSURE1: Yup.number()
+    .typeError("La pression systolique doit être un nombre")
+    .min(70, "La pression systolique doit être supérieur ou égale à 70")
+    .max(200, "La pression systolique doit être inférieur ou égale à 200"),
+  //.required("La pression systolique est obligatoire"),
+  ARTERIAL_PRESSURE2: Yup.number()
+    .typeError("La pression diastolique doit être un nombre")
+    .min(40, "La pression diastolique doit être supérieur ou égale à 40")
+    .max(130, "La pression diastolique doit être inférieur ou égale à 130"),
+  //.required("La pression diastolique est obligatoire"),
+  CARDIAC_FREQUENCY: Yup.number()
+    .typeError("La fréquence cardiaque doit être un nombre")
+    .min(30, "La fréquence cardiaque doit être supérieur ou égale à 30")
+    .max(200, "La fréquence cardiaque doit être inférieur ou égale à 200"),
+  //.required("La fréquence cardiaque est obligatoire"),
+  BLOOD_SUGAR: Yup.number()
+    .typeError("La glycémie doit être un nombre")
+    .min(0, "La glycémie doit être supérieur ou égale à 0")
+    .max(30, "La glycémie doit être inférieur ou égale à 30"),
+  //.required("La glycémie est obligatoire"),
+  OXYGEN_SATURATION: Yup.number()
+    .typeError("La saturation en oxygène doit être un nombre")
+    .min(0, "La saturation en oxygène doit être supérieur ou égale à 0")
+    .max(100, "La saturation en oxygène doit être inférieur ou égale à 100"),
+  //.required("La saturation en oxygène est obligatoire"),
+  HEIGHT: Yup.number()
+    .typeError("La taille doit être un nombre ex: 1.45")
+    .positive("La taille doit être un nombre positif"),
+  //.required("La taille est obligatoire"),
+  BLOOD_GROUP: Yup.string()
+    .oneOf(
+      ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      "La groupe sanguin n'est pas valide"
+    ),
+    //.required("Le groupe sanguin est obligatoire"),
+  //.required("Le poid est requis"),
+});
+
 const ModalParamedicalMutiple = ({
   id,
-  type,
-  labelInput,
-  placeholderInput,
-  oldValue = { id: "", content: "", pressDia: "" },
-  refresh = () => {},
 }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
-  const [paramedical, setParamedical] = useState(initData);
-  const [pressionDia, setPressionDia] = useState("");
   const [list, setList] = useState([]);
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
-  const [formValidate, setFormValidate] = useState("needs-validation");
-  const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   const closeRef = useRef();
-  const closeEditRef = useRef();
   const notifyRef = useRef();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
 
-  useEffect(() => {
-    if (oldValue.content !== "") {
-      initParamedical.value = oldValue.content;
-      setParamedical(initParamedical.value);
-      setPressionDia(oldValue.pressDia);
-    }
-  }, [oldValue]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (values) => {
     var first = 0;
     const date = formatDate(new Date());
 
-    const data = Object.keys(paramedical).map((key) => {
+    const data = Object.keys(values).map((key) => {
       return key;
     });
     data.map((key) => {
-      //console.log(paramedical)
       if (
-        key == "ARTERIAL_PRESSURE1" ||
-        (key == "ARTERIAL_PRESSURE2" && first === 0)
+        key === "ARTERIAL_PRESSURE1" ||
+        (key === "ARTERIAL_PRESSURE2" && first === 0)
       ) {
-        list.push({
-          patientCni: user.cni,
-          paramedicalType: "ARTERIAL_PRESSURE",
-          dateElaborate: date,
-          value: paramedical["ARTERIAL_PRESSURE1"],
-          arterialPressure: paramedical["ARTERIAL_PRESSURE2"],
-        });
-        first = 1;
-        
-      }else{
-        if(key !=="ARTERIAL_PRESSURE2"){
+        if(values["ARTERIAL_PRESSURE1"] !== "" && values["ARTERIAL_PRESSURE2"] !==""){
           list.push({
             patientCni: user.cni,
-            paramedicalType: key,
+            paramedicalType: "ARTERIAL_PRESSURE",
             dateElaborate: date,
-            value: paramedical[key],
-            arterialPressure: "",
-          });
+            value: values["ARTERIAL_PRESSURE1"],
+            arterialPressure: values["ARTERIAL_PRESSURE2"],
+          })
+          first = 1
         }
         
-      } 
+      } else {
+        if (key !== "ARTERIAL_PRESSURE2") {
+          if(values[key] !==""){
+            list.push({
+              patientCni: user.cni,
+              paramedicalType: key,
+              dateElaborate: date,
+              value: values[key],
+              arterialPressure: "",
+            });
+          }
+        }
+      }
     });
     console.log(list);
     configNotify("loading", "", "Ajout des données en cours...");
-    console.log(header)
-    setModalNotifyMsg("Les informations ont bien été enrégistrées");
     requestPatient
-      .post(
-        apiParamedical.postMulti + "/" + user.organisationRef,
-        list,
-        header
-      )
+      .post(apiParamedical.postMulti + "/" + user.organisationRef + "/"+user.cni, list, header)
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -115,68 +137,19 @@ const ModalParamedicalMutiple = ({
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-
+        setList([])
         closeRef.current.click();
         notifyRef.current.click();
-        refresh();
       })
       .catch((error) => {
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
+        setList([])
       });
-  };
-
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-
-    console.log(initParamedical);
-    configNotify("loading", "", "Modification des données en cours...");
-    //console.log(jsData)
-    requestPatient
-      .put(
-        apiParamedical.put +
-          "/" +
-          oldValue.id +
-          "?value=" +
-          initParamedical.value +
-          "&date=" +
-          initParamedical.dateElaborate +
-          "&arterialPressure=" +
-          initParamedical.arterialPressure,
-        header
-      )
-      .then((res) => {
-        console.log("enregistrement ok");
-
-        configNotify(
-          "success",
-          "Modification réussi",
-          "Les informations ont bien été modifiées"
-        );
-        setModalNotifyMsg("Les informations ont bien été modifiées");
-        closeRef.current.click();
-        notifyRef.current.click();
-        refresh();
-      })
-      .catch((error) => {
-        console.log(error);
-        configNotify(
-          "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
-        );
-      });
-  };
-  const handleInputChange = (e) => {
-    e.preventDefault();
-    initParamedical.patientCni = user.cni;
-    initParamedical.paramedicalType = type;
-    initParamedical.dateElaborate = new Date();
-    initParamedical.value = paramedical;
   };
 
   const configNotify = (bg, title, message) => {
@@ -184,9 +157,7 @@ const ModalParamedicalMutiple = ({
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
-  const fValidate = (cl) => {
-    setFormValidate(cl);
-  };
+
   const getDate = () => {
     const mois = [
       "janvier",
@@ -232,19 +203,18 @@ const ModalParamedicalMutiple = ({
       date.getMonth() < 10
         ? 0 + "" + (date.getMonth() + 1)
         : date.getMonth() + 1;
-    console.log(date.getFullYear() + "-" + month + "-" + day);
     return date.getFullYear() + "-" + month + "-" + day;
   };
 
-  const onChange = (name, value) => {
-    console.log(name, value);
-    setParamedical({
-      ...paramedical,
-      [name]: value,
-    });
+  
 
-    console.log(paramedical);
-  };
+  const formik = useFormik({
+    initialValues: initData,
+    validationSchema: validateData,
+    onSubmit: (values) => {
+      handleSubmit(values)
+    },
+  });
   return (
     <>
       <div className="modal fade" id={id}>
@@ -261,7 +231,7 @@ const ModalParamedicalMutiple = ({
               ></button>
             </div>
             <div className="modal-body">
-              {notifyBg != "" ? (
+              {notifyBg !== "" ? (
                 <FormNotify
                   bg={notifyBg}
                   title={notifyTitle}
@@ -269,123 +239,100 @@ const ModalParamedicalMutiple = ({
                 />
               ) : null}
               <form
-                className={formValidate}
-                onSubmit={oldValue.id != "" ? handleEditSubmit : handleSubmit}
+                className="mt-3"
+                onSubmit={formik.handleSubmit}
                 noValidate
               >
                 <InputField
                   type={"text"}
-                  label="Poid"
+                  label="Entrer le poids en Kg"
                   name={"WEIGHT"}
-                  value={paramedical.WEIGHT}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Température corporelle"
+                  label="Entrer la température corporelle en degré Celsius"
                   name={"BODY_TEMPERATURE"}
-                  value={paramedical.BODY_TEMPERATURE}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Pression artérielle systolique"
+                  label="Entrer la pression systolique en mmHg"
                   name={"ARTERIAL_PRESSURE1"}
-                  value={paramedical.ARTERIAL_PRESSURE1}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Pression artérielle diastolique"
+                  label="Entrer la pression diastolique en mmHg"
                   name={"ARTERIAL_PRESSURE2"}
-                  value={paramedical.ARTERIAL_PRESSURE2}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Fréquence cardiaque"
+                  label="Entrer la fréquence cardiaque en bpm"
                   name={"CARDIAC_FREQUENCY"}
-                  value={paramedical.CARDIAC_FREQUENCY}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Glycémie"
+                  label="Entrer la glycémie en mg/dL"
                   name={"BLOOD_SUGAR"}
-                  value={paramedical.BLOOD_SUGAR}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Saturation en oxygène"
+                  label="Entrer la saturation en Sao2"
                   name={"OXYGEN_SATURATION"}
-                  value={paramedical.OXYGEN_SATURATION}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Taille"
+                  label="Entrer la taille en m"
                   name={"HEIGHT"}
-                  value={paramedical.HEIGHT}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <InputField
                   type={"text"}
-                  label="Groupe Sanguin"
+                  label="Entrer le groupe sanguin"
                   name={"BLOOD_GROUP"}
-                  value={paramedical.BLOOD_GROUP}
-                  onChange={onChange}
+                  formik={formik}
                 />
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
-                    {labelInput}
+                    Note à transmettre à toute l’équipe
                   </label>
                   <textarea
                     type="text"
                     className="form-control"
                     id="lname"
                     placeholder={"Transmission"}
-                    value={paramedical.TRANSMISSION}
-                    onChange={(e) => {
-                      if (e.target.value.length <= 500) {
-                        setParamedical({
-                          ...paramedical,
-                          TRANSMISSION: e.target.value,
-                        });
-                      }
-                    }}
+                    name="TRANSMISSION"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                     rows="6"
                     required
                   ></textarea>
-                  <div>{paramedical.TRANSMISSION.length + "/" + 500}</div>
-
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
+                  <div>{formik.values["TRANSMISSION"].length + "/" + 500}</div>
+                  {formik.touched["TRANSMISSION"] &&
+                  formik.errors["TRANSMISSION"] ? (
+                    <div className="text-danger">
+                      {formik.errors["TRANSMISSION"]}
+                    </div>
+                  ) : null}
                 </div>
 
-                <input
-                  type="text"
-                  className="form-control"
-                  id="lname"
-                  placeholder={placeholderInput}
-                  value={"paramedical"}
-                  required
-                />
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     className="btn btn-danger"
                     data-bs-dismiss="modal"
                     ref={closeRef}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      fValidate("needs-validation");
-                    }}
+                    onClick ={(e) => e.preventDefault()}
                   >
                     Annuler
                   </button>
                   <button
                     type="submit"
                     className="btn btn-primary"
-                    onClick={() => fValidate("was-validated")}
                   >
                     Enregistrer
                   </button>
@@ -407,7 +354,7 @@ const ModalParamedicalMutiple = ({
               ></button>
             </div>
 
-            <div className="modal-body">{modalNotifyMsg}</div>
+            <div className="modal-body">Les informations ont bien été enrégistrées</div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
               <button

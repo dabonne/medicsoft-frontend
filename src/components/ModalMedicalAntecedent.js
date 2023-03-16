@@ -75,8 +75,6 @@ const ModalMedicalAntecedent = ({
       .post(apiMedical.postFamily + "/" + user.organisationRef, initMedical, header)
       .then((res) => {
         console.log("enregistrement ok");
-        
-
         configNotify(
           "success",
           "Ajout réussi",

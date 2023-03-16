@@ -1,13 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
-  Link,
-  NavLink,
-  Route,
-  Routes,
-  useLocation,
-  useParams,
-} from "react-router-dom";
-import profile from "../../../assets/imgs/profile.png";
+  Link} from "react-router-dom";
 import mgs from "../../../assets/imgs/mgs.png";
 import poids from "../../../assets/imgs/poids.png";
 import pression from "../../../assets/imgs/pression.png";
@@ -19,7 +12,6 @@ import bck from "../../../assets/imgs/bck.png";
 
 
 import ButtonParamedical from "../../../components/ButtonParamedical";
-import ModalParamedical from "../../../components/ModalParamedical";
 import { AppContext } from "../../../services/context";
 import requestPatient from "../../../services/requestPatient";
 import { apiPatient } from "../../../services/api";
@@ -41,12 +33,7 @@ const initPatient = {
 
 const ContentParamedical = () => {
   const authCtx = useContext(AppContext);
-  const { user, onUserChange } = authCtx;
-  const [datas, setDatas] = useState([]);
-  const [pageName, setPageName] = useState("Dossier médical");
-  const [location, setLocation] = useState(window.location.pathname);
-  const [search, setSearch] = useState("");
-  const [list, setList] = useState("");
+  const { user } = authCtx;
 
   const header = {
     headers: { Authorization: `${user.token}` },
@@ -130,39 +117,13 @@ const ContentParamedical = () => {
     requestPatient
       .get(apiPatient.get + "/" + user.cni, header)
       .then((res) => {
-        setDatas(res.data);
         //console.log(res.data);
         setPatient(res.data);
       })
       .catch((error) => {
         //deconnect()
       });
-  }, [location]);
-
-  const onSearch = (e) => {
-    e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
-  };
+  }, []);
 
   return (
     <>
@@ -191,24 +152,15 @@ const ContentParamedical = () => {
           <button className="btn btn-primary">Exporter le dossier</button>
         </div>
       </div>
-      {paramedicalButton.map(({ id, img, title, label, placeholder, link}) => {
+      {paramedicalButton.map(({ id, img, title, label, link}) => {
         return (
           <div key={label}>
             <ButtonParamedical id={"modal" + id} img={img} title={title} link={link}/>
-            <ModalParamedical
-              id={"modal" + id}
-              type={id}
-              labelInput={label}
-              placeholderInput={placeholder}
-            />
           </div>
         );
       })}
       <ModalParamedicalMutiple
               id={"modalMul"}
-              type={""}
-              labelInput={""}
-              placeholderInput={""}
             />
     </>
   );

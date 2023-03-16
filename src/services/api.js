@@ -39,7 +39,7 @@ const apiPatient = {
 
 const apiParamedical = {
     "post":"add-paramedical",
-    "postMulti":"add-multiple-paramedical",
+    "postMulti":"v2/add-multiple-paramedical",
     "get":"paramedicals",
     "put":"update-paramedical",
     "delete":"delete-paramedical"
@@ -54,8 +54,17 @@ const apiMedical = {
     "getPersonalForm":"personal-family-form",
     "getPersonalList":"medical/personal-family",
     "putFamily":"update-medical/personal-family",
-    "deleteFamily":"delete-medical/personal-family"
+    "deleteFamily":"delete-medical/personal-family",
+    "postReport":"report",
+    "getReport": "report-list",
+    "getReportByID": "report-id",
+    "updateReport":"update-report",
+    "deleteReport":"delete-report",
+    "getListImagery":"prescription/param-type-imagery",
+    "getListBiology":"prescription/param-biological-analysis",
+    "getListExamen":"prescription/param-consultation"
 }
+
 
 export {
     apiEmploye,

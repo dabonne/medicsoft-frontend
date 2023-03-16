@@ -1,15 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import back from "../../../assets/imgs/back.png";
 import sui from "../../../assets/imgs/sui.png";
-import view from "../../../assets/imgs/view.png";
 import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
-import user from "../../../assets/imgs/user.png";
-import print from "../../../assets/imgs/print.png";
+
 import bck from "../../../assets/imgs/bck.png";
-import { Link, Route, Routes, useLocation } from "react-router-dom";
-import Dossier from "./DossierMedicaux";
-import Modal from "bootstrap/js/dist/modal";
+import { Link } from "react-router-dom";
 import requestPatient from "../../../services/requestPatient";
 import { apiParamedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
@@ -22,6 +18,18 @@ const initSelected = {
   title: "",
   callBack: () => {},
 };
+const initData = {
+  TRANSMISSION: "",
+  WEIGHT: "",
+  BODY_TEMPERATURE: "",
+  ARTERIAL_PRESSURE: "",
+  ARTERIAL_PRESSURE2: "",
+  CARDIAC_FREQUENCY: "",
+  BLOOD_SUGAR: "",
+  OXYGEN_SATURATION: "",
+  HEIGHT: "",
+  BLOOD_GROUP: "",
+};
 const TableParamedal = ({
   label = ["", ""],
   type = {},
@@ -32,11 +40,10 @@ const TableParamedal = ({
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
   const authCtx = useContext(AppContext);
-  const { user, onUserChange } = authCtx;
+  const { user } = authCtx;
   const [editValue, setEditValue] = useState();
-  const [refresh, setRefresh] = useState(0)
-  const [seletedData, setSelectedData] = useState(initSelected);
-  const notify = useRef()
+  const [refresh, setRefresh] = useState(0);
+  const notify = useRef();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -47,8 +54,7 @@ const TableParamedal = ({
     textOverflow: "ellipsis",
   };
   useEffect(() => {
-    console.log(type);
-    get()
+    get();
   }, [refresh]);
 
   const get = () => {
@@ -64,7 +70,7 @@ const TableParamedal = ({
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   setLocation(window.location.pathname);
   const onSearch = (e) => {
@@ -92,19 +98,12 @@ const TableParamedal = ({
     dd !== [] ? setList(dd) : setList(datas);
   };
 
-  const openModal = (id) => {
-    var myModal = new Modal(document.getElementById(id), {});
-    myModal.show();
-  };
   const onDelete = (id) => {
-    //e.preventDefault();
     requestPatient
       .delete(apiParamedical.delete + "/" + id)
       .then((res) => {
-        console.log("suppression ok");
-        
         //setModalNotifyMsg("Suppression réussie !")
-        notify.current.click()
+        notify.current.click();
         //setDelete([]);
         setRefresh(refresh + 1);
       })
@@ -115,7 +114,12 @@ const TableParamedal = ({
   return (
     <div className="container-fluid">
       <div className="row">
-        <Link className="text-decoration-none text-black" to="/dashboard/patient/dossier-paramedical/"><img src={bck} alt="" /> Retour</Link>
+        <Link
+          className="text-decoration-none text-black"
+          to="/dashboard/patient/dossier-paramedical/"
+        >
+          <img src={bck} alt="" /> Retour
+        </Link>
       </div>
       <div className="row my-3">
         <div className="col-9">
@@ -144,7 +148,21 @@ const TableParamedal = ({
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
-          <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target={"#modalEdit" + type.id}>Ajouter</button>
+          <button
+            className="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target={"#modalEdit" + type.id}
+            onClick={(e) => {
+              e.preventDefault();
+              setEditValue({
+                id: "",
+                content: "",
+                pressDia: "",
+              });
+            }}
+          >
+            Ajouter
+          </button>
         </div>
       </div>
 
@@ -156,9 +174,9 @@ const TableParamedal = ({
                 {label[0]} ID
               </th>
               <th scope="col">{label[1]}</th>
-              {
-                    (type.id === "ARTERIAL_PRESSURE") && <th scope="col">Pression A. Diastolique</th>
-                    }
+              {type.id === "ARTERIAL_PRESSURE" && (
+                <th scope="col">Pression A. Diastolique</th>
+              )}
               <th scope="col">Date d’élobaration</th>
               <th scope="col">Auteur</th>
               <th scope="col" className="text-center">
@@ -168,7 +186,6 @@ const TableParamedal = ({
           </thead>
           <tbody>
             {datas.map((data, idx) => {
-              //data.checkValue = false
               return (
                 <tr key={idx}>
                   <td>
@@ -176,17 +193,16 @@ const TableParamedal = ({
                   </td>
                   <td>
                     <div className="text-bold" style={styles}>
-                      {data.value + " " + unite}
+                      {data.value.toString()+" " + unite}
                     </div>
                   </td>
-                  {
-                    (type.id === "ARTERIAL_PRESSURE") &&
+                  {type.id === "ARTERIAL_PRESSURE" && (
                     <td>
-                    <div className="text-bold" style={styles}>
-                      {data.arterialPressure + " " + unite}
-                    </div>
-                  </td>
-                  }
+                      <div className="text-bold" style={styles}>
+                        {data.arterialPressure + " " + unite}
+                      </div>
+                    </td>
+                  )}
                   <td>
                     <span className="text-bold">{data.dateElaboration}</span>
                   </td>
@@ -208,7 +224,11 @@ const TableParamedal = ({
                         data-bs-target={"#modalEdit" + type.id}
                         onClick={(e) => {
                           e.preventDefault();
-                          setEditValue({ id: data.id, content: data.value, pressDia: data.arterialPressure });
+                          setEditValue({
+                            id: data.id,
+                            content: data.value,
+                            pressDia: data.arterialPressure,
+                          });
                         }}
                         src={edit}
                         alt=""
@@ -218,15 +238,13 @@ const TableParamedal = ({
                       <img
                         title="Supprimer les données"
                         data-bs-toggle="modal"
-                        data-bs-target={"#deleteData"+data.id}
+                        data-bs-target={"#deleteData" + data.id}
                         onClick={(e) => {
                           e.preventDefault();
                           initSelected.idData = data.id;
                           initSelected.idModale = "delete" + type.title;
                           initSelected.title = type.title;
                           initSelected.callBack = onDelete;
-                          setSelectedData(initSelected);
-                          //openModal("deleteData")
                           //setDelete(["" + data.employeeReference]);
                         }}
                         src={del}
@@ -235,7 +253,7 @@ const TableParamedal = ({
                     </div>
                     <DeleteModal
                       id={data.id}
-                      modal={"deleteData"+data.id}
+                      modal={"deleteData" + data.id}
                       title={"Supprimer " + type.title}
                       onDelete={onDelete}
                     />
@@ -258,7 +276,6 @@ const TableParamedal = ({
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold"></h4>
               <button
                 type="button"
                 className="btn-close"
