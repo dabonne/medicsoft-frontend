@@ -7,19 +7,26 @@ import { apiMedical, apiParamedical } from "../services/api";
 import { AppContext } from "../services/context";
 
 const initMedical = {
-  "patientCni": "",
-  "entitled": "",
-  "medicalType": "",
-  "dateElaborate": "",
-  "detail": ""
+  patientCni: "",
+  entitled: "",
+  medicalType: "",
+  dateElaborate: "",
+  detail: "",
 };
 
-const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue={id:"", entitled:"", content:""}}) => {
+const ModalMedical = ({
+  id,
+  type,
+  title,
+  list = [],
+  refresh = () => {},
+  oldValue = { id: "", entitled: "", content: "" },
+}) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [medical, setMedical] = useState(initMedical);
-  const [entitled, setEntitled] = useState("")
-  const [detail, setDetail] = useState("")
+  const [entitled, setEntitled] = useState("");
+  const [detail, setDetail] = useState("");
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
@@ -33,31 +40,40 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
   };
 
   useEffect(() => {
-    if(oldValue.content !== ""  || oldValue.entitled !== ""){
-      initMedical.entitled = oldValue.entitled;
+    if (oldValue.content !== "" || oldValue.entitled !== "") {
       initMedical.detail = oldValue.content;
-      setEntitled(initMedical.entitled)
-      setDetail(initMedical.detail)
+      if (list.length !== 0) {
+        list.map((data) => {
+          if (data.label === oldValue.entitled) {
+            setEntitled(data.uuid);
+            initMedical.entitled = data.uuid;
+          }
+        });
+      }else{
+        setEntitled(oldValue.entitled);
+        initMedical.entitled = oldValue.entitled;
+      }
+
+      setDetail(initMedical.detail);
     }
     //console.log(list )
     //console.log(list.length !== 0)
-  },[oldValue, list])
+  }, [oldValue, list]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    initMedical.patientCni = user.cni
-    initMedical.medicalType = type
-    initMedical.dateElaborate = formatDate(new Date())
-    initMedical.entitled = entitled
-    initMedical.detail = detail
-    console.log(initMedical)
+    initMedical.patientCni = user.cni;
+    initMedical.medicalType = type;
+    initMedical.dateElaborate = formatDate(new Date());
+    initMedical.entitled = entitled;
+    initMedical.detail = detail;
+    console.log(initMedical);
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
     requestPatient
-      .post(apiMedical.post+"/"+user.organisationRef, initMedical, header)
+      .post(apiMedical.post + "/" + user.organisationRef, initMedical, header)
       .then((res) => {
         console.log("enregistrement ok");
-        
 
         configNotify(
           "success",
@@ -67,7 +83,7 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
         setModalNotifyMsg("Les informations ont bien été enrégistrées");
         closeRef.current.click();
         notifyRef.current.click();
-        refresh()
+        refresh();
       })
       .catch((error) => {
         console.log(error);
@@ -81,16 +97,20 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    initMedical.patientCni = user.cni
-    initMedical.medicalType = type
-    initMedical.dateElaborate = formatDate(new Date())
-    initMedical.entitled = entitled
-    initMedical.detail = detail
-    console.log(initMedical)
+    initMedical.patientCni = user.cni;
+    initMedical.medicalType = type;
+    initMedical.dateElaborate = formatDate(new Date());
+    initMedical.entitled = entitled;
+    initMedical.detail = detail;
+    console.log(initMedical);
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
     requestPatient
-      .put(apiMedical.put+"/"+oldValue.id+"?detail="+initMedical.detail+"&entiled="+initMedical.entitled, header)
+      .put(
+        apiMedical.put + "/" + user.organisationRef + "/" + oldValue.id,
+        initMedical,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -102,7 +122,7 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
         setModalNotifyMsg("Les informations ont bien été modifiées");
         closeRef.current.click();
         notifyRef.current.click();
-        refresh()
+        refresh();
       })
       .catch((error) => {
         console.log(error);
@@ -123,7 +143,6 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
     setFormValidate(cl);
   };
 
-  
   const getDate = () => {
     const mois = [
       "janvier",
@@ -148,8 +167,8 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
       let weekday = today.toLocaleDateString("fr-FR", { weekday: "long" });
       let hours = today.getHours();
       let minutes = today.getMinutes();
-      hours = hours < 10 ? "0"+hours : hours
-      minutes = minutes < 10 ? "0"+minutes : minutes
+      hours = hours < 10 ? "0" + hours : hours;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
       return { weekday, dayNumber, month, year, hours, minutes };
     }
 
@@ -165,8 +184,11 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
   };
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
-    const month = date.getMonth() < 10 ? 0 + "" + (date.getMonth() + 1) : (date.getMonth() + 1);
-    console.log(date.getFullYear() + "-" + month + "-" + day)
+    const month =
+      date.getMonth() < 10
+        ? 0 + "" + (date.getMonth() + 1)
+        : date.getMonth() + 1;
+    console.log(date.getFullYear() + "-" + month + "-" + day);
     return date.getFullYear() + "-" + month + "-" + day;
   };
   return (
@@ -175,9 +197,7 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim">
-              {title}
-              </h4>
+              <h4 className="modal-title text-meduim">{title}</h4>
               <button
                 type="button"
                 className="btn-close"
@@ -192,37 +212,46 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
                   message={notifyMessage}
                 />
               ) : null}
-              <form className={formValidate} onSubmit={oldValue.id != "" ? handleEditSubmit : handleSubmit} noValidate>
+              <form
+                className={formValidate}
+                onSubmit={oldValue.id != "" ? handleEditSubmit : handleSubmit}
+                noValidate
+              >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Intitulé
                   </label>
-                  {
-                    list.length !== 0 ? <select
-                    type="select"
-                    className="form-select"
-                    value={entitled}
-                    onChange={(e)=>setEntitled(e.target.value)}
-                    required
+                  {list.length !== 0 ? (
+                    <select
+                      type="select"
+                      className="form-select"
+                      value={entitled}
+                      onChange={(e) => setEntitled(e.target.value)}
+                      required
                     >
                       <option>Sélectionnez l'intitule du compte rendu</option>
-                      {
-                        list.map((data) => {
-
-                          return <option key={data.uuid} value={data.uuid}>{data.label}</option>
-                        })
-                      }
-                    </select> : <input
-                    type="text"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer l'intitule du compte rendu"
-                    value={entitled}
-                    onChange={(e)=>setEntitled(e.target.value)}
-                    required
-                  />
-                  }
-                  <div className="invalid-feedback">Veuillez entrer un intitulé</div>
+                      {list.map((data) => {
+                        return (
+                          <option key={data.uuid} value={data.uuid}>
+                            {data.label}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="lname"
+                      placeholder="Entrer l'intitule du compte rendu"
+                      value={entitled}
+                      onChange={(e) => setEntitled(e.target.value)}
+                      required
+                    />
+                  )}
+                  <div className="invalid-feedback">
+                    Veuillez entrer un intitulé
+                  </div>
                 </div>
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
@@ -236,14 +265,16 @@ const ModalMedical = ({ id,type, title, list = [], refresh = () => {}, oldValue=
                     rows="6"
                     value={detail}
                     onChange={(e) => {
-                      if(e.target.value.length <= 500){
-                        setDetail(e.target.value)
+                      if (e.target.value.length <= 500) {
+                        setDetail(e.target.value);
                       }
                     }}
                     required
                   ></textarea>
-                  <div>{detail.length +"/"+500}</div>
-                  <div className="invalid-feedback">Veuillez entrer un détails</div>
+                  <div>{detail.length + "/" + 500}</div>
+                  <div className="invalid-feedback">
+                    Veuillez entrer un détails
+                  </div>
                 </div>
 
                 <div className="modal-footer d-flex justify-content-start border-0">

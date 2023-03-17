@@ -114,7 +114,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
     //e.preventDefault();
     console.log(id);
     requestPatient
-      .delete(apiMedical.delete + "/" + id)
+      .delete(apiMedical.delete + "/" + id + "?type="+type.id)
       .then((res) => {
         console.log("suppression ok");
         setRefresh(refresh + 1);
@@ -160,6 +160,9 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
             className="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target={"#modalEdit" + type.id}
+            onClick={e => {
+              setEditValue({ id: "", entitled: "", content: "" })
+            }}
           >
             Ajouter
           </button>

@@ -377,6 +377,73 @@ const Prescription = ({ setLocation }) => {
           </div>
         </div>
       </div>
+      <div className="modal fade" id="detailModal">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="row row-cols-1 row-cols-md-4 my-5">
+                <div className="col">
+                  <div
+                    to="antecedent-personne"
+                    className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
+                  >
+                    <div className="text-center">
+                      <Ordonnance /> <br />
+                      <span className="text-bold">Ordonnance</span> <br />
+                      <span className="text-bold">médicale</span> <br />
+                      <span className="text-bold">pharmaceutique</span> <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="col">
+                  <div
+                    to="imageries"
+                    className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
+                  >
+                    <div className="text-center">
+                      <AnaBiolo /> <br />
+                      <span className="text-bold">Analyses</span> <br />
+                      <span className="text-bold">biologiques</span> <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="col">
+                  <div
+                    to="imageries"
+                    className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
+                  >
+                    <div className="text-center">
+                      <Imagery /> <br />
+                      <span className="text-bold">Imagerie </span> <br />
+                      <span className="text-bold">Médicale</span> <br />
+                    </div>
+                  </div>
+                </div>
+                <div className="col">
+                  <div
+                    to="examens-specialises"
+                    className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
+                  >
+                    <div className="text-center">
+                      <Doctor /> <br />
+                      <span className="text-bold">Consultation /</span> <br />
+                      <span className="text-bold">Examen</span> <br />
+                      <span className="text-bold">spécialisé</span> <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
