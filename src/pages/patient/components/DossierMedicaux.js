@@ -38,9 +38,9 @@ const DossierMedicaux = () => {
             <span>Date de naissance: </span>
             <span className="text-bold">{data.birthdate}</span> <br />
             <span>Poids: </span>
-            <span className="text-bold">{data.weight}kg</span> <br />
+            <span className="text-bold">{data.weight} kg</span> <br />
             <span>Taille: </span>
-            <span className="text-bold">{data.height}m</span> <br />
+            <span className="text-bold">{data.height} m</span> <br />
             <span>IMC: </span>
             <span className="text-bold">{data.imc} KG/M²</span> <br />
             <span>

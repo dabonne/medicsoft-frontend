@@ -140,11 +140,11 @@ const ContentParamedical = () => {
             <span>Date de naissance: </span>
             <span className="text-bold">{patient.birthdate}</span> <br />
             <span>Poids: </span>
-            <span className="text-bold">89kg</span> <br />
+            <span className="text-bold">{patient.weight} kg</span> <br />
             <span>Taille: </span>
-            <span className="text-bold">1m 90</span> <br />
+            <span className="text-bold">{patient.height} m</span> <br />
             <span>IMC: </span>
-            <span className="text-bold">24.65 KG/M²</span> <br />
+            <span className="text-bold">{patient.imc} KG/M²</span> <br />
           </div>
         </div>
         <div>
