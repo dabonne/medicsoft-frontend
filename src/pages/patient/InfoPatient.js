@@ -174,7 +174,7 @@ const InfoPatient = () => {
             <Routes>
               <Route path="/" element={<RendezVous setLocation={setLocation} />} />
               <Route path="/rendez-vous" element={<RendezVous setLocation={setLocation} />} />
-              <Route path="/prescriptions" element={<Prescription setLocation={setLocation} />} />
+              <Route path="/prescriptions/*" element={<Prescription setLocation={setLocation} />} />
               <Route path="/dossiers-medicaux/*" element={<DossierContainer setLocation={setLocation} setPageName={setPageName} />} />
               <Route path="/comptes-rendus" element={<CompteRendu setLocation={setLocation} />} />
             </Routes>

@@ -65,6 +65,20 @@ const apiMedical = {
     "getListExamen":"prescription/param-consultation"
 }
 
+const apiPrescription = {
+    "getListPresc" : "prescription/param-pharmaceutical-prescription",
+    "postOrdonnance":"prescription/add-pharmaceutical-prescription",
+    "getAllPrescri":"prescription/prescriptions-list",
+    "getTypeAnalyse":"prescription/param-biological-analysis",
+    "postTypeAnalyse":"prescription/add-biological-analysis",
+    "getTypeImagerie":"prescription/param-type-imagery",
+    "postTypeImagerie":"prescription/add-medical-imaging",
+    "getTypeConsultation":"prescription/param-consultation",
+    "postTypeConsultation":"prescription/add-consultation-exam",
+    "deletePresc":"prescription/delete-prescription",
+    "getPrescriptionById":"prescription/prescription-id"
+}
+
 
 export {
     apiEmploye,
@@ -72,5 +86,6 @@ export {
     apiAgenda,
     apiPatient,
     apiParamedical,
-    apiMedical
+    apiMedical,
+    apiPrescription
 }
