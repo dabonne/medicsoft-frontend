@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import back from "../../../assets/imgs/back.png";
 import sui from "../../../assets/imgs/sui.png";
 import view from "../../../assets/imgs/view.png";
@@ -9,7 +9,8 @@ import print from "../../../assets/imgs/print.png";
 import { apiPrescription } from "../../../services/api";
 import requestDoctor from "../../../services/requestDoctor";
 import { AppContext } from "../../../services/context";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import DeleteModal from "../../../components/DeleteModal";
 
 const Ordonnance = () => {
   return (
@@ -144,12 +145,28 @@ const PrescriptionListe = () => {
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
   const [modalView, setModalView] = useState("");
+
+  const [notifyBg, setNotifyBg] = useState("");
+
+  const [modalNotifyMsg, setModalNotifyMsg] = useState("");
+  const notifyRef = useRef();
+  const [refresh, setRefresh] = useState(0);
+  const [deleteId, setDeleteId] = useState("");
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+  const navigate = useNavigate();
+  const [viewPresc, setViewPresc] = useState({
+    date: "",
+    author: "",
+    id: "",
+    type: "",
+    prescriptions: [],
+  });
+
   useEffect(() => {
     getList();
-  }, []);
+  }, [refresh]);
 
   const onSearch = (e) => {
     e.preventDefault();
@@ -193,7 +210,7 @@ const PrescriptionListe = () => {
       .get(apiPrescription.getPrescriptionById + "/" + id, header)
       .then((res) => {
         console.log(res.data);
-        //setDatas(res.data);
+        setViewPresc(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -202,14 +219,30 @@ const PrescriptionListe = () => {
 
   const deletePresc = (id) => {
     requestDoctor
-      .delete(apiPrescription.deletePresc+"/"+id, header)
+      .delete(apiPrescription.deletePresc + "/" + id, header)
       .then((res) => {
-        console.log(res.data);
-        console.log("suppression réussi")
+        setModalNotifyMsg("Suppression réussie !");
+        notifyRef.current.click();
+        setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const editPrescr = (data, typePresc) => {
+    if (typePresc === "ORDINANCE") {
+      navigate("ordonnance-medicale/" + data.id);
+    }
+    if (typePresc === "BIOLOGICAL_ANALYSIS") {
+      navigate("form-analyse-biologique/" + data.id);
+    }
+    if (typePresc === "MEDICAL_IMAGERY") {
+      navigate("form-imagerie/" + data.id);
+    }
+    if (typePresc === "CONSULTATION") {
+      navigate("form-examen-specialise/" + data.id);
+    }
   };
 
   return (
@@ -302,11 +335,13 @@ const PrescriptionListe = () => {
                       <div className="d-inline-block mx-1">
                         <img
                           title="Voir la prescription"
+                          data-bs-toggle="modal"
+                          data-bs-target="#viewPrescriptionModal"
                           onClick={(e) => {
                             e.preventDefault();
                             //setDelete(["" + data.employeeReference]);
                             //viewEmploye(data);
-                            getPrescriptionById(data.id)
+                            getPrescriptionById(data.id);
                           }}
                           src={view}
                           alt=""
@@ -327,11 +362,10 @@ const PrescriptionListe = () => {
                       <div className="d-inline-block mx-1">
                         <img
                           title="Éditer la prescription"
-                          data-bs-toggle="modal"
-                          data-bs-target="#deleteEmploye"
                           onClick={(e) => {
                             e.preventDefault();
                             //setDelete(["" + data.employeeReference]);
+                            editPrescr(data, data.keyType);
                           }}
                           src={edit}
                           alt=""
@@ -340,9 +374,11 @@ const PrescriptionListe = () => {
                       <div className="d-inline-block mx-1">
                         <img
                           title="Supprimer la prescription"
+                          data-bs-toggle="modal"
+                          data-bs-target="#deletePresc"
                           onClick={(e) => {
                             e.preventDefault();
-                            deletePresc(data.id)
+                            setDeleteId(data.id);
                           }}
                           src={del}
                           alt=""
@@ -355,6 +391,106 @@ const PrescriptionListe = () => {
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="modal fade" id="viewPrescriptionModal">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header1 p-4 border-0">
+              <div className="d-flex">
+                {viewPresc.type === "ORDINANCE" && (
+                  <span className="me-auto text-meduim">Ordonnance / PRESC-0218374</span>
+                )}
+                {viewPresc.type === "BIOLOGICAL_ANALYSIS" && (
+                  <span className="me-auto text-meduim">Analyses biologiques / PRESC-0218374</span>
+                )}
+                {viewPresc.type === "MEDICAL_IMAGERY" && (
+                  <span className="me-auto text-meduim">Imagerie médicale / PRESC-0218374</span>
+                )}
+                {viewPresc.type === "CONSULTATION" && (
+                  <span className="me-auto text-meduim">Consultation et/ou examen spécialisé / PRESC-0218374</span>
+                )}
+                <div className="btn-group me-2">
+                  <div className="d-inline-block mx-1">
+                    <img
+                      title="Imprimer la prescription"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        //setDelete(["" + data.employeeReference]);
+                        //viewEmploye(data);
+                      }}
+                      src={print}
+                      alt=""
+                    />
+                  </div>
+                  <div className="d-inline-block mx-1">
+                    <img
+                      title="Éditer la prescription"
+                      data-bs-dismiss="modal"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        //setDelete(["" + data.employeeReference]);
+                        editPrescr(viewPresc, viewPresc.type);
+                      }}
+                      src={edit}
+                      alt=""
+                    />
+                  </div>
+                  <div className="d-inline-block mx-1">
+                    <img
+                      title="Supprimer la prescription"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deletePresc"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setDeleteId(viewPresc.id);
+                      }}
+                      src={del}
+                      alt=""
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                ></button>
+              </div>
+              <div className="d-flex py-3 border-bottom">
+                <div className="d-flex me-auto">
+                  <img
+                    className="me-2"
+                    width={"42px"}
+                    src={user.profile}
+                    alt=""
+                  />
+                  <div>
+                    <span className="fw-bold">{viewPresc.author}</span> <br />
+                    <span>Psychiatre</span>
+                  </div>
+                </div>
+                <div>
+                  <span>Date de délivrance</span> <br />
+                  <span className="fw-bold text-meduim">{viewPresc.date}</span>
+                </div>
+              </div>
+            </div>
+            <div className="modal-body">
+              {viewPresc.prescriptions.map((data, idx) => {
+                return (
+                  <div key={idx} className="my-2">
+                    {viewPresc.type === "ORDINANCE" && <Ordonnance />}
+                    {viewPresc.type === "BIOLOGICAL_ANALYSIS" && <AnaBiolo />}
+                    {viewPresc.type === "MEDICAL_IMAGERY" && <Imagery />}
+                    {viewPresc.type === "CONSULTATION" && <Doctor />}
+
+                    <div className="d-inline ms-3 fw-bold">{data.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="modal fade" id="prescriptionModal">
@@ -497,6 +633,54 @@ const PrescriptionListe = () => {
           </div>
         </div>
       </div>
+
+      <DeleteModal
+        title={"Suppression de la prescription"}
+        modal={"deletePresc"}
+        id={deleteId}
+        onDelete={deletePresc}
+      />
+
+      <div className="modal fade" id="notifyRef">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">{modalNotifyMsg}</div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <input
+        type="hidden"
+        ref={notifyRef}
+        data-bs-toggle="modal"
+        data-bs-target="#notifyRef"
+        onClick={(e) => {
+          e.preventDefault();
+          setNotifyBg("");
+        }}
+      />
     </>
   );
 };

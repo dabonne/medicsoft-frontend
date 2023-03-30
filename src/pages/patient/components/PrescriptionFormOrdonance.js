@@ -12,7 +12,7 @@ import requestDoctor from "../../../services/requestDoctor";
 import { apiPrescription } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import FormNotify from "../../../components/FormNotify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const initOrdonnance = {
   drug: "",
@@ -77,10 +77,16 @@ const PrescriptionFormOrdonance = (type = "") => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+  const [firstCall, setFirstCall] = useState(0);
+  const { id } = useParams();
   useEffect(() => {
     getList();
-    console.log(data);
-    console.log(list);
+    //console.log(data);
+    if (id !== undefined && firstCall !== 1) {
+      getPrescriptionById(id);
+      setFirstCall(firstCall + 1);
+    }
+    //console.log(list);
   }, [list]);
 
   const getList = () => {
@@ -88,18 +94,31 @@ const PrescriptionFormOrdonance = (type = "") => {
       .get(apiPrescription.getListPresc)
       .then((res) => {
         setData(res.data);
-        console.log(data);
       })
       .catch((error) => {
         console.log(error);
       });
   };
-
+  const getPrescriptionById = (id) => {
+    requestDoctor
+      .get(apiPrescription.getPrescriptionById + "/" + id, header)
+      .then((res) => {
+        console.log(res.data);
+        //setDatas(res.data);
+        setList({
+          ...list,
+          list: res.data.prescriptions,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const formik = useFormik({
     initialValues: initOrdonnance,
 
     onSubmit: (values) => {
-      //console.log(values)
+      console.log(values)
       const data = {
         drug: values.drug,
         dosage: values.dosage,
@@ -118,11 +137,20 @@ const PrescriptionFormOrdonance = (type = "") => {
         administrationMode: values.administrationMode,
         precision: values.precision,
       };
+      
+      
+      if (list.sendata) {
+        if(id !== undefined){
+          handleEditSubmit([...list.list, data])
+        }else{
+          handleSubmit([...list.list, data])
+        }
+      }
       setList({
         ...list,
         list: [...list.list, data],
       });
-      //console.log(list);
+      console.log([...list.list, data]);
       setPeriodeChecked({
         MORNING: false,
         NIGHT: false,
@@ -130,25 +158,47 @@ const PrescriptionFormOrdonance = (type = "") => {
         MIDDAY: false,
       });
       formik.resetForm();
-      if (list.sendata) {
-        handleSubmit(list.list);
-      }
     },
   });
+  const editFromList = (e, drug) => {
+    e.preventDefault();
+    console.log(drug)
+    var tab = list.list.filter((data) => {
+      if(data.drug !== drug){
+        return data
+      }
+      formik.setFieldValue("drug",data.drug)
+      formik.setFieldValue("dosage",data.dosage)
+      formik.setFieldValue("during",data.during)
+      formik.setFieldValue("dayOrWeekOrMonth",data.dayOrWeekOrMonth)
+      formik.setFieldValue("MORNING",data.MORNING)
+      formik.setFieldValue("NIGHT",data.NIGHT)
+      formik.setFieldValue("EVENING",data.EVENING)
+      formik.setFieldValue("MIDDAY",data.MIDDAY)
+      formik.setFieldValue("frequency",data.frequency)
+      formik.setFieldValue("quantity",data.quantity)
+      formik.setFieldValue("administrationMode",data.administrationMode)
+      formik.setFieldValue("precision",data.precision)
+    });
 
+    setList({
+      ...list,
+      list: tab,
+    });
+  };
   const deleteFromList = (e, drug) => {
     e.preventDefault();
 
     var tab = list.list.filter((data) => data.drug !== drug);
 
-    console.log(tab);
+    //console.log(tab);
     setList({
       ...list,
       list: tab,
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (tab) => {
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
     requestDoctor
@@ -158,7 +208,7 @@ const PrescriptionFormOrdonance = (type = "") => {
           user.organisationRef +
           "/" +
           user.cni,
-        list.list,
+          tab,
         header
       )
       .then((res) => {
@@ -183,7 +233,35 @@ const PrescriptionFormOrdonance = (type = "") => {
         );
       });
   };
+  const handleEditSubmit = (tab) => {
+    console.log(tab)
+    configNotify("loading", "", "Modification des données en cours...");
+    requestDoctor
+      .put(
+        apiPrescription.updateOrdonnance +"/" +
+        user.organisationRef +"/"+id, tab,header)
+      .then((res) => {
+        console.log("enregistrement ok");
 
+        configNotify(
+          "success",
+          "Modification réussi",
+          "Les informations ont bien été modifiées"
+        );
+        setModalNotifyMsg(
+          "Les informations ont bien été modifiées"
+        );
+        notifyRef.current.click();
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
+      });
+  };
   const configNotify = (bg, title, message) => {
     setNotifyBg(bg);
     setNotifyTitle(title);
@@ -204,6 +282,9 @@ const PrescriptionFormOrdonance = (type = "") => {
                     return d.uuid === dta.drug && d.label;
                   })}
                 </span>
+              </div>
+              <div className="me-2" onClick={(e) => editFromList(e, dta.drug)}>
+                <img src={edit} alt="" />
               </div>
               <div onClick={(e) => deleteFromList(e, dta.drug)}>
                 <img src={del} alt="" />

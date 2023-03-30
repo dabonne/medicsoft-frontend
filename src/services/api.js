@@ -27,7 +27,8 @@ const apiAgenda = {
     "post":"agenda-request",
     "put":"agenda-updateform",
     "delete":"agenda-delete",
-    "agendaEmployee":"agenda-employee-list"
+    "agendaEmployee":"agenda-employee-list",
+    "eventEmploye":"events-employee"
 }
 
 const apiPatient = {
@@ -60,21 +61,28 @@ const apiMedical = {
     "getReportByID": "report-id",
     "updateReport":"update-report",
     "deleteReport":"delete-report",
+    "printReport":"medical-record/report",
     "getListImagery":"prescription/param-type-imagery",
     "getListBiology":"prescription/param-biological-analysis",
-    "getListExamen":"prescription/param-consultation"
+    "getListExamen":"prescription/param-consultation",
+    "rendezVous":"appointment/add-appointment",
+    "rendezVousListe":"appointment/appointment-patient"
 }
 
 const apiPrescription = {
     "getListPresc" : "prescription/param-pharmaceutical-prescription",
     "postOrdonnance":"prescription/add-pharmaceutical-prescription",
+    "updateOrdonnance":"prescription/update-pharmaceutical-prescription",
     "getAllPrescri":"prescription/prescriptions-list",
     "getTypeAnalyse":"prescription/param-biological-analysis",
     "postTypeAnalyse":"prescription/add-biological-analysis",
+    "updateTypeAnalyse":"prescription/update-biological-analysis",
     "getTypeImagerie":"prescription/param-type-imagery",
     "postTypeImagerie":"prescription/add-medical-imaging",
+    "updateTypeImagerie":"prescription/update-medical-imaging",
     "getTypeConsultation":"prescription/param-consultation",
     "postTypeConsultation":"prescription/add-consultation-exam",
+    "updateTypeConsultation":"prescription/update-consultation-exam",
     "deletePresc":"prescription/delete-prescription",
     "getPrescriptionById":"prescription/prescription-id"
 }

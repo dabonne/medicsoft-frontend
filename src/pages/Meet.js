@@ -7,12 +7,24 @@ import sui from "../assets/imgs/sui.png";
 import userProfile from "../assets/imgs/userinfo.png";
 import userp from "../assets/imgs/user.png";
 import requestEmploye from "../services/requestEmploye";
-import { apiEmploye } from "../services/api";
+import { apiAgenda, apiEmploye } from "../services/api";
 import FormNotify from "../components/FormNotify";
 import { AppContext } from "../services/context";
 import { getUser } from "../services/storage";
 import { useNavigate } from "react-router-dom";
+import InputField from "../components/InputField";
+import { useFormik } from "formik";
+import requestAgenda from "../services/requestAgenda";
 
+const initData = {
+  startDate: "",
+  endDate: "",
+  doctorUuid: "",
+  period: "",
+  hour: "",
+  patientCni: "",
+  detail: ""
+};
 const Meet = () => {
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState("");
@@ -57,7 +69,13 @@ const Meet = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
   let navigate = useNavigate();
-
+  const header = {
+    headers: { Authorization: `${user.token}` },
+  };
+  const [doctor, setDoctor] = useState({
+    date: "",
+    list: [],
+  });
   useEffect(() => {
     setList([...Array(12).keys()]);
     onUserChange(getUser());
@@ -81,12 +99,41 @@ const Meet = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
+  const getEnvetEmploye = (values) => {
+    //configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
     //console.log(jsData)
-    requestEmploye
-      .post(apiEmploye.post, jsData)
+    requestAgenda
+      .get(
+        apiAgenda.eventEmploye +
+          "/" +
+          user.organisationRef +
+          "?startDate=" +
+          values.startDate +
+          "&endDate=" +
+          values.endDate
+      )
+      .then((res) => {
+        console.log(res.data);
+        setDoctor({
+          ...doctor,
+          list: res.data,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Ouppss!!",
+          "Une erreur est survenue, veuillez reesayer plus tard..."
+        );
+      });
+  };
+
+  const handleSubmit = () => {
+    //configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
+    //console.log(jsData)
+    requestAgenda
+      .get(apiAgenda.eventEmploye)
       .then((res) => {
         console.log("enregistrement ok");
         setRefresh(refresh + 1);
@@ -265,6 +312,13 @@ const Meet = () => {
     setNotifyMessage(message);
   };
 
+  const formik = useFormik({
+    initialValues: initData,
+    onSubmit: (values) => {
+      getEnvetEmploye(values);
+      doctor.date = values.startDate + " - " + values.endDate;
+    },
+  });
   return (
     <>
       <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
@@ -274,19 +328,19 @@ const Meet = () => {
             className="btn btn-primary"
             type="button"
             data-bs-toggle="modal"
-            data-bs-target="#newEmploye"
+            data-bs-target="#newMeet"
             onClick={(e) => getJsData(e)}
           >
             +
           </button>
         </div>
       </div>
-      <div className="modal fade" id="newEmploye">
+      <div className="modal fade" id="newMeet">
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
             <div className="modal-header border-0">
               <h4 className="modal-title text-meduim text-bold">
-                Ajout d’une pharmacie
+                Ajout un rendez vous
               </h4>
               <button
                 type="button"
@@ -302,181 +356,60 @@ const Meet = () => {
                   message={notifyMessage}
                 />
               ) : null}
-              <form className={formValidate} onSubmit={handleSubmit} noValidate>
-                <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                    Nom
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer le nom de famille de l’employé(e)"
-                    value={lastName}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setLastName(e.target.value);
-                      jsData.lastName = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Entrer l’adresse mail"
-                    value={email}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setEmail(e.target.value);
-                      jsData.email = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer l’adresse mail
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    Telephone
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="phone"
-                    placeholder="Entrer le numero de téléphone"
-                    value={phone}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setPhone(e.target.value);
-                      jsData.phone = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="boite" className="form-label">
-                    Boite postale
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="boite"
-                    placeholder="Entrer la boîte postale"
-                    value={classification}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setClassification(e.target.value);
-                      jsData.classification = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="adresse" className="form-label">
-                    Adresse
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="adresse"
-                    placeholder="Entrer l’adresse"
-                    value={specialisation}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setSpecialisation(e.target.value);
-                      jsData.specialisation = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
-                    Nom et prénom(s) du responsable
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="fname"
-                    placeholder="Entrer le nom et le(s) prénom(s) du responsable"
-                    value={firstName}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setFirstName(e.target.value);
-                      jsData.firstName = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le nom et le prénom du responsable
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="date" className="form-label">
-                    Email du responsable
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="date"
-                    placeholder="Entrer l’adresse mail du responsable"
-                    value={birthdate}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setBirthdate(e.target.value);
-                      jsData.birthdate = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer l'email du responsable
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="cni" className="form-label">
-                    Téléphone du responsable
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="cni"
-                    placeholder="Entrer numero de téléphone du responsable"
-                    value={cnib}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setCnib(e.target.value);
-                      jsData.cnib = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone du responsable
-                  </div>
-                </div>
+              <form
+                className={formValidate}
+                onSubmit={formik.handleSubmit}
+                noValidate
+              >
+                <label htmlFor="lname" className="form-label">
+                  Date de début
+                </label>
+                <InputField type={"date"} name={"startDate"} formik={formik} />
+                <label htmlFor="lname" className="form-label">
+                  Date de fin
+                </label>
+                <InputField type={"date"} name={"endDate"} formik={formik} />
+                <button type="submit" className="btn btn-primary mb-3">
+                  Valider
+                </button>
+                <br />
+                <label htmlFor="lname" className="form-label">
+                  Les docteur disponible ({doctor.date})
+                </label>
+                <InputField
+                  type={"select2"}
+                  name={"doctorUuid"}
+                  placeholder="Séletionnez un docteur"
+                  formik={formik}
+                  options={doctor.list}
+                />
+                <label htmlFor="lname" className="form-label">
+                  Entrer la période
+                </label>
+                <InputField
+                  type={"text2"}
+                  name={"period"}
+                  placeholder="Entrer la période"
+                  formik={formik}
+                />
+                <label htmlFor="lname" className="form-label">
+                  Entrer l'heure
+                </label>
+                <InputField
+                  type={"text2"}
+                  name={"hour"}
+                  placeholder="Entrer l'heure"
+                  formik={formik}
+                />
+                <label htmlFor="lname" className="form-label">
+                  Entrer les détails
+                </label>
+                <InputField
+                  type={"text2"}
+                  name={"detail"}
+                  placeholder="Entrer les détails"
+                  formik={formik}
+                />
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     type="reset"
@@ -496,333 +429,6 @@ const Meet = () => {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="modal fade" id="editEmploye">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                Modification d’une pharmacie
-              </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">
-              {notifyBg != "" ? (
-                <FormNotify
-                  bg={notifyBg}
-                  title={notifyTitle}
-                  message={notifyMessage}
-                />
-              ) : null}
-              <form className={formValidate} onSubmit={handleSubmit} noValidate>
-                <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                    Nom
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer le nom de famille de l’employé(e)"
-                    value={lastName}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setLastName(e.target.value);
-                      jsData.lastName = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Entrer l’adresse mail"
-                    value={email}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setEmail(e.target.value);
-                      jsData.email = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer l’adresse mail
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    Telephone
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="phone"
-                    placeholder="Entrer le numero de téléphone"
-                    value={phone}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setPhone(e.target.value);
-                      jsData.phone = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="boite" className="form-label">
-                    Boite postale
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="boite"
-                    placeholder="Entrer la boîte postale"
-                    value={classification}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setClassification(e.target.value);
-                      jsData.classification = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="adresse" className="form-label">
-                    Adresse
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="adresse"
-                    placeholder="Entrer l’adresse"
-                    value={specialisation}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setSpecialisation(e.target.value);
-                      jsData.specialisation = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
-                    Nom et prénom(s) du responsable
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="fname"
-                    placeholder="Entrer le nom et le(s) prénom(s) du responsable"
-                    value={firstName}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setFirstName(e.target.value);
-                      jsData.firstName = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le nom et le prénom du responsable
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="date" className="form-label">
-                    Email du responsable
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="date"
-                    placeholder="Entrer l’adresse mail du responsable"
-                    value={birthdate}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setBirthdate(e.target.value);
-                      jsData.birthdate = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer l'email du responsable
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="cni" className="form-label">
-                    Téléphone du responsable
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="cni"
-                    placeholder="Entrer numero de téléphone du responsable"
-                    value={cnib}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setCnib(e.target.value);
-                      jsData.cnib = e.target.value;
-                      setJsData(jsData);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numero de téléphone du responsable
-                  </div>
-                </div>
-                <div className="modal-footer d-flex justify-content-start border-0">
-                  <button
-                    type="reset"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                    onClick={() => fValidate("needs-validation")}
-                  >
-                    Fermer
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    data-bs-dismiss="modal1"
-                    onClick={() => fValidate("was-validated")}
-                  >
-                    Ajouter
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="modal fade" id="deleteEmploye">
-        <div className="modal-dialog modal-dialog-centered modal-md">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                Supprimer la pharmacie
-              </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">Comfirmer l'action</div>
-
-            <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-                onClick={(e) => {
-                  onDelete(e);
-                }}
-              >
-                Supprimer
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                Annuler
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="modal fade" id="viewEmploye">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                Information de l’employé
-              </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">
-              <div className="row">
-                <div className="col-3">
-                  <img src={userProfile} alt="" />
-                </div>
-                <div className="col-9">
-                  <div className="d-flex justify-content-between">
-                    <span>Nom:</span>
-                    <span className="text-bold">{userInfos.lastName}</span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span>Prenom:</span>
-                    <span className="text-bold">{userInfos.firstName}</span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span>CNIB:</span>
-                    <span className="text-bold">{userInfos.cnib}</span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span>Département:</span>
-                    <span className="text-bold">{userInfos.department}</span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span>fonction:</span>
-                    <span className="text-bold">{userInfos.fonction}</span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span>Date de naissance:</span>
-                    <span className="text-bold">{userInfos.birthDate}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteEmploye"
-              >
-                Supprimer
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                Activer comme utilisateur
-              </button>
             </div>
           </div>
         </div>
@@ -855,85 +461,84 @@ const Meet = () => {
           </div>
         </div>
       </div>
-      
       <div className="table-responsive-sm">
-                <table className="table table-striped align-middle">
-                  <thead>
-                    <tr className="align-middle">
-                      <th scope="col" className="border-raduis-left">
-                        Patients
-                      </th>
-                      <th scope="col">Date et heure</th>
-                      <th scope="col">Statut</th>
-                      <th scope="col" className="text-center">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[...Array(9).keys()].map((data, idx) => {
-                      //data.checkValue = false
-                      return (
-                        <tr key={idx}>
-                          <td>
-                            <div className="d-inline-block me-2 align-middle">
-                              <img src={userp} alt="" />
-                            </div>
-                            <div className="d-inline-block align-middle">
-                              <span className="text-bold">Dr. Jannette DOE</span>
-                              <br />
-                              <span>Psychiatre</span>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="text-bold">12/02/2023</span>
-                            <br />
-                            <span>
-                              <span className="text-bold">Heure:</span> 10h30
-                            </span>
-                          </td>
-                          <td>
-                            <button className="btn bg-success border-radius text-bold">
-                              Terminer
-                            </button>
-                          </td>
-                          <td className="text-center">
-                            <div className="btn-group">
-                              <div className="d-inline-block mx-1">
-                                <img
-                                  title="Voir l'employé"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#viewEmploye"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    //setDelete(["" + data.employeeReference]);
-                                    //viewEmploye(data);
-                                  }}
-                                  src={view}
-                                  alt=""
-                                />
-                              </div>
-                              <div className="d-inline-block mx-1">
-                                <img
-                                  title="Désactiver l'utilisateur"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#deleteEmploye"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    //setDelete(["" + data.employeeReference]);
-                                  }}
-                                  src={disable}
-                                  alt=""
-                                />
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+        <table className="table table-striped align-middle">
+          <thead>
+            <tr className="align-middle">
+              <th scope="col" className="border-raduis-left">
+                Patients
+              </th>
+              <th scope="col">Date et heure</th>
+              <th scope="col">Statut</th>
+              <th scope="col" className="text-center">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(9).keys()].map((data, idx) => {
+              //data.checkValue = false
+              return (
+                <tr key={idx}>
+                  <td>
+                    <div className="d-inline-block me-2 align-middle">
+                      <img src={userp} alt="" />
+                    </div>
+                    <div className="d-inline-block align-middle">
+                      <span className="text-bold">Dr. Jannette DOE</span>
+                      <br />
+                      <span>Psychiatre</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className="text-bold">12/02/2023</span>
+                    <br />
+                    <span>
+                      <span className="text-bold">Heure:</span> 10h30
+                    </span>
+                  </td>
+                  <td>
+                    <button className="btn bg-success border-radius text-bold">
+                      Terminer
+                    </button>
+                  </td>
+                  <td className="text-center">
+                    <div className="btn-group">
+                      <div className="d-inline-block mx-1">
+                        <img
+                          title="Voir l'employé"
+                          data-bs-toggle="modal"
+                          data-bs-target="#viewEmploye"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            //setDelete(["" + data.employeeReference]);
+                            //viewEmploye(data);
+                          }}
+                          src={view}
+                          alt=""
+                        />
+                      </div>
+                      <div className="d-inline-block mx-1">
+                        <img
+                          title="Désactiver l'utilisateur"
+                          data-bs-toggle="modal"
+                          data-bs-target="#deleteEmploye"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            //setDelete(["" + data.employeeReference]);
+                          }}
+                          src={disable}
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };

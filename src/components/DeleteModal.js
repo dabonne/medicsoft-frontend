@@ -34,8 +34,6 @@ const DeleteModal = ({ title, id, modal, onDelete = callBack }) => {
               className="btn btn-danger"
               data-bs-dismiss="modal"
               onClick={(e) => {
-                console.log("modal id: " + deleteModal);
-                console.log("delete id: " + deleteId);
                 onDelete(deleteId);
               }}
             >

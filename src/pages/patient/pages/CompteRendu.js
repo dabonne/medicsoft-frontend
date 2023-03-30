@@ -28,9 +28,9 @@ const CompteRendu = ({ setLocation }) => {
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
   const [value, setValue] = useState("");
-  const [editMode, setEditMode] = useState("")
+  const [editMode, setEditMode] = useState("");
   const [refresh, setRefresh] = useState(0);
-  const [deleteId, setDeleteId] = useState("")
+  const [deleteId, setDeleteId] = useState("");
   const closeRef = useRef();
   const notifyRef = useRef();
   const header = {
@@ -39,9 +39,9 @@ const CompteRendu = ({ setLocation }) => {
 
   useEffect(() => {
     get();
+    setLocation(window.location.pathname);
   }, [refresh]);
 
-  setLocation(window.location.pathname);
   const onSearch = (e) => {
     e.preventDefault();
     let str = e.target.value;
@@ -104,12 +104,18 @@ const CompteRendu = ({ setLocation }) => {
   };
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    console.log(editMode)
+    console.log(editMode);
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(apiMedical.updateReport + "/" + user.organisationRef + "/" + editMode+"?description="+value);
     requestPatient
       .put(
-        apiMedical.updateReport + "/" + user.organisationRef + "/" + editMode+"?description="+value,
+        apiMedical.updateReport +
+          "/" +
+          user.organisationRef +
+          "/" +
+          editMode +
+          "?description=" +
+          value,
         {
           patientCni: user.cni,
           description: value,
@@ -167,7 +173,7 @@ const CompteRendu = ({ setLocation }) => {
     requestPatient
       .delete(apiMedical.deleteReport + "/" + id)
       .then((res) => {
-        setModalNotifyMsg("Suppression réussie !")
+        setModalNotifyMsg("Suppression réussie !");
         closeRef.current.click();
         notifyRef.current.click();
         setRefresh(refresh + 1);
@@ -276,12 +282,15 @@ const CompteRendu = ({ setLocation }) => {
                       <div className="d-inline-block mx-1">
                         <img
                           title="Imprimer le rapport"
-                          data-bs-toggle="modal"
-                          data-bs-target="#viewEmploye"
                           onClick={(e) => {
                             e.preventDefault();
                             //setDelete(["" + data.employeeReference]);
                             //viewEmploye(data);
+                            //window.location.href=apiMedical.printReport+"/"+data.id
+                            window.open(
+                              "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/report/" +
+                                data.id
+                            );
                           }}
                           src={print}
                           alt=""
@@ -297,7 +306,7 @@ const CompteRendu = ({ setLocation }) => {
                               onClick={(e) => {
                                 e.preventDefault();
                                 viewCompteRendu(data.id);
-                                setEditMode(data.id)
+                                setEditMode(data.id);
                               }}
                               src={edit}
                               alt=""
@@ -348,7 +357,10 @@ const CompteRendu = ({ setLocation }) => {
                   message={notifyMessage}
                 />
               ) : null}
-              <form className={"mt-3"} onSubmit={editMode !== "" ? handleEditSubmit : handleSubmit}>
+              <form
+                className={"mt-3"}
+                onSubmit={editMode !== "" ? handleEditSubmit : handleSubmit}
+              >
                 <div className="mb-5">
                   <ReactQuill
                     theme="snow"
@@ -381,9 +393,7 @@ const CompteRendu = ({ setLocation }) => {
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim">
-                Compte rendu
-              </h4>
+              <h4 className="modal-title text-meduim">Compte rendu</h4>
               <button
                 type="button"
                 className="btn-close"
@@ -391,11 +401,10 @@ const CompteRendu = ({ setLocation }) => {
               ></button>
             </div>
             <div className="modal-body">
-            <div dangerouslySetInnerHTML={{ __html: value }}></div>
+              <div dangerouslySetInnerHTML={{ __html: value }}></div>
             </div>
             <div className="modal-footer d-flex justify-content-start border-0">
-              <button className="btn btn-primary" data-bs-dismiss="modal"
-              >
+              <button className="btn btn-primary" data-bs-dismiss="modal">
                 Fermer
               </button>
             </div>
@@ -433,41 +442,43 @@ const CompteRendu = ({ setLocation }) => {
         </div>
       </div>
       <div className="modal fade" id="deleteModal">
-      <div className="modal-dialog modal-dialog-centered modal-md">
-        <div className="modal-content">
-          <div className="modal-header border-0">
-            <h4 className="modal-title text-meduim text-bold">Suppression du compte rendu</h4>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
-          </div>
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Suppression du compte rendu
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
 
-          <div className="modal-body text-start">Comfirmer l'action</div>
+            <div className="modal-body text-start">Comfirmer l'action</div>
 
-          <div className="modal-footer border-0 d-flex justify-content-start">
-            <button
-              type="button"
-              className="btn btn-danger"
-              data-bs-dismiss="modal"
-              onClick={(e) => {
-                onDelete(deleteId);
-              }}
-            >
-              Comfirmer
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary"
-              data-bs-dismiss="modal"
-            >
-              Annuler
-            </button>
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  onDelete(deleteId);
+                }}
+              >
+                Comfirmer
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Annuler
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
       <input
         type="hidden"
         ref={notifyRef}

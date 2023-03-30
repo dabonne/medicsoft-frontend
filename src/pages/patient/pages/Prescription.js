@@ -19,6 +19,10 @@ const Prescription = ({ setLocation }) => {
           element={<PrescriptionFormOrdonance />}
         />
         <Route
+          path="/ordonnance-medicale/:id"
+          element={<PrescriptionFormOrdonance />}
+        />
+        <Route
           path="/form-analyse-biologique"
           element={
             <PrescriptionForm
@@ -28,6 +32,22 @@ const Prescription = ({ setLocation }) => {
               url={{
                 get: apiPrescription.getTypeAnalyse,
                 post: apiPrescription.postTypeAnalyse,
+                update: apiPrescription.updateTypeAnalyse,
+              }}
+            />
+          }
+        />
+        <Route
+          path="/form-analyse-biologique/:id"
+          element={
+            <PrescriptionForm
+              title={"Analyses biologiques"}
+              group={"Groupe d'examen"}
+              type={"Type d'examen"}
+              url={{
+                get: apiPrescription.getTypeAnalyse,
+                post: apiPrescription.postTypeAnalyse,
+                update: apiPrescription.updateTypeAnalyse,
               }}
             />
           }
@@ -42,6 +62,22 @@ const Prescription = ({ setLocation }) => {
               url={{
                 get: apiPrescription.getTypeImagerie,
                 post: apiPrescription.postTypeImagerie,
+                update: apiPrescription.updateTypeImagerie,
+              }}
+            />
+          }
+        />
+        <Route
+          path="/form-imagerie/:id"
+          element={
+            <PrescriptionForm
+              title={"Imagerie Médicale"}
+              group={"Groupe d'imagerie"}
+              type={"Type d'imagerie"}
+              url={{
+                get: apiPrescription.getTypeImagerie,
+                post: apiPrescription.postTypeImagerie,
+                update: apiPrescription.updateTypeImagerie,
               }}
             />
           }
@@ -55,6 +91,21 @@ const Prescription = ({ setLocation }) => {
               url={{
                 get: apiPrescription.getTypeConsultation,
                 post: apiPrescription.postTypeConsultation,
+                update: apiPrescription.updateTypeConsultation,
+              }}
+            />
+          }
+        />
+        <Route
+          path="/form-examen-specialise/:id"
+          element={
+            <PrescriptionForm
+              title={"Consultation / Examen specialisé"}
+              type={"Type de consultation et/ou examen spécialisé"}
+              url={{
+                get: apiPrescription.getTypeConsultation,
+                post: apiPrescription.postTypeConsultation,
+                update: apiPrescription.updateTypeConsultation,
               }}
             />
           }

@@ -1,18 +1,15 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import back from "../../../assets/imgs/back.png";
-import sui from "../../../assets/imgs/sui.png";
-import view from "../../../assets/imgs/view.png";
-import edit from "../../../assets/imgs/edit.png";
+
 import del from "../../../assets/imgs/delete.png";
-import user from "../../../assets/imgs/user.png";
-import print from "../../../assets/imgs/print.png";
+import edit from "../../../assets/imgs/edit.png";
+
 import { useFormik } from "formik";
 import InputField from "../../../components/InputField";
 import requestDoctor from "../../../services/requestDoctor";
-import { apiPrescription } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import FormNotify from "../../../components/FormNotify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { apiPrescription } from "../../../services/api";
 
 const initData = {
   type: "",
@@ -37,7 +34,12 @@ const Doc = () => {
   );
 };
 
-const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post:""} }) => {
+const PrescriptionForm = ({
+  title = "",
+  type = "",
+  group = "",
+  url = { get: "", post: "" },
+}) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [data, setData] = useState([]);
@@ -49,19 +51,25 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const notifyRef = useRef();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+  const [firstCall, setFirstCall] = useState(0);
+  const { id } = useParams();
   useEffect(() => {
     getList();
     //console.log(data);
-    console.log(list);
+    if (id !== undefined && firstCall !== 1) {
+      getPrescriptionById(id);
+      setFirstCall(firstCall + 1);
+    }
+    //console.log(list);
   }, [list]);
 
   const getList = () => {
-    console.log(url)
+    console.log(url);
     requestDoctor
       .get(url.get)
       .then((res) => {
@@ -71,16 +79,37 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
         console.log(error);
       });
   };
-
+  const getPrescriptionById = (id) => {
+    requestDoctor
+      .get(apiPrescription.getPrescriptionById + "/" + id, header)
+      .then((res) => {
+        console.log(res.data);
+        //setDatas(res.data);
+        setList({
+          ...list,
+          list: res.data.prescriptions,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const formik = useFormik({
     initialValues: initData,
 
     onSubmit: (values) => {
-      console.log(values)
+      console.log(values);
       const data = {
         type: values.type,
         detail: values.detail,
       };
+      if (list.sendata) {
+        if(id !== undefined){
+          handleEditSubmit([...list.list, data])
+        }else{
+          handleSubmit([...list.list, data])
+        }
+      }
       setList({
         ...list,
         list: [...list.list, data],
@@ -88,16 +117,30 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
       //console.log(list);
 
       formik.resetForm();
-      if (list.sendata) {
-        handleSubmit(list.list);
-      }
     },
   });
 
-  const deleteFromList = (e, type) => {
+  const editFromList = (e, uuid) => {
     e.preventDefault();
+    console.log(uuid);
+    var tab = list.list.filter((data) => {
+      if (data.type !== uuid) {
+        return data;
+      }
+      formik.setFieldValue("type", data.type);
+      formik.setFieldValue("detail", data.detail);
+    });
 
-    var tab = list.list.filter((data) => data.type !== type);
+    setList({
+      ...list,
+      list: tab,
+    });
+  };
+
+  const deleteFromList = (e, uuid) => {
+    e.preventDefault();
+    console.log(uuid);
+    var tab = list.list.filter((data) => data.type !== uuid);
 
     console.log(tab);
     setList({
@@ -106,17 +149,13 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (tab) => {
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
     requestDoctor
       .post(
-        url.post +
-          "/" +
-          user.organisationRef +
-          "/" +
-          user.cni,
-        list.list,
+        url.post + "/" + user.organisationRef + "/" + user.cni,
+        tab,
         header
       )
       .then((res) => {
@@ -130,6 +169,36 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
         setModalNotifyMsg("Les informations ont bien été enrégistrées");
         notifyRef.current.click();
         //refresh();
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
+      });
+  };
+
+  const handleEditSubmit = (tab) => {
+    console.log(tab)
+    configNotify("loading", "", "Modification des données en cours...");
+    requestDoctor
+      .put(
+        url.update +"/" +
+        user.organisationRef +"/"+id, tab,header)
+      .then((res) => {
+        console.log("enregistrement ok");
+
+        configNotify(
+          "success",
+          "Modification réussi",
+          "Les informations ont bien été modifiées"
+        );
+        setModalNotifyMsg(
+          "Les informations ont bien été modifiées"
+        );
+        notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
@@ -157,15 +226,15 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
               <div className="me-auto">
                 <Doc />
                 <span className="ms-2 fw-bold">
-                  {
-                    data.map((d) => {
-                      return d.uuid === dta.type && d.label
-                    })
-                  }
-                  
+                  {data.map((d) => {
+                    return d.uuid === dta.type && d.label;
+                  })}
                 </span>
               </div>
-              <div onClick={(e) => deleteFromList(e, dta.drug)}>
+              <div className="me-2" onClick={(e) => editFromList(e, dta.type)}>
+                <img src={edit} alt="" />
+              </div>
+              <div onClick={(e) => deleteFromList(e, dta.type)}>
                 <img src={del} alt="" />
               </div>
             </div>
@@ -250,7 +319,7 @@ const PrescriptionForm = ({ title = "", type = "", group = "", url={get:"", post
                 onClick={(e) => {
                   e.preventDefault();
                   setModalNotifyMsg("");
-                  navigate("/dashboard/patient/details/prescriptions")
+                  navigate("/dashboard/patient/details/prescriptions");
                 }}
               >
                 Ok

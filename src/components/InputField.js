@@ -98,7 +98,7 @@ const InputField = ({ type, label, name, value, options, onChange, formik, place
     if (type === "date") {
       return (
         <div className="col-md-12">
-          <div className="form-floating mb-3">
+          <div className="mb-3">
             <input
               className="form-control form-control-sm form-floating-height"
               type="date"
@@ -108,9 +108,24 @@ const InputField = ({ type, label, name, value, options, onChange, formik, place
               placeholder={label}
               onChange={formik.handleChange}
             />
-            <label htmlFor={name} className="form-label mb-4">
-              {label}
-            </label>
+          </div>
+        </div>
+      );
+    }
+
+    if (type === "time") {
+      return (
+        <div className="col-md-12">
+          <div className="mb-3">
+            <input
+              className="form-control form-control-sm form-floating-height"
+              type="time"
+              id={name}
+              name={name}
+              value={formik.values[name]}
+              placeholder={label}
+              onChange={formik.handleChange}
+            />
           </div>
         </div>
       );
