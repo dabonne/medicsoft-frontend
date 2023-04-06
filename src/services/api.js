@@ -12,7 +12,8 @@ const apiEmploye = {
     "disableAccount":"desactive-account",
 }
 const apiUser = {
-    "login":"auth/login",
+    //"login":"auth/login",
+    "login":"auth/v2/login",
     "get":"user/user-account",
     //"getRoles":"user/rolename-request",
     "getRoles":"user/v2/rolename-request",
@@ -66,7 +67,11 @@ const apiMedical = {
     "getListBiology":"prescription/param-biological-analysis",
     "getListExamen":"prescription/param-consultation",
     "rendezVous":"appointment/add-appointment",
-    "rendezVousListe":"appointment/appointment-patient"
+    "rendezVousListe":"appointment/appointment-patient",
+    "rendezVousDoctor":"appointment/appointment-list",
+    "deleteRendezVous":"appointment",
+    "getRendezVous":"appointment",
+    "statusRendezVous":"appointment/update-appointment"
 }
 
 const apiPrescription = {

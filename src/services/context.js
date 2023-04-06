@@ -11,6 +11,7 @@ export const initialUser = {
     profile:"",
     name: null,
     token: null,
+    refreshToken: null,
     cni: null
 }
 

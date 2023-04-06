@@ -6,6 +6,7 @@ import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
 import user from "../../../assets/imgs/user.png";
 import print from "../../../assets/imgs/print.png";
+import profile from "../../../assets/imgs/profile.png";
 import { useFormik } from "formik";
 import requestAgenda from "../../../services/requestAgenda";
 import { apiAgenda, apiMedical } from "../../../services/api";
@@ -13,6 +14,8 @@ import InputField from "../../../components/InputField";
 import FormNotify from "../../../components/FormNotify";
 import { AppContext } from "../../../services/context";
 import requestDoctor from "../../../services/requestDoctor";
+import DeleteModal from "../../../components/DeleteModal";
+import { Link } from "react-router-dom";
 
 const initData = {
   doctorUuid: "",
@@ -32,26 +35,33 @@ const RendezVous = ({ setLocation }) => {
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
-  const doctors = [
-    { name: "Sawadogo Jean Brice", sp: "Pediatre" },
-    { name: "Coulibaly Philippe", sp: "Psychiatre" },
-    { name: "Dembele Hoda", sp: "Cardiologue" },
-    { name: "Bazongo Bonou", sp: "Pediatre" },
-  ];
   const [doctor, setDoctor] = useState({
     startDate: "",
     endDate: "",
     list: [],
   });
+  const [dateList, setDateList] = useState([])
+  const [deleteId, setDeleteId] = useState("");
+  const [detail, setDetail] = useState({
+    doctor: "",
+    specialityDoctor: "",
+    period: "",
+    status: "",
+    patient: "",
+    hour: "",
+    numberPatient: "",
+    detail: "",
+  });
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  const closeRef = useRef()
+  const closeRef = useRef();
   const notifyRef = useRef();
+  const [refresh, setRefresh] = useState(0);
   useEffect(() => {
     setLocation(window.location.pathname);
-    get()
-  }, []);
+    get();
+  }, [refresh]);
 
   const onSearch = (e) => {
     e.preventDefault();
@@ -81,21 +91,33 @@ const RendezVous = ({ setLocation }) => {
     //configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
     //console.log(jsData)
     requestDoctor
-      .get(
-        apiMedical.rendezVousListe +
-          "/" +
-          user.cni
-      )
+      .get(apiMedical.rendezVousListe + "/" + user.cni)
       .then((res) => {
         console.log(res.data);
-        setDatas(res.data)
+        setDatas(res.data);
       })
       .catch((error) => {
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
+      });
+  };
+  const getDetail = (id) => {
+    requestDoctor
+      .get(apiMedical.getRendezVous + "/" + id, header)
+      .then((res) => {
+        setDetail(res.data);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
       });
   };
@@ -123,8 +145,8 @@ const RendezVous = ({ setLocation }) => {
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
       });
   };
@@ -162,9 +184,21 @@ const RendezVous = ({ setLocation }) => {
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
+      });
+  };
+  const onDelete = (id) => {
+    requestDoctor
+      .delete(apiMedical.deleteRendezVous + "/" + id, header)
+      .then((res) => {
+        setModalNotifyMsg("Suppression réussie !");
+        notifyRef.current.click();
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
   const formik = useFormik({
@@ -280,22 +314,47 @@ const RendezVous = ({ setLocation }) => {
                   Les docteur disponible (
                   {doctor.startDate + " - " + doctor.endDate})
                 </label>
-                <InputField
-                  type={"select2"}
-                  name={"doctorUuid"}
-                  placeholder="Séletionnez un docteur"
-                  formik={formik}
-                  options={doctor.list}
-                />
+
+                <div className="col-md-12 mb-3">
+                  <select
+                    className="form-select"
+                    name={"doctorUuid"}
+                    value={formik.values["doctorUuid"]}
+                    onChange={e =>{
+                      formik.handleChange(e)
+                      doctor.list.map(data => {
+                        if(formik.values["doctorUuid"] === data.employeeReference){
+                          setDateList(data.daysAvailable)
+                        }
+                      })
+                    }}
+                  >
+                    <option>{"Séletionnez un docteur"}</option>
+                    {doctor.list.map((data, idx) => (
+                      <option key={"select2" + idx} value={data.employeeReference}>
+                        {data.lastName + " " + data.firstName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <label htmlFor="lname" className="form-label">
                   Entrer la période
                 </label>
-                <InputField
-                  type={"date"}
-                  name={"period"}
-                  placeholder="Entrer la période"
-                  formik={formik}
-                />
+                <div className="col-md-12 mb-3">
+                  <select
+                    className="form-select"
+                    name={"period"}
+                    value={formik.values["period"]}
+                    onChange={formik.handleChange}
+                  >
+                    <option>Entrer la période</option>
+                    {dateList.map((data, idx) => (
+                      <option key={"select3" + idx} value={data}>
+                        {data}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <label htmlFor="lname" className="form-label">
                   Entrer l'heure
                 </label>
@@ -361,7 +420,7 @@ const RendezVous = ({ setLocation }) => {
                     <div className="d-inline-block align-middle">
                       <span className="text-bold">Dr. {data.doctor}</span>
                       <br />
-                      <span>Pediatre</span>
+                      <span>{data.specialityDoctor}</span>
                     </div>
                   </td>
                   <td>
@@ -392,11 +451,10 @@ const RendezVous = ({ setLocation }) => {
                         <img
                           title="Voir le patient"
                           data-bs-toggle="modal"
-                          data-bs-target="#viewEmploye"
+                          data-bs-target="#detailRendezVous"
                           onClick={(e) => {
                             e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            //viewEmploye(data);
+                            getDetail(data.uuid);
                           }}
                           src={view}
                           alt=""
@@ -407,9 +465,10 @@ const RendezVous = ({ setLocation }) => {
                           <img
                             title="Supprimer le patient"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteEmploye"
+                            data-bs-target="#deleteRendezVous"
                             onClick={(e) => {
                               e.preventDefault();
+                              setDeleteId(data.uuid);
                               //setDelete(["" + data.employeeReference]);
                             }}
                             src={del}
@@ -465,6 +524,94 @@ const RendezVous = ({ setLocation }) => {
           setNotifyBg("");
         }}
       />
+      <DeleteModal
+        title={"Suppression du rendez vous"}
+        modal={"deleteRendezVous"}
+        id={deleteId}
+        onDelete={onDelete}
+      />
+      <div className="modal fade" id="detailRendezVous">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold">
+                Information de la consultation
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-3 col-sm-2">
+                  <img width="100px" src={profile} alt="" />
+                </div>
+                <div className="col-9 col-sm-10 py-2">
+                  <div className="d-flex justify-content-between">
+                    <span className="text-bold text-meduim">
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      {detail.patient}
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="text-bold">
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      (00226) {detail.numberPatient}
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="text-bold">
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      johndoe@example.com
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="">
+                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
+                      <Link to="#" className="text-black">
+                        Dossier patient
+                      </Link>
+                    </span>
+                  </div>
+                </div>
+                <div className="col-12 pt-3 ">
+                  <span className="text-bold">Date de consultation: </span>
+                  <span className="text-bold text-meduim">{detail.period}</span>
+                  <br />
+                  <span className="text-bold">Heure:</span>
+                  <span className="text-bold text-meduim">{detail.hour}</span>
+                </div>
+
+                <div className="col-12 pt-3 ">
+                  <span className="text-bold text-underline">Détails</span>
+                  <hr className="mt-0" />
+                </div>
+              </div>
+              {detail.detail}
+            </div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Confirmer le rendez-vous
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -37,7 +37,7 @@ const Login = () => {
         password: password,
       })
       .then((res) => {
-
+        console.log(res.data)
         onUserChange({
           isAuth: true,
           type: "",
@@ -47,7 +47,8 @@ const Login = () => {
           organisations: res.data.organisation,
           profile:"",
           roles: res.data.roles,
-          token: res.data.token,
+          token: res.data.accessToken,
+          refreshToken: res.data.refreshToken,
           cni:""
         });
           isAuth();
