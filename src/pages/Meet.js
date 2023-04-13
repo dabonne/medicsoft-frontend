@@ -107,6 +107,7 @@ const Meet = () => {
       .get(apiMedical.rendezVousDoctor + "/" + user.organisationRef, header)
       .then((res) => {
         setDatas(res.data);
+        console.log(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -239,9 +240,8 @@ const Meet = () => {
                       <img src={user} alt="" />
                     </div>
                     <div className="d-inline-block align-middle">
-                      <span className="text-bold">Dr. {data.doctor}</span>
+                      <span className="text-bold">{data.patient}</span>
                       <br />
-                      <span>{data.specialityDoctor}</span>
                     </div>
                   </td>
                   <td>

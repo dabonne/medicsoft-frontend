@@ -29,26 +29,26 @@ export const validateData = Yup.object({
     .typeError("Le poid doit être un nombre")
     //.required("Le poids est requis")
     .positive("Le poids doit être positif")
-    .max(1000, "Le poids doit être inférieur ou égal à 1000"),
+    .max(500, "Entrez un nombre compris entre 0 et 500"),
   BODY_TEMPERATURE: Yup.number()
     .typeError("La température doit être un nombre")
-    .min(35, "La température doit être supérieur ou égale à 35")
-    .max(42, "La température doit être inférieur ou égale à 42"),
+    .min(30, "Entrez un nombre compris entre 30 et 42")
+    .max(42, "Entrez un nombre compris entre 30 et 42"),
   //.required("La température n'est pas valide"),
   ARTERIAL_PRESSURE1: Yup.number()
     .typeError("La pression systolique doit être un nombre")
-    .min(70, "La pression systolique doit être supérieur ou égale à 70")
-    .max(200, "La pression systolique doit être inférieur ou égale à 200"),
+    .min(20, "Entrez un nombre compris entre 20 et 350")
+    .max(350, "Entrez un nombre compris entre 20 et 350"),
   //.required("La pression systolique est obligatoire"),
   ARTERIAL_PRESSURE2: Yup.number()
     .typeError("La pression diastolique doit être un nombre")
-    .min(40, "La pression diastolique doit être supérieur ou égale à 40")
-    .max(130, "La pression diastolique doit être inférieur ou égale à 130"),
+    .min(20, "Entrez un nombre compris entre 20 et 350")
+    .max(350, "Entrez un nombre compris entre 20 et 350"),
   //.required("La pression diastolique est obligatoire"),
   CARDIAC_FREQUENCY: Yup.number()
     .typeError("La fréquence cardiaque doit être un nombre")
-    .min(30, "La fréquence cardiaque doit être supérieur ou égale à 30")
-    .max(200, "La fréquence cardiaque doit être inférieur ou égale à 200"),
+    .min(20, "Entrez un nombre compris entre 20 et 200")
+    .max(200, "Entrez un nombre compris entre 20 et 200"),
   //.required("La fréquence cardiaque est obligatoire"),
   BLOOD_SUGAR: Yup.number()
     .typeError("La glycémie doit être un nombre")
@@ -57,8 +57,8 @@ export const validateData = Yup.object({
   //.required("La glycémie est obligatoire"),
   OXYGEN_SATURATION: Yup.number()
     .typeError("La saturation en oxygène doit être un nombre")
-    .min(0, "La saturation en oxygène doit être supérieur ou égale à 0")
-    .max(100, "La saturation en oxygène doit être inférieur ou égale à 100"),
+    .min(0, "Entrez un nombre compris entre 0 et 100")
+    .max(100, "Entrez un nombre compris entre 0 et 100"),
   //.required("La saturation en oxygène est obligatoire"),
   HEIGHT: Yup.number()
     .typeError("La taille doit être un nombre ex: 1.45")
@@ -292,10 +292,11 @@ const ModalParamedicalMutiple = ({
                   formik={formik}
                 />
                 <InputField
-                  type={"text"}
-                  label="Entrer le groupe sanguin"
+                  type={"select"}
+                  placeholder="Entrer le groupe sanguin"
                   name={"BLOOD_GROUP"}
                   formik={formik}
+                  options={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
                 />
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">

@@ -10,6 +10,7 @@ import { AppContext } from "../../../services/context";
 import FormNotify from "../../../components/FormNotify";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiPrescription } from "../../../services/api";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 const initData = {
   type: "",
@@ -57,6 +58,8 @@ const PrescriptionForm = ({
     headers: { Authorization: `${user.token}` },
   };
   const [firstCall, setFirstCall] = useState(0);
+  const [options, setOptions] = useState([]);
+  const [selectedOption, setSelectedOption] = useState([]);
   const { id } = useParams();
   useEffect(() => {
     getList();
@@ -74,6 +77,7 @@ const PrescriptionForm = ({
       .get(url.get)
       .then((res) => {
         setData(res.data);
+        console.log(res.data)
       })
       .catch((error) => {
         console.log(error);
@@ -98,24 +102,28 @@ const PrescriptionForm = ({
     initialValues: initData,
 
     onSubmit: (values) => {
-      console.log(values);
-      const data = {
-        type: values.type,
+      console.log("selectedOption");
+      console.log(selectedOption);
+      const presc = {
+        type: selectedOption[0].uuid,// values.type,
         detail: values.detail,
       };
-      if (list.sendata) {
-        if(id !== undefined){
-          handleEditSubmit([...list.list, data])
-        }else{
-          handleSubmit([...list.list, data])
+      if(presc.type !=="" && presc.type !== undefined && presc.detail !==""){
+        if (list.sendata) {
+          if(id !== undefined){
+            handleEditSubmit([...list.list, presc])
+          }else{
+            handleSubmit([...list.list, presc])
+          }
         }
+        setList({
+          ...list,
+          list: [...list.list, presc],
+        });
+        setSelectedOption([])
       }
-      setList({
-        ...list,
-        list: [...list.list, data],
-      });
-      //console.log(list);
-
+      list.sendata = false
+      console.log(list);
       formik.resetForm();
     },
   });
@@ -215,6 +223,16 @@ const PrescriptionForm = ({
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
+  const handleInputChange = (input) => {
+    // Filter the options based on the user input
+    const filteredOptions = data.filter((option) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    );
+    return filteredOptions;
+  };
+  const renderMenuItemChildren = (option, props) => {
+    return <div key={option.uuid}>{option.label}</div>;
+  };
   return (
     <div className="row">
       <h2>{title}</h2>
@@ -261,7 +279,8 @@ const PrescriptionForm = ({
            */}
 
           <div className="form-label mt-3">{type}</div>
-          <InputField
+          {/*
+           <InputField
             type={"select3"}
             name={"type"}
             label=""
@@ -269,7 +288,17 @@ const PrescriptionForm = ({
             formik={formik}
             options={data}
           />
-
+           */}
+          <Typeahead
+            id="basic-typeahead-example"
+            labelKey="label"
+            options={data}
+            placeholder="Veuillez choisir le nom du médicament"
+            onChange={setSelectedOption}
+            onInputChange={handleInputChange}
+            renderMenuItemChildren={renderMenuItemChildren}
+            selected={selectedOption}
+          />
           <div className="form-label mt-3">Précisions</div>
           <InputField
             type={"textarea"}

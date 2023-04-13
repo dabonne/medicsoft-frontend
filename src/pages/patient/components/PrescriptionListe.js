@@ -245,6 +245,13 @@ const PrescriptionListe = () => {
     }
   };
 
+  const printPresciption = (e, id) => {
+    e.preventDefault();
+    window.open(
+      "https://doctor-management.herokuapp.com/doctor-management/external-api/prescription/report-prescription/" +
+        id
+    );
+  };
   return (
     <>
       <div className="row my-3">
@@ -350,11 +357,7 @@ const PrescriptionListe = () => {
                       <div className="d-inline-block mx-1">
                         <img
                           title="Imprimer la prescription"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            //viewEmploye(data);
-                          }}
+                          onClick={(e) => {printPresciption(e,data.id)}}
                           src={print}
                           alt=""
                         />
@@ -399,26 +402,30 @@ const PrescriptionListe = () => {
             <div className="modal-header1 p-4 border-0">
               <div className="d-flex">
                 {viewPresc.type === "ORDINANCE" && (
-                  <span className="me-auto text-meduim">Ordonnance / PRESC-0218374</span>
+                  <span className="me-auto text-meduim">
+                    Ordonnance / PRESC-0218374
+                  </span>
                 )}
                 {viewPresc.type === "BIOLOGICAL_ANALYSIS" && (
-                  <span className="me-auto text-meduim">Analyses biologiques / PRESC-0218374</span>
+                  <span className="me-auto text-meduim">
+                    Analyses biologiques / PRESC-0218374
+                  </span>
                 )}
                 {viewPresc.type === "MEDICAL_IMAGERY" && (
-                  <span className="me-auto text-meduim">Imagerie médicale / PRESC-0218374</span>
+                  <span className="me-auto text-meduim">
+                    Imagerie médicale / PRESC-0218374
+                  </span>
                 )}
                 {viewPresc.type === "CONSULTATION" && (
-                  <span className="me-auto text-meduim">Consultation et/ou examen spécialisé / PRESC-0218374</span>
+                  <span className="me-auto text-meduim">
+                    Consultation et/ou examen spécialisé / PRESC-0218374
+                  </span>
                 )}
                 <div className="btn-group me-2">
                   <div className="d-inline-block mx-1">
                     <img
                       title="Imprimer la prescription"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        //setDelete(["" + data.employeeReference]);
-                        //viewEmploye(data);
-                      }}
+                      onClick={(e) => {printPresciption(e,viewPresc.id)}}
                       src={print}
                       alt=""
                     />

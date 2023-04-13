@@ -13,6 +13,8 @@ import { apiPrescription } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import FormNotify from "../../../components/FormNotify";
 import { useNavigate, useParams } from "react-router-dom";
+import { Typeahead } from "react-bootstrap-typeahead";
+import { ta } from "date-fns/locale";
 
 const initOrdonnance = {
   drug: "",
@@ -72,6 +74,10 @@ const PrescriptionFormOrdonance = (type = "") => {
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
+  //const [options, setOptions] = useState([]);
+  const [selectedDrug, setSelectedDrug] = useState([]);
+  const [selectedDosage, setSelectedDosage] = useState([]);
+  const [selectedAdministation, setSelectedAdministation] = useState([]);
   const navigate = useNavigate();
   const notifyRef = useRef();
   const header = {
@@ -90,10 +96,19 @@ const PrescriptionFormOrdonance = (type = "") => {
   }, [list]);
 
   const getList = () => {
+    const dosage = []
+    const mode = []
     requestDoctor
       .get(apiPrescription.getListPresc)
       .then((res) => {
+        //console.log(res.data)
+        Object.keys(res.data.dosage).map(key => dosage.push({uuid:key,label:res.data.dosage[key]}))
+        Object.keys(res.data.mode).map(key => mode.push({uuid:key,label:res.data.mode[key]}))
+        res.data.dosage = dosage
+        res.data.mode = mode
         setData(res.data);
+        console.log(data)
+
       })
       .catch((error) => {
         console.log(error);
@@ -118,10 +133,10 @@ const PrescriptionFormOrdonance = (type = "") => {
     initialValues: initOrdonnance,
 
     onSubmit: (values) => {
-      console.log(values)
+      //console.log(selectedOption);
       const data = {
-        drug: values.drug,
-        dosage: values.dosage,
+        drug: selectedDrug[0].uuid,
+        dosage: selectedDosage[0].uuid,
         during: values.during,
         dayOrWeekOrMonth: values.dayOrWeekOrMonth,
         periodEnumStringMap: {
@@ -134,16 +149,15 @@ const PrescriptionFormOrdonance = (type = "") => {
           frequency: values.frequency,
           quantity: values.quantity,
         },
-        administrationMode: values.administrationMode,
+        administrationMode: selectedAdministation[0].uuid,
         precision: values.precision,
       };
-      
-      
+      console.log(data)
       if (list.sendata) {
-        if(id !== undefined){
-          handleEditSubmit([...list.list, data])
-        }else{
-          handleSubmit([...list.list, data])
+        if (id !== undefined) {
+          handleEditSubmit([...list.list, data]);
+        } else {
+          handleSubmit([...list.list, data]);
         }
       }
       setList({
@@ -157,28 +171,31 @@ const PrescriptionFormOrdonance = (type = "") => {
         EVENING: false,
         MIDDAY: false,
       });
+      setSelectedAdministation([])
+      setSelectedDosage([])
+      setSelectedDrug([])
       formik.resetForm();
     },
   });
   const editFromList = (e, drug) => {
     e.preventDefault();
-    console.log(drug)
+    console.log(drug);
     var tab = list.list.filter((data) => {
-      if(data.drug !== drug){
-        return data
+      if (data.drug !== drug) {
+        return data;
       }
-      formik.setFieldValue("drug",data.drug)
-      formik.setFieldValue("dosage",data.dosage)
-      formik.setFieldValue("during",data.during)
-      formik.setFieldValue("dayOrWeekOrMonth",data.dayOrWeekOrMonth)
-      formik.setFieldValue("MORNING",data.MORNING)
-      formik.setFieldValue("NIGHT",data.NIGHT)
-      formik.setFieldValue("EVENING",data.EVENING)
-      formik.setFieldValue("MIDDAY",data.MIDDAY)
-      formik.setFieldValue("frequency",data.frequency)
-      formik.setFieldValue("quantity",data.quantity)
-      formik.setFieldValue("administrationMode",data.administrationMode)
-      formik.setFieldValue("precision",data.precision)
+      formik.setFieldValue("drug", data.drug);
+      formik.setFieldValue("dosage", data.dosage);
+      formik.setFieldValue("during", data.during);
+      formik.setFieldValue("dayOrWeekOrMonth", data.dayOrWeekOrMonth);
+      formik.setFieldValue("MORNING", data.MORNING);
+      formik.setFieldValue("NIGHT", data.NIGHT);
+      formik.setFieldValue("EVENING", data.EVENING);
+      formik.setFieldValue("MIDDAY", data.MIDDAY);
+      formik.setFieldValue("frequency", data.frequency);
+      formik.setFieldValue("quantity", data.quantity);
+      formik.setFieldValue("administrationMode", data.administrationMode);
+      formik.setFieldValue("precision", data.precision);
     });
 
     setList({
@@ -208,7 +225,7 @@ const PrescriptionFormOrdonance = (type = "") => {
           user.organisationRef +
           "/" +
           user.cni,
-          tab,
+        tab,
         header
       )
       .then((res) => {
@@ -220,7 +237,7 @@ const PrescriptionFormOrdonance = (type = "") => {
           "Les informations ont bien été enrégistrées"
         );
         setModalNotifyMsg("Les informations ont bien été enrégistrées");
-        
+
         notifyRef.current.click();
         //refresh();
       })
@@ -234,12 +251,18 @@ const PrescriptionFormOrdonance = (type = "") => {
       });
   };
   const handleEditSubmit = (tab) => {
-    console.log(tab)
+    console.log(tab);
     configNotify("loading", "", "Modification des données en cours...");
     requestDoctor
       .put(
-        apiPrescription.updateOrdonnance +"/" +
-        user.organisationRef +"/"+id, tab,header)
+        apiPrescription.updateOrdonnance +
+          "/" +
+          user.organisationRef +
+          "/" +
+          id,
+        tab,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -248,9 +271,7 @@ const PrescriptionFormOrdonance = (type = "") => {
           "Modification réussi",
           "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg(
-          "Les informations ont bien été modifiées"
-        );
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         notifyRef.current.click();
       })
       .catch((error) => {
@@ -266,6 +287,10 @@ const PrescriptionFormOrdonance = (type = "") => {
     setNotifyBg(bg);
     setNotifyTitle(title);
     setNotifyMessage(message);
+  };
+  
+  const renderMenuItemChildren = (option, props) => {
+    return <div key={option.uuid}>{option.label}</div>;
   };
   return (
     <div className="row">
@@ -301,7 +326,9 @@ const PrescriptionFormOrdonance = (type = "") => {
             />
           ) : null}
           <div className="form-label mt-3">Médicaments ou DCI</div>
-          <InputField
+          {
+            /**
+             * <InputField
             type={"select3"}
             name={"drug"}
             label="Médicaments ou DCI"
@@ -309,8 +336,21 @@ const PrescriptionFormOrdonance = (type = "") => {
             formik={formik}
             options={data.drugs}
           />
+             */
+          }
+          <Typeahead
+            id="basic-typeahead-example"
+            labelKey="label"
+            options={data.drugs}
+            placeholder="Veuillez choisir le nom du médicament"
+            onChange={setSelectedDrug}
+            //onInputChange={handleInputChange}
+            renderMenuItemChildren={renderMenuItemChildren}
+            selected={selectedDrug}
+          />
           <div className="form-label mt-3">Dosage/Forme galénique</div>
-          <InputField
+          {/**
+           * <InputField
             type={"select2"}
             name={"dosage"}
             label=""
@@ -318,23 +358,41 @@ const PrescriptionFormOrdonance = (type = "") => {
             formik={formik}
             options={data.dosage}
           />
-
+           */}
+          <Typeahead
+            id="dosage"
+            labelKey="label"
+            options={data.dosage}
+            placeholder="Veuillez entrer le type du medicament (comprimé/gélule, ampoule,...)"
+            onChange={setSelectedDosage}
+            //onInputChange={handleInputChange}
+            renderMenuItemChildren={renderMenuItemChildren}
+            selected={selectedDosage}
+          />
           <div className="form-label mt-3">Durée</div>
-          <InputField
+          <div className="row">
+            <div className="col">
+            <InputField
             type={"text2"}
             name={"during"}
             label="Durée"
             placeholder="Veuillez entrer le durée"
             formik={formik}
           />
-          <InputField
+            </div>
+            <div className="col">
+            <InputField
             type={"select2"}
             name={"dayOrWeekOrMonth"}
             label=""
-            placeholder="Jours"
+            placeholder="Sélectionnez l'unité"
             formik={formik}
             options={data.dayWeekMonth}
           />
+            </div>
+          </div>
+          
+          
           <div className="form-label mt-3">Nombre de prise par jour</div>
           <div className="mt-3">
             <div
@@ -417,13 +475,25 @@ const PrescriptionFormOrdonance = (type = "") => {
             )}
           </div>
           <div className="form-label mt-3">Mode d’administration</div>
-          <InputField
+          {/**
+           * <InputField
             type={"select2"}
             name={"administrationMode"}
             label=""
             placeholder="Veuillez choisir le mode d’administration"
             formik={formik}
             options={data.mode}
+          />
+           */}
+          <Typeahead
+            id="administration"
+            labelKey="label"
+            options={data.mode}
+            placeholder="Veuillez choisir le mode d’administration"
+            onChange={setSelectedAdministation}
+            //onInputChange={handleInputChange}
+            renderMenuItemChildren={renderMenuItemChildren}
+            selected={selectedAdministation}
           />
           <div className="form-label mt-3">Précisions</div>
           <InputField
@@ -475,7 +545,7 @@ const PrescriptionFormOrdonance = (type = "") => {
                 onClick={(e) => {
                   e.preventDefault();
                   setModalNotifyMsg("");
-                  navigate("/dashboard/patient/details/prescriptions")
+                  navigate("/dashboard/patient/details/prescriptions");
                 }}
               >
                 Ok
