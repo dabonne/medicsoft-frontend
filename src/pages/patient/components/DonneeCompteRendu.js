@@ -12,6 +12,7 @@ import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 import requestDoctor from "../../../services/requestDoctor";
+import Loading from "../../../components/Loading";
 
 const initSelected = {
   idData: "",
@@ -169,6 +170,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         </div>
       </div>
 
+      <Loading data={datas}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -273,6 +275,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
           </tbody>
         </table>
       </div>
+      </Loading>
       <ModalMedical
         id={"modalEdit" + type.id}
         title={type.title}

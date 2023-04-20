@@ -8,6 +8,7 @@ import FormNotify from "../../components/FormNotify";
 import requestPatient from "../../services/requestPatient";
 import { apiPatient } from "../../services/api";
 import { AppContext } from "../../services/context";
+import Loading from "../../components/Loading";
 
 const initPatient = {
   organisationId: "",
@@ -24,12 +25,12 @@ const initPatient = {
   countryMinor: "",
   cityMinor: "",
   cni: "",
-  gender:"",
-  linkParental:"",
+  gender: "",
+  linkParental: "",
   cities: {},
   countries: {},
-  genders:{},
-  parental:{},
+  genders: {},
+  parental: {},
   mineur: false,
 };
 
@@ -44,12 +45,12 @@ const ListPatient = () => {
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
-  const [modalNotifyMsg, setModalNotifyMsg] = useState('')
+  const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   const [patient, setPatient] = useState(initPatient);
   let navigate = useNavigate();
   const closeRef = useRef();
   const closeEditRef = useRef();
-  const notifyRef = useRef()
+  const notifyRef = useRef();
 
   const header = {
     headers: { Authorization: `${user.token}` },
@@ -74,14 +75,14 @@ const ListPatient = () => {
       .get(apiPatient.getData)
       .then((res) => {
         //get dataForm success
-        console.log(res.data)
-        initPatient.organisationId = user.organisationRef
-        initPatient.countries = res.data.countries
-        initPatient.cities = res.data.cities
-        initPatient.genders = res.data.genders
-        initPatient.parental = res.data.parental
+        console.log(res.data);
+        initPatient.organisationId = user.organisationRef;
+        initPatient.countries = res.data.countries;
+        initPatient.cities = res.data.cities;
+        initPatient.genders = res.data.genders;
+        initPatient.parental = res.data.parental;
 
-        setPatient(initPatient)
+        setPatient(initPatient);
         //console.log(patient);
         setFormValidate("needs-validation");
         configNotify("", "", "");
@@ -99,18 +100,17 @@ const ListPatient = () => {
       .post(apiPatient.post, patient, header)
       .then((res) => {
         console.log("enregistrement ok");
-        console.log(res.data)
+        console.log(res.data);
         //setRefresh(refresh + 1);
         configNotify(
           "success",
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("Le patient a été ajouté avec succès")
-        closeRef.current.click()
-        notifyRef.current.click()
-        setRefresh(refresh + 1)
-        
+        setModalNotifyMsg("Le patient a été ajouté avec succès");
+        closeRef.current.click();
+        notifyRef.current.click();
+        setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
@@ -123,7 +123,7 @@ const ListPatient = () => {
   };
 
   const handleInputChange = (name, e) => {
-    const value = (name === 'mineur') ? !patient.mineur : e.target.value
+    const value = name === "mineur" ? !patient.mineur : e.target.value;
     setPatient({
       ...patient,
       [name]: value,
@@ -135,8 +135,8 @@ const ListPatient = () => {
 
   const navigateToPatientInfo = (e, idx) => {
     e.preventDefault();
-    user.cni = idx
-    onUserChange(user)
+    user.cni = idx;
+    onUserChange(user);
     return navigate(`details`);
   };
 
@@ -213,48 +213,45 @@ const ListPatient = () => {
         </div>
       </div>
 
-      <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
-        {datas.map((data, idx) => {
-          return (
-            <div
-              key={idx}
-              className="col"
-              type="button"
-              onClick={(e) => navigateToPatientInfo(e, data.cni)}
-            >
-              <div className="card v-card shadow-sm p-1">
-                <div className="d-inline-block mx-auto my-2">
-                  <img
-                    className="circle"
-                    width="100%"
-                    src={profile}
-                    alt=""
-                  />
-                </div>
-                <div className="mt-2 mb-5">
-                  <span className="d-block text-center text-bold text-meduim">
-                    {
-                      data.lastname + " " + data.firstname
-                    }
-                  </span>
-                  <span className="d-block my-1 text-center">
-                    <span>ID Patient: </span>
-                    <span className="text-bold">P12902</span>
-                  </span>
-                  <span className="d-block my-1 text-center">
-                    <span className="text-bold">{data.age} ans . {data.gender}</span>
-                  </span>
-                  <span className="d-block my-1 text-center">
-                    <span className="text-bold text-meduim">
-                      <img src={sang} alt="" /> {data.bloodGroup}
+      <Loading data={datas}>
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
+          {datas.map((data, idx) => {
+            return (
+              <div
+                key={idx}
+                className="col"
+                type="button"
+                onClick={(e) => navigateToPatientInfo(e, data.cni)}
+              >
+                <div className="card v-card shadow-sm p-1">
+                  <div className="d-inline-block mx-auto my-2">
+                    <img className="circle" width="100%" src={profile} alt="" />
+                  </div>
+                  <div className="mt-2 mb-5">
+                    <span className="d-block text-center text-bold text-meduim">
+                      {data.lastname + " " + data.firstname}
                     </span>
-                  </span>
+                    <span className="d-block my-1 text-center">
+                      <span>ID Patient: </span>
+                      <span className="text-bold">P12902</span>
+                    </span>
+                    <span className="d-block my-1 text-center">
+                      <span className="text-bold">
+                        {data.age} ans . {data.gender}
+                      </span>
+                    </span>
+                    <span className="d-block my-1 text-center">
+                      <span className="text-bold text-meduim">
+                        <img src={sang} alt="" /> {data.bloodGroup}
+                      </span>
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </Loading>
 
       <div className="modal fade" id="newPatient">
         <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -455,175 +452,174 @@ const ListPatient = () => {
                       className="form-check-input"
                       type="checkbox"
                       value={patient.mineur}
-                      onChange = {(e) =>{
-                        e.target.value = !patient.value
-                        handleInputChange("mineur",e)
+                      onChange={(e) => {
+                        e.target.value = !patient.value;
+                        handleInputChange("mineur", e);
                       }}
-                      
                     />
                     <label className="form-check-label">Mineur</label>
                   </div>
                 </div>
-                {
-                  patient.mineur && <>
-                  <hr />
-                <p>Informations du parent</p>
-                <div className="mb-3">
-                  <label htmlFor="plname" className="form-label">
-                    Nom du parent
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="plname"
-                    placeholder="Entrer le numero de téléphone"
-                    value={patient.parentLastname}
-                    onChange={(e) => {
-                      handleInputChange("parentLastname", e);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le nom du parent
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="pfname" className="form-label">
-                    Prénom du parent
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="pfname"
-                    placeholder="Entrer le numero de téléphone"
-                    value={patient.parentFirstname}
-                    onChange={(e) => {
-                      handleInputChange("parentFirstname", e);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le prénom du parent
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="parentPhoneNumber" className="form-label">
-                    téléphone du parent
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="parentPhoneNumber"
-                    placeholder="Entrer le numero de téléphone du parent"
-                    value={patient.parentPhoneNumber}
-                    onChange={(e) => {
-                      handleInputChange("parentPhoneNumber", e);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numéro de téléphone du parent
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="pcni" className="form-label">
-                    Numéro CNI du parent
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="pcni"
-                    placeholder="Entrer le numéro cni du parent"
-                    value={patient.parentCnib}
-                    onChange={(e) => {
-                      handleInputChange("parentCnib", e);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer le numéro CNI du parent
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="clst" className="form-label">
-                    Lien de parenté
-                  </label>
-                  <select
-                    id="clst"
-                    className="form-select"
-                    value={patient.linkParental}
-                    onChange={(e) => {
-                      handleInputChange("linkParental", e);
-                    }}
-                    required
-                  >
-                    <option value="">Choisir le lien</option>
-                    {Object.keys(patient.parental).map((key) => {
-                      return (
-                        <option key={key} value={key}>
-                          {patient.parental[key]}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="invalid-feedback">
-                    Veuillez Choisir le lien de parenté
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="clst" className="form-label">
-                    Pays
-                  </label>
-                  <select
-                    id="clst"
-                    className="form-select"
-                    value={patient.countryMinor}
-                    onChange={(e) => {
-                      handleInputChange("countryMinor", e);
-                    }}
-                    required
-                  >
-                    <option value="">Choisir le pays</option>
-                    {Object.keys(patient.countries).map((key) => {
-                      return (
-                        <option key={key} value={key}>
-                          {patient.countries[key]}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="invalid-feedback">
-                    Veuillez Choisir le pays
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="clst" className="form-label">
-                    Ville
-                  </label>
-                  <select
-                    id="clst"
-                    className="form-select"
-                    value={patient.cityMinor}
-                    onChange={(e) => {
-                      handleInputChange("cityMinor", e);
-                    }}
-                    required
-                  >
-                    <option value="">Choisir la ville</option>
-                    {Object.keys(patient.cities).map((key) => {
-                      return (
-                        <option key={key} value={key}>
-                          {patient.cities[key]}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="invalid-feedback">
-                    Veuillez Choisir une ville
-                  </div>
-                </div>
+                {patient.mineur && (
+                  <>
+                    <hr />
+                    <p>Informations du parent</p>
+                    <div className="mb-3">
+                      <label htmlFor="plname" className="form-label">
+                        Nom du parent
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="plname"
+                        placeholder="Entrer le numero de téléphone"
+                        value={patient.parentLastname}
+                        onChange={(e) => {
+                          handleInputChange("parentLastname", e);
+                        }}
+                        required
+                      />
+                      <div className="invalid-feedback">
+                        Veuillez entrer le nom du parent
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="pfname" className="form-label">
+                        Prénom du parent
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="pfname"
+                        placeholder="Entrer le numero de téléphone"
+                        value={patient.parentFirstname}
+                        onChange={(e) => {
+                          handleInputChange("parentFirstname", e);
+                        }}
+                        required
+                      />
+                      <div className="invalid-feedback">
+                        Veuillez entrer le prénom du parent
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="parentPhoneNumber" className="form-label">
+                        téléphone du parent
+                      </label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id="parentPhoneNumber"
+                        placeholder="Entrer le numero de téléphone du parent"
+                        value={patient.parentPhoneNumber}
+                        onChange={(e) => {
+                          handleInputChange("parentPhoneNumber", e);
+                        }}
+                        required
+                      />
+                      <div className="invalid-feedback">
+                        Veuillez entrer le numéro de téléphone du parent
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="pcni" className="form-label">
+                        Numéro CNI du parent
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="pcni"
+                        placeholder="Entrer le numéro cni du parent"
+                        value={patient.parentCnib}
+                        onChange={(e) => {
+                          handleInputChange("parentCnib", e);
+                        }}
+                        required
+                      />
+                      <div className="invalid-feedback">
+                        Veuillez entrer le numéro CNI du parent
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="clst" className="form-label">
+                        Lien de parenté
+                      </label>
+                      <select
+                        id="clst"
+                        className="form-select"
+                        value={patient.linkParental}
+                        onChange={(e) => {
+                          handleInputChange("linkParental", e);
+                        }}
+                        required
+                      >
+                        <option value="">Choisir le lien</option>
+                        {Object.keys(patient.parental).map((key) => {
+                          return (
+                            <option key={key} value={key}>
+                              {patient.parental[key]}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <div className="invalid-feedback">
+                        Veuillez Choisir le lien de parenté
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="clst" className="form-label">
+                        Pays
+                      </label>
+                      <select
+                        id="clst"
+                        className="form-select"
+                        value={patient.countryMinor}
+                        onChange={(e) => {
+                          handleInputChange("countryMinor", e);
+                        }}
+                        required
+                      >
+                        <option value="">Choisir le pays</option>
+                        {Object.keys(patient.countries).map((key) => {
+                          return (
+                            <option key={key} value={key}>
+                              {patient.countries[key]}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <div className="invalid-feedback">
+                        Veuillez Choisir le pays
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="clst" className="form-label">
+                        Ville
+                      </label>
+                      <select
+                        id="clst"
+                        className="form-select"
+                        value={patient.cityMinor}
+                        onChange={(e) => {
+                          handleInputChange("cityMinor", e);
+                        }}
+                        required
+                      >
+                        <option value="">Choisir la ville</option>
+                        {Object.keys(patient.cities).map((key) => {
+                          return (
+                            <option key={key} value={key}>
+                              {patient.cities[key]}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <div className="invalid-feedback">
+                        Veuillez Choisir une ville
+                      </div>
+                    </div>
                   </>
-                }
+                )}
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     className="btn btn-secondary"
@@ -653,9 +649,7 @@ const ListPatient = () => {
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                
-              </h4>
+              <h4 className="modal-title text-meduim text-bold"></h4>
               <button
                 type="button"
                 className="btn-close"
@@ -670,9 +664,9 @@ const ListPatient = () => {
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={(e) =>{
-                  e.preventDefault()
-                  setModalNotifyMsg('')
+                onClick={(e) => {
+                  e.preventDefault();
+                  setModalNotifyMsg("");
                 }}
               >
                 Ok
@@ -681,10 +675,16 @@ const ListPatient = () => {
           </div>
         </div>
       </div>
-      <input type="hidden" ref={notifyRef} data-bs-toggle="modal" data-bs-target="#notifyRef" onClick={(e) =>{
-                    e.preventDefault()
-                    setNotifyBg("")
-                  }} />
+      <input
+        type="hidden"
+        ref={notifyRef}
+        data-bs-toggle="modal"
+        data-bs-target="#notifyRef"
+        onClick={(e) => {
+          e.preventDefault();
+          setNotifyBg("");
+        }}
+      />
     </>
   );
 };

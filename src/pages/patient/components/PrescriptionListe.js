@@ -11,6 +11,7 @@ import requestDoctor from "../../../services/requestDoctor";
 import { AppContext } from "../../../services/context";
 import { Link, useNavigate } from "react-router-dom";
 import DeleteModal from "../../../components/DeleteModal";
+import Loading from "../../../components/Loading";
 
 const Ordonnance = () => {
   return (
@@ -294,6 +295,7 @@ const PrescriptionListe = () => {
         </div>
       </div>
 
+      <Loading data={datas}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -395,6 +397,7 @@ const PrescriptionListe = () => {
           </tbody>
         </table>
       </div>
+      </Loading>
 
       <div className="modal fade" id="viewPrescriptionModal">
         <div className="modal-dialog modal-dialog-centered modal-lg">

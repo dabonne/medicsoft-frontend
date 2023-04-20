@@ -17,6 +17,7 @@ import { useFormik } from "formik";
 import requestAgenda from "../services/requestAgenda";
 import requestDoctor from "../services/requestDoctor";
 import DeleteModal from "../components/DeleteModal";
+import Loading from "../components/Loading";
 
 const initStatus = {
   CANCEL: "Annuler",
@@ -216,6 +217,7 @@ const Meet = () => {
           </div>
         </div>
       </div>
+      <Loading data={datas}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>
@@ -323,6 +325,7 @@ const Meet = () => {
           </tbody>
         </table>
       </div>
+      </Loading>
       <DeleteModal
         title={"Suppression du rendez vous"}
         modal={"deleteRendezVous"}

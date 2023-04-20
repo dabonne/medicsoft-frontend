@@ -29,7 +29,8 @@ const apiAgenda = {
     "put":"agenda-updateform",
     "delete":"agenda-delete",
     "agendaEmployee":"agenda-employee-list",
-    "eventEmploye":"events-employee"
+    "eventEmploye":"events-employee",
+    "eventConsultation":"v2/events"
 }
 
 const apiPatient = {
@@ -71,7 +72,10 @@ const apiMedical = {
     "rendezVousDoctor":"appointment/appointment-list",
     "deleteRendezVous":"appointment",
     "getRendezVous":"appointment",
-    "statusRendezVous":"appointment/update-appointment"
+    "statusRendezVous":"appointment/update-appointment",
+    "patientsReduce":"doctor/patients-reduce",
+    "appointmentConfirmWait":"appointment/appointment-confirm-wait",
+    
 }
 
 const apiPrescription = {

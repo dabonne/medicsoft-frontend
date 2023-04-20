@@ -11,6 +11,7 @@ import requestPatient from "../../../services/requestPatient";
 import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
+import Loading from "../../../components/Loading";
 
 const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const authCtx = useContext(AppContext);
@@ -122,6 +123,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
         </div>
       </div>
 
+      <Loading data={datas}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -201,6 +203,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
           </tbody>
         </table>
       </div>
+      </Loading>
 
       <ModalMedicalAntecedent
         id={"modalEdit" + type.id}

@@ -16,6 +16,7 @@ import { AppContext } from "../../../services/context";
 import requestDoctor from "../../../services/requestDoctor";
 import DeleteModal from "../../../components/DeleteModal";
 import { Link } from "react-router-dom";
+import Loading from "../../../components/Loading";
 
 const initData = {
   doctorUuid: "",
@@ -395,6 +396,7 @@ const RendezVous = ({ setLocation }) => {
           </div>
         </div>
       </div>
+      <Loading data={datas}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>
@@ -484,6 +486,7 @@ const RendezVous = ({ setLocation }) => {
           </tbody>
         </table>
       </div>
+      </Loading>
       <div className="modal fade" id="notifyRef">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">

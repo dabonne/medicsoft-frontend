@@ -16,6 +16,7 @@ import "react-quill/dist/quill.snow.css";
 import requestPatient from "../../../services/requestPatient";
 import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
+import Loading from "../../../components/Loading";
 
 const CompteRendu = ({ setLocation }) => {
   const authCtx = useContext(AppContext);
@@ -228,6 +229,7 @@ const CompteRendu = ({ setLocation }) => {
         </div>
       </div>
 
+      <Loading data={datas}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -335,6 +337,7 @@ const CompteRendu = ({ setLocation }) => {
           </tbody>
         </table>
       </div>
+      </Loading>
 
       <div className="modal fade" id="compteRenduModal">
         <div className="modal-dialog modal-dialog-centered modal-lg">

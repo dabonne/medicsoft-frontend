@@ -15,6 +15,7 @@ import requestUser from "../services/requestUser";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { deleteUser } from "../services/storage";
+import Loading from "../components/Loading";
 
 
 const Employe = () => {
@@ -1184,7 +1185,8 @@ const Employe = () => {
           </div>
         </div>
       </div>
-      <p className="text-ultra-small">12 éléments affichés</p>
+      <p className="text-ultra-small">{list.length} éléments affichés</p>
+      <Loading data={list}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>
@@ -1264,6 +1266,7 @@ const Employe = () => {
           </tbody>
         </table>
       </div>
+      </Loading>
       <div className="d-inline-block my-1 me-1">
         <img
           title="Supprimer les employés selectionnés"

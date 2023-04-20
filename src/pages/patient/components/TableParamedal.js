@@ -11,6 +11,7 @@ import { apiParamedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import ModalParamedical from "../../../components/ModalParamedical";
 import DeleteModal from "../../../components/DeleteModal";
+import Loading from "../../../components/Loading";
 
 const initSelected = {
   idData: "",
@@ -166,6 +167,7 @@ const TableParamedal = ({
         </div>
       </div>
 
+      <Loading data={datas}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -264,6 +266,7 @@ const TableParamedal = ({
           </tbody>
         </table>
       </div>
+      </Loading>
       <ModalParamedical
         id={"modalEdit" + type.id}
         type={type.id}

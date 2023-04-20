@@ -160,7 +160,7 @@ const Dashboard = () => {
                 </li>
                 <li className="nav-item">
                   <NavLink
-                    to="/dashboard/agenda"
+                    to="/dashboard/agenda/"
                     className={({ isActive }) =>
                       isActive ? "nav-link active" : "nav-link"
                     }
@@ -330,7 +330,7 @@ const Dashboard = () => {
               <Route path="/" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Home /></ProtectedRoute> } />
               <Route path="/personnel" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Employe /></ProtectedRoute>} />
               <Route path="/rendez-vous" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Meet /></ProtectedRoute>} />
-              <Route path="/agenda" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Notebook /></ProtectedRoute>} />
+              <Route path="/agenda/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Notebook /></ProtectedRoute>} />
               <Route path="/patient/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
               <Route path="/hospitalisation/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
               <Route path="/planning/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Planning /></ProtectedRoute>} />
