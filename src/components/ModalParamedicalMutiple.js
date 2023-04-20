@@ -32,8 +32,8 @@ export const validateData = Yup.object({
     .max(500, "Entrez un nombre compris entre 0 et 500"),
   BODY_TEMPERATURE: Yup.number()
     .typeError("La température doit être un nombre")
-    .min(30, "Entrez un nombre compris entre 30 et 42")
-    .max(42, "Entrez un nombre compris entre 30 et 42"),
+    .min(30, "Entrez un nombre compris entre 30 et 45")
+    .max(45, "Entrez un nombre compris entre 30 et 45"),
   //.required("La température n'est pas valide"),
   ARTERIAL_PRESSURE1: Yup.number()
     .typeError("La pression systolique doit être un nombre")
@@ -52,8 +52,8 @@ export const validateData = Yup.object({
   //.required("La fréquence cardiaque est obligatoire"),
   BLOOD_SUGAR: Yup.number()
     .typeError("La glycémie doit être un nombre")
-    .min(0, "La glycémie doit être supérieur ou égale à 0")
-    .max(30, "La glycémie doit être inférieur ou égale à 30"),
+    .min(0, "Entrez un nombre compris entre 0 et 30")
+    .max(30, "Entrez un nombre compris entre 0 et 30"),
   //.required("La glycémie est obligatoire"),
   OXYGEN_SATURATION: Yup.number()
     .typeError("La saturation en oxygène doit être un nombre")
@@ -62,7 +62,8 @@ export const validateData = Yup.object({
   //.required("La saturation en oxygène est obligatoire"),
   HEIGHT: Yup.number()
     .typeError("La taille doit être un nombre ex: 1.45")
-    .positive("La taille doit être un nombre positif"),
+    .positive("La taille doit être un nombre positif")
+    .max(100, "Entrez un nombre compris entre 0 et 5"),
   //.required("La taille est obligatoire"),
   BLOOD_GROUP: Yup.string()
     .oneOf(

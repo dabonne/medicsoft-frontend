@@ -9,8 +9,9 @@ import requestDoctor from "../../../services/requestDoctor";
 import { AppContext } from "../../../services/context";
 import FormNotify from "../../../components/FormNotify";
 import { useNavigate, useParams } from "react-router-dom";
-import { apiPrescription } from "../../../services/api";
+import { apiBackOffice, apiPrescription } from "../../../services/api";
 import { Typeahead } from "react-bootstrap-typeahead";
+import requestBackOffice from "../../../services/requestBackOffice";
 
 const initData = {
   type: "",
@@ -60,9 +61,15 @@ const PrescriptionForm = ({
   const [firstCall, setFirstCall] = useState(0);
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
+  const [selectedFamily, setSelectedFamily] = useState([]);
+  const [familyGroup,setFamilyGroup] = useState([])
   const { id } = useParams();
   useEffect(() => {
-    getList();
+    if(type.includes("consultation")){
+      getfamilyBiological()
+    }else{
+      getList();
+    }
     //console.log(data);
     if (id !== undefined && firstCall !== 1) {
       getPrescriptionById(id);
@@ -77,7 +84,7 @@ const PrescriptionForm = ({
       .get(url.get)
       .then((res) => {
         setData(res.data);
-        console.log(res.data)
+        //console.log(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -98,6 +105,29 @@ const PrescriptionForm = ({
         console.log(error);
       });
   };
+
+  const getfamilyBiological = () => {
+    requestBackOffice
+      .get(apiBackOffice.familyBiological,header)
+      .then((res) => {
+        setFamilyGroup(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getfamilyBiologicalById = (id) => {
+    requestBackOffice
+      .get(apiBackOffice.familyBiologicalById+"/"+id,header)
+      .then((res) => {
+        console.log(res.data);
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const formik = useFormik({
     initialValues: initData,
 
@@ -105,24 +135,29 @@ const PrescriptionForm = ({
       console.log("selectedOption");
       console.log(selectedOption);
       const presc = {
-        type: selectedOption[0].uuid,// values.type,
+        type: selectedOption[0].uuid, // values.type,
         detail: values.detail,
       };
-      if(presc.type !=="" && presc.type !== undefined && presc.detail !==""){
+      if (
+        presc.type !== "" &&
+        presc.type !== undefined &&
+        presc.detail !== ""
+      ) {
         if (list.sendata) {
-          if(id !== undefined){
-            handleEditSubmit([...list.list, presc])
-          }else{
-            handleSubmit([...list.list, presc])
+          if (id !== undefined) {
+            handleEditSubmit([...list.list, presc]);
+          } else {
+            console.log(presc)
+            handleSubmit([...list.list, presc]);
           }
         }
         setList({
           ...list,
           list: [...list.list, presc],
         });
-        setSelectedOption([])
+        setSelectedOption([]);
       }
-      list.sendata = false
+      list.sendata = false;
       console.log(list);
       formik.resetForm();
     },
@@ -161,11 +196,7 @@ const PrescriptionForm = ({
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
     requestDoctor
-      .post(
-        url.post + "/" + user.organisationRef + "/" + user.cni,
-        tab,
-        header
-      )
+      .post(url.post + "/" + user.organisationRef + "/" + user.cni, tab, header)
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -189,12 +220,10 @@ const PrescriptionForm = ({
   };
 
   const handleEditSubmit = (tab) => {
-    console.log(tab)
+    console.log(tab);
     configNotify("loading", "", "Modification des données en cours...");
     requestDoctor
-      .put(
-        url.update +"/" +
-        user.organisationRef +"/"+id, tab,header)
+      .put(url.update + "/" + user.organisationRef + "/" + id, tab, header)
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -203,9 +232,7 @@ const PrescriptionForm = ({
           "Modification réussi",
           "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg(
-          "Les informations ont bien été modifiées"
-        );
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         notifyRef.current.click();
       })
       .catch((error) => {
@@ -230,6 +257,15 @@ const PrescriptionForm = ({
     );
     return filteredOptions;
   };
+  const familyChange = (e) => {
+    console.log(e)
+    setSelectedFamily(e)
+    if(e.length !== 0){
+      getfamilyBiologicalById(e[0].uuid)
+    }else{
+      setSelectedOption([])
+    }
+  }
   const renderMenuItemChildren = (option, props) => {
     return <div key={option.uuid}>{option.label}</div>;
   };
@@ -289,16 +325,46 @@ const PrescriptionForm = ({
             options={data}
           />
            */}
-          <Typeahead
-            id="basic-typeahead-example"
-            labelKey="label"
-            options={data}
-            placeholder="Veuillez choisir le nom du médicament"
-            onChange={setSelectedOption}
-            onInputChange={handleInputChange}
-            renderMenuItemChildren={renderMenuItemChildren}
-            selected={selectedOption}
-          />
+          {type.includes("consultation") ? (
+            <>
+            <div className="form-label mt-3">{"Sélectionnez une famille d'examen"}</div>
+              <Typeahead
+                id="basic-typeahead-goupe"
+                labelKey="label"
+                options={familyGroup}
+                placeholder="Veuillez choisir une famille"
+                onChange={familyChange}
+                onInputChange={handleInputChange}
+                renderMenuItemChildren={renderMenuItemChildren}
+                selected={selectedFamily}
+              />
+              <div className="form-label mt-3">{"Sélectionnez un examen"}</div>
+              <Typeahead
+                id="basic-typeahead-family"
+                labelKey="label"
+                options={data}
+                placeholder="Veuillez choisir un examen"
+                onChange={setSelectedOption}
+                onInputChange={handleInputChange}
+                renderMenuItemChildren={renderMenuItemChildren}
+                selected={selectedOption}
+              />
+            </>
+          ) : (
+            <>
+              <Typeahead
+                id="basic-typeahead-example"
+                labelKey="label"
+                options={data}
+                placeholder="Veuillez choisir le nom du médicament"
+                onChange={setSelectedOption}
+                onInputChange={handleInputChange}
+                renderMenuItemChildren={renderMenuItemChildren}
+                selected={selectedOption}
+              />
+            </>
+          )}
+
           <div className="form-label mt-3">Précisions</div>
           <InputField
             type={"textarea"}

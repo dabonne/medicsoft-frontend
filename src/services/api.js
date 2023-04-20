@@ -96,6 +96,10 @@ const apiPrescription = {
     "getPrescriptionById":"prescription/prescription-id"
 }
 
+const apiBackOffice = {
+    "familyBiological":"settings/family-biological",
+    "familyBiologicalById":"settings/biological-analysis"
+}
 
 export {
     apiEmploye,
@@ -104,5 +108,6 @@ export {
     apiPatient,
     apiParamedical,
     apiMedical,
-    apiPrescription
+    apiPrescription,
+    apiBackOffice
 }

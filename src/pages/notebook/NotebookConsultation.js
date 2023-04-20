@@ -204,11 +204,11 @@ const NotebookConsultation = () => {
             start: new Date(data.startDate + ", " + data.startHour),
             end: new Date(data.endDate + ", " + data.endHour),
             desc: data.typeEvent ? data.typeEvent : "Consultation",
-            title: data.title ? data.title : "title",
+            title: data.title ? data.title : data.patient.firstname +" " +data.patient.lastname,
             name: "John Doe",
             description: data.description ? data.description : "",
             idx: idx,
-            referenceId: data.referenceId ? data.referenceId : "",
+            referenceId: data.referenceId ? data.referenceId : data.id,
             type: data.type,
           };
         });
@@ -417,6 +417,7 @@ const NotebookConsultation = () => {
         setType("");
         setDesc("");
         fValidate("needs-validation");
+        getRendezVous(doctor)
       })
       .catch((error) => {
         console.log(error);
@@ -463,13 +464,25 @@ const NotebookConsultation = () => {
         console.log(error);
       });
   };
-  const onDelete = (e) => {
+  /*const onDelete = (e) => {
     e.preventDefault();
     console.log(eventList[indexEvent].referenceId);
     requestAgenda
       .delete(apiAgenda.delete + "/" + eventList[indexEvent].referenceId)
       .then((res) => {
         console.log("suppression ok");
+        setModalNotifyMsg("Suppression réussie !");
+        notifyRef.current.click();
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };*/
+  const onDelete = () => {
+    requestDoctor
+      .delete(apiMedical.deleteRendezVous + "/" + eventList[indexEvent].referenceId, header)
+      .then((res) => {
         setModalNotifyMsg("Suppression réussie !");
         notifyRef.current.click();
         setRefresh(refresh + 1);
@@ -941,25 +954,23 @@ const NotebookConsultation = () => {
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
+              {
+                eventList[indexEvent] !== undefined && eventList[indexEvent].type === "CONSULTATION" ? <button
                 type="button"
                 className="btn btn-danger"
                 data-bs-toggle="modal"
                 data-bs-target="#deleteAgenda"
               >
-                Annuler
-              </button>
+                supprimer
+              </button> : null
+              }
               <button
                 type="button"
                 className="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#editEvent"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setEditData();
-                }}
+                data-bs-dismiss="modal"
+                
               >
-                Modifier
+                fermer
               </button>
             </div>
           </div>
