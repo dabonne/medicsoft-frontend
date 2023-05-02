@@ -18,8 +18,10 @@ const apiUser = {
     //"getRoles":"user/rolename-request",
     "getRoles":"user/v2/rolename-request",
     "put":"user/update-user-account",
-    "profile":"user/user-photo"
+    "profile":"user/user-photo",
     //"delete":"user/remove-role"
+    "refreshToken":"auth/login-refresh-token",
+    "changePassword":"user/update-password"
 }
 
 const apiAgenda = {

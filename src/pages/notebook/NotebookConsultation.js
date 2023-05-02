@@ -1170,7 +1170,7 @@ const NotebookConsultation = () => {
                     <span className="fw-bold  text-primary">
                       {doctor !== ""
                         ? employeList[doctor]
-                        : "Veuillez sélectionnez l'agenda d'un docteur"}
+                        : "Veuillez choisir l'agenda du médecin avant de pouvoir créer un rendez-vous"}
                     </span>
                   </div>
                 </div>

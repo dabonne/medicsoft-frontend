@@ -46,11 +46,13 @@ const Dashboard = () => {
             //console.log(res.data.employeeResponseList);
           })
           .catch((error) => {
+            console.log("user error");
             console.log(error);
           });
     setUserLocal(getUser())
     isAuth();
   }, [user]);
+  
   const isAuth = () => {
     if (user.isAuth == false || user.token == null || user.token == "") {
       console.log(`connexion échoué, isAuth`);

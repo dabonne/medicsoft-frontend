@@ -6,33 +6,57 @@ import { AppContext } from "../services/context";
 import { Link } from "react-router-dom";
 import DPicker from "../components/DPicker";
 import { Calendar } from "react-calendar";
-import '../assets/css/Calendar.css';
+import "../assets/css/Calendar.css";
 import requestUser from "../services/requestUser";
-import { apiUser } from "../services/api";
+import { apiMedical, apiUser } from "../services/api";
+import requestDoctor from "../services/requestDoctor";
 
 const Home = () => {
   const authCtx = useContext(AppContext);
-  const { user, onUserChange} = authCtx;
+  const { user, onUserChange } = authCtx;
   const [userImg, setUserImg] = useState(hp);
   const [value, onChange] = useState(new Date());
-
+  const [rdv, setRdv] = useState([]);
+  const header = {
+    headers: { Authorization: `${user.token}` },
+  };
   useEffect(() => {
-    setUserImg(user.profile)
+    setUserImg(user.profile);
+    getUserInfos()
+    getEvent();
+  }, []);
+
+  const getUserInfos = () => {
     requestUser
-          .get(apiUser.get+"/"+user.organisationRef,{
-            headers: { Authorization: `Bearer ${user.token}`, },
-          })
-          .then((res) => {
-            console.log(res.data.photo);
-            user.profile = "data:image/jpeg;base64,"+res.data.photo
-            setUserImg("data:image/jpeg;base64,"+res.data.photo)
-            onUserChange(user)
-            //console.log(res.data.employeeResponseList);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-  },[])
+      .get(apiUser.get + "/" + user.organisationRef, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+      .then((res) => {
+        ///console.log(res.data.photo);
+        user.profile = "data:image/jpeg;base64," + res.data.photo;
+        setUserImg("data:image/jpeg;base64," + res.data.photo);
+        onUserChange(user);
+        //console.log(res.data.employeeResponseList);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getEvent = () => {
+    requestDoctor
+      .get(
+        apiMedical.appointmentConfirmWait + "/" + user.organisationRef,
+        header
+      )
+      .then((res) => {
+        console.log(res.data);
+        //setEmployeList(res.data.employees);
+        console.log(res.data);
+        setRdv(res.data)
+      })
+      .catch((error) => {});
+  };
   return (
     <>
       <div className="row px-3">
@@ -58,7 +82,7 @@ const Home = () => {
           </div>
         </div>
         <div className="col-12 col-md-12 col-lg-4 mx-lg-3 bg-secondary border-radius d-flex align-items-center justify-content-center mt-4">
-        <div className="row py-2">
+          <div className="row py-2">
             <div className="col-7">
               <div className="align-middle">
                 <span className="d-block">Connecté sur</span>
@@ -66,28 +90,34 @@ const Home = () => {
                   {user.organisation}
                 </span>
                 <span className="d-block">
-                  <span 
-                  className="text-bold text-decoration-underline"
-                  style={{cursor:"pointer"}}
-                  data-bs-toggle="modal"
-                  data-bs-target="#changeOrganisation"
-                  >Changer d’organisation</span>
+                  <span
+                    className="text-bold text-decoration-underline"
+                    style={{ cursor: "pointer" }}
+                    data-bs-toggle="modal"
+                    data-bs-target="#changeOrganisation"
+                  >
+                    Changer d’organisation
+                  </span>
                 </span>
               </div>
             </div>
             <div className="col-4">
-              <img className="rounded-circle" width="100px" src={userImg} alt="" />
+              <img
+                className="rounded-circle"
+                width="100px"
+                src={userImg}
+                alt=""
+              />
             </div>
           </div>
         </div>
       </div>
       <div className="row px-3">
         <div className="col-12 col-lg-7 border border-radius mt-4 d-flex align-items-center position-relative">
-        <div className="w-100 text-bold text-meduim mb-3 ms-2 position-absolute top-0 py-4">
-              Cette semaine
-            </div>
+          <div className="w-100 text-bold text-meduim mb-3 ms-2 position-absolute top-0 py-4">
+            Cette semaine
+          </div>
           <div className="row row-cols-1 row-cols-md-3 mt-3 py-4">
-            
             <div className="col text-center">
               <span className="text-48 text-bold">10</span> <br />
               <span className="text-bold text-meduim">
@@ -111,14 +141,14 @@ const Home = () => {
         <div className="col-12 col-lg-4 mx-md-3  border border-radius col-md-5 py-4 mt-4">
           <DPicker open={true} />
           <div className="mt-4">
-          <Calendar onChange={onChange} value={value} />
+            <Calendar onChange={onChange} value={value} />
           </div>
         </div>
       </div>
       <div className="row px-3 mb-4">
         <div className="col-12 col-md-7 border border-radius py-4 mt-4">
           <p className="text-bold text-meduim ms-2">Vos rendez-vous à venir</p>
-          {[...Array(4).keys()].map((data, idx) => {
+          {rdv.map((data, idx) => {
             return (
               <div key={idx} className="row">
                 <div className="col-11 ms-3 border border-radius d-flex py-2 my-1">
@@ -127,13 +157,13 @@ const Home = () => {
                   </div>
                   <div className="col-8 col-md-10 d-flex justify-content-between">
                     <div className="d-inline-block">
-                      <span className="text-bold">Jannette DOE</span> <br />
-                      <span>23 ans . Femme</span>
+                      <span className="text-bold">{ data.patient}</span> <br />
+                      <span>{data.age} ans . {data.gender}</span>
                     </div>
                     <div className="d-inline-block">
-                      <span className="text-bold">12/02/2023</span> <br />
+                      <span className="text-bold">{data.period}</span> <br />
                       <span>
-                        <span className="text-bold">Heure</span>: 10h30
+                        <span className="text-bold">Heure</span>: {data.hour}
                       </span>
                     </div>
                   </div>
@@ -143,7 +173,7 @@ const Home = () => {
           })}
         </div>
         <div className="col-12 col-md-4 mx-md-3 border border-radius py-4 mt-4">
-        <p className="text-bold text-meduim ms-2">Vos rendez-vous à venir</p>
+          <p className="text-bold text-meduim ms-2">Vos récentes activités</p>
         </div>
       </div>
     </>

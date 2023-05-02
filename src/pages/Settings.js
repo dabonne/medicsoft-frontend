@@ -38,8 +38,12 @@ const Settings = () => {
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
   const [formValidate, setFormValidate] = useState("needs-validation");
+  const [password, setPassword] = useState({
+    new:"",
+    old:""
+  })
   const header = {
-    headers: { Authorization: `Bearer ${user.token}`, },
+    headers: { Authorization: `${user.token}`, },
   }
   const [refresh, setRefresh] = useState(0)
   const [userProfile, setUserProfile] = useState({})
@@ -190,6 +194,22 @@ const Settings = () => {
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
+
+  const changePassword = (e) => {
+    e.preventDefault()
+    requestUser.post(apiUser.changePassword+"?password="+password.new+"&oldPassword="+password.old,header).then((res) =>{
+      console.log(res.data)
+    }).catch((error) =>{
+      console.log(error)
+    })
+  }
+
+  const onChange = (e) =>{
+    setPassword({
+      ...password,
+      [e.target.name]:e.target.value
+    })
+  }
   return (
     <>
       <div className="row">
@@ -475,7 +495,7 @@ const Settings = () => {
             </div>
 
             <div className="modal-body">
-              <form >
+              <div>
                 <div className="mb-3 mt-3">
                   <label htmlFor="newMdp" className="form-label">
                   Nouveau mot de passe
@@ -485,12 +505,9 @@ const Settings = () => {
                     className="form-control"
                     id="newMdp"
                     placeholder="Entrer le nouveau mot de passe"
-                    value={""}
-                    autoComplete="false"
-                    onChange={(e) => {
-                      e.preventDefault();
-                      
-                    }}
+                    name="new"
+                    value={password.new}
+                    onChange={onChange}
                   />
                 </div>
                 <div className="mb-3">
@@ -502,12 +519,9 @@ const Settings = () => {
                     className="form-control"
                     id="comfMdp"
                     placeholder="Confirmer le nouveau mot de passe"
-                    value={""}
-                    autoComplete="false"
-                    onChange={(e) => {
-                      e.preventDefault();
-                      
-                    }}
+                    name="new"
+                    value={password.new}
+                    onChange={onChange}
                   />
                 </div>
                 <div className="mb-3">
@@ -519,12 +533,10 @@ const Settings = () => {
                     className="form-control"
                     id="oldMdp"
                     placeholder="Entrer l’ancien mot de passe"
-                    value=""
-                    autoComplete="false"
-                    onChange={(e) => {
-                      e.preventDefault();
-                      
-                    }}
+                    name="old"
+                    value={password.old}
+                    onChange={onChange}
+
                   />
                 </div>
                 <div className="modal-footer d-flex justify-content-start border-0">
@@ -536,14 +548,14 @@ const Settings = () => {
                     Fermer
                   </button>
                   <button
-                    type="submit"
                     className="btn btn-primary"
                     data-bs-dismiss="modal"
+                    onClick={changePassword}
                   >
                     Enrégistrer les modifications
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
