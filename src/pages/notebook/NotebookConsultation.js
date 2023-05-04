@@ -310,79 +310,14 @@ const NotebookConsultation = () => {
       .catch((error) => {});
   };
 
-  const setEditData = () => {
-    console.log(eventList[indexEvent]);
-    setStartDay(formatDate(eventList[indexEvent].start));
-    setEndDay(formatDate(eventList[indexEvent].end));
-    setStartHours(eventList[indexEvent].start.toLocaleTimeString());
-    setEndHours(eventList[indexEvent].end.toLocaleTimeString());
-    setDesc(eventList[indexEvent].description);
-    setTitre(eventList[indexEvent].title);
-    setType(eventList[indexEvent].desc);
-    setReferenceId(eventList[indexEvent].referenceId);
-  };
-
-  const submitEventOld = (e) => {
-    e.preventDefault();
-    console.log({
-      doctorUuid: doctor,
-      period: startDay,
-      hour: startHours,
-      patientCni: selectedOption[0].uuid,
-      detail: desc,
-    });
-    /*console.log({
-      startDate: startDay,
-      endDate: endDay,
-      startHour: startHours,
-      endHour: endHours,
-      //username: user.roles[0].organisation,
-      organisationId: user.organisationRef,
-      description: desc,
-    });*/
-    console.log(selectedOption[0]);
-
-    /*requestAgenda
-      .post(
-        apiAgenda.post,
-        {
-          title: titre,
-          startDate: startDay,
-          endDate: endDay,
-          startHour: startHours,
-          endHour: endHours,
-          //username: user.roles[0].organisation,
-          typeEvent: type,
-          organisationId: user.organisationRef,
-          description: desc,
-        },
-        header
-      )
-      .then((res) => {
-        console.log("creation ok");
-        setModalNotifyMsg("Les informations ont bien été enrégistrées");
-        agendaRef.current.click();
-        notifyRef.current.click();
-        setRefresh(refresh + 1);
-        setStartDay("");
-        setEndDay("");
-        setTitre("");
-        setType("");
-        setDesc("");
-        fValidate("needs-validation");
-      })
-      .catch((error) => {
-        console.log(error);
-      });*/
-  };
-
   const submitEvent = (e) => {
     e.preventDefault();
     configNotify("loading", "", "Ajout d’un nouvel rendez vous en cours...");
     const rdv = {
       doctorUuid: doctor,
       period: startDay,
-      hour: startHours,
+      startHour: startHours,
+      endHour: endHours,
       patientCni: selectedOption[0].uuid,
       detail: desc,
     };
@@ -428,6 +363,7 @@ const NotebookConsultation = () => {
         );
       });
   };
+
   const submitEditEvent = (e) => {
     e.preventDefault();
     requestAgenda
@@ -464,21 +400,6 @@ const NotebookConsultation = () => {
         console.log(error);
       });
   };
-  /*const onDelete = (e) => {
-    e.preventDefault();
-    console.log(eventList[indexEvent].referenceId);
-    requestAgenda
-      .delete(apiAgenda.delete + "/" + eventList[indexEvent].referenceId)
-      .then((res) => {
-        console.log("suppression ok");
-        setModalNotifyMsg("Suppression réussie !");
-        notifyRef.current.click();
-        setRefresh(refresh + 1);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };*/
   const onDelete = () => {
     requestDoctor
       .delete(apiMedical.deleteRendezVous + "/" + eventList[indexEvent].referenceId, header)
@@ -1160,6 +1081,16 @@ const NotebookConsultation = () => {
                       value={startHours}
                       onChange={(e) => {
                         setStartHours(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="col-3">
+                    <input
+                      className="form-control border-0"
+                      type="time"
+                      value={endHours}
+                      onChange={(e) => {
+                        setEndHours(e.target.value);
                       }}
                     />
                   </div>
