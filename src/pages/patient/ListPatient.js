@@ -233,7 +233,7 @@ const ListPatient = () => {
                     </span>
                     <span className="d-block my-1 text-center">
                       <span>ID Patient: </span>
-                      <span className="text-bold">P12902</span>
+                      <span className="text-bold">{data.patientId}</span>
                     </span>
                     <span className="d-block my-1 text-center">
                       <span className="text-bold">

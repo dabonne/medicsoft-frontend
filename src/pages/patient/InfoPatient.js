@@ -94,7 +94,7 @@ const InfoPatient = () => {
             </span>
             <span className="d-block my-1">
               <span>ID Patient: </span>
-              <span className="text-bold">P12902</span>
+              <span className="text-bold">{patient.patientId}</span>
             </span>
             <span className="d-block my-1">
               <span className="text-bold">{patient.age} ans . {patient.gender}</span>

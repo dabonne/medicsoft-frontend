@@ -253,18 +253,7 @@ const RendezVous = ({ setLocation }) => {
             1/10
           </div>
         </div>
-        <div className="col-3 d-flex justify-content-end align-items-center">
-          <button
-            className="btn btn-primary"
-            data-bs-target="#newMeet"
-            data-bs-toggle="modal"
-            onClick={(e) => {
-              //setModalView("");
-            }}
-          >
-            Ajouter
-          </button>
-        </div>
+        
       </div>
       <div className="modal fade" id="newMeet">
         <div className="modal-dialog modal-dialog-centered modal-lg">
