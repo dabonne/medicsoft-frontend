@@ -77,6 +77,7 @@ const apiMedical = {
     "statusRendezVous":"appointment/update-appointment",
     "patientsReduce":"doctor/patients-reduce",
     "appointmentConfirmWait":"appointment/appointment-confirm-wait",
+    "statistique":"statistics/consultation-prescriptions"
     
 }
 

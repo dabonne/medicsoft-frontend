@@ -17,6 +17,7 @@ const Home = () => {
   const [userImg, setUserImg] = useState(hp);
   const [value, onChange] = useState(new Date());
   const [rdv, setRdv] = useState([]);
+  const [stat, setStat] = useState({});
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -24,6 +25,7 @@ const Home = () => {
     setUserImg(user.profile);
     getUserInfos()
     getEvent();
+    getStatistique();
   }, []);
 
   const getUserInfos = () => {
@@ -54,6 +56,19 @@ const Home = () => {
         //setEmployeList(res.data.employees);
         console.log(res.data);
         setRdv(res.data)
+      })
+      .catch((error) => {});
+  };
+  const getStatistique = () => {
+    requestDoctor
+      .get(
+        apiMedical.statistique + "/" + user.organisationRef,
+        header
+      )
+      .then((res) => {
+        console.log(res.data);
+        //setEmployeList(res.data.employees);
+        setStat(res.data);
       })
       .catch((error) => {});
   };
@@ -119,19 +134,19 @@ const Home = () => {
           </div>
           <div className="row row-cols-1 row-cols-md-3 mt-3 py-4">
             <div className="col text-center">
-              <span className="text-48 text-bold">10</span> <br />
+              <span className="text-48 text-bold">{stat.consultation_end}</span> <br />
               <span className="text-bold text-meduim">
                 Consultation(s) effectuée(s)
               </span>
             </div>
             <div className="col text-center">
-              <span className="text-48 text-bold">5</span> <br />
+              <span className="text-48 text-bold">{stat.consultation_cancel}</span> <br />
               <span className="text-bold text-meduim">
                 Consultation(s) annulée(s)
               </span>
             </div>
             <div className="col text-center">
-              <span className="text-48 text-bold">100</span> <br />
+              <span className="text-48 text-bold">{stat.prescriptions}</span> <br />
               <span className="text-bold text-meduim">
                 Prescription(s) distribuée(s)
               </span>
