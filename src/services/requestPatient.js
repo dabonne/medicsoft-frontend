@@ -46,7 +46,7 @@ requestPatient.interceptors.request.use(
           return requestPatient(originalConfig);
         } catch (e) {
           deleteUser()
-          window.location.replace("/login");
+          window.location.replace("/");
         }
       }
   

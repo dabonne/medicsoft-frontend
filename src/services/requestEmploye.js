@@ -46,7 +46,7 @@ const requestEmploye = axios.create({
           return requestEmploye(originalConfig);
         } catch (e) {
           deleteUser()
-          window.location.replace("/login");
+          window.location.replace("/");
         }
       }
   

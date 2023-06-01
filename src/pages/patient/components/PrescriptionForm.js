@@ -65,7 +65,8 @@ const PrescriptionForm = ({
   const [familyGroup,setFamilyGroup] = useState([])
   const { id } = useParams();
   useEffect(() => {
-    if(type.includes("consultation")){
+    console.log(type)
+    if(type.includes("d'examen")){
       getfamilyBiological()
     }else{
       getList();
@@ -314,7 +315,6 @@ const PrescriptionForm = ({
           />
            */}
 
-          <div className="form-label mt-3">{type}</div>
           {/*
            <InputField
             type={"select3"}
@@ -325,25 +325,25 @@ const PrescriptionForm = ({
             options={data}
           />
            */}
-          {type.includes("consultation") ? (
+          {type.includes("d'examen") ? (
             <>
-            <div className="form-label mt-3">{"Sélectionnez une famille d'examen"}</div>
+            <div className="form-label mt-3">{"Sélectionnez une famille d'analyse biologique"}</div>
               <Typeahead
                 id="basic-typeahead-goupe"
                 labelKey="label"
                 options={familyGroup}
-                placeholder="Veuillez choisir une famille"
+                placeholder="Veuillez choisir une famille d'analyse biologique"
                 onChange={familyChange}
                 onInputChange={handleInputChange}
                 renderMenuItemChildren={renderMenuItemChildren}
                 selected={selectedFamily}
               />
-              <div className="form-label mt-3">{"Sélectionnez un examen"}</div>
+              <div className="form-label mt-3">{"Sélectionnez une analyse biologique"}</div>
               <Typeahead
                 id="basic-typeahead-family"
                 labelKey="label"
                 options={data}
-                placeholder="Veuillez choisir un examen"
+                placeholder="Veuillez choisir une analyse biologique"
                 onChange={setSelectedOption}
                 onInputChange={handleInputChange}
                 renderMenuItemChildren={renderMenuItemChildren}
@@ -352,11 +352,14 @@ const PrescriptionForm = ({
             </>
           ) : (
             <>
+              <div className="form-label mt-3">{type}</div>
               <Typeahead
                 id="basic-typeahead-example"
                 labelKey="label"
                 options={data}
-                placeholder="Veuillez choisir le nom du médicament"
+                placeholder={
+                   "Veuillez choisir le type"
+                }
                 onChange={setSelectedOption}
                 onInputChange={handleInputChange}
                 renderMenuItemChildren={renderMenuItemChildren}

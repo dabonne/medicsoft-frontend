@@ -45,7 +45,7 @@ requestAgenda.interceptors.request.use(
           return requestAgenda(originalConfig);
         } catch (e) {
           deleteUser()
-          window.location.replace("/login");
+          window.location.replace("/");
         }
       }
   

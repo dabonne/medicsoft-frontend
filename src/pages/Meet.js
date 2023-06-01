@@ -28,6 +28,7 @@ const initStatus = {
 const Meet = () => {
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState("");
+  const [stopLoad, setStopLoad] = useState(false);
   const [datas, setDatas] = useState([]);
   const [detail, setDetail] = useState({
     doctor: "",
@@ -62,7 +63,7 @@ const Meet = () => {
   const notifyRef = useRef();
 
   useEffect(() => {
-    setList([...Array(12).keys()]);
+    //setList([...Array(12).keys()]);
     onUserChange(getUser());
     isAuth();
     get();
@@ -107,6 +108,7 @@ const Meet = () => {
     requestDoctor
       .get(apiMedical.rendezVousDoctor + "/" + user.organisationRef, header)
       .then((res) => {
+        setStopLoad(true)
         setDatas(res.data);
         console.log(res.data);
       })
@@ -217,7 +219,7 @@ const Meet = () => {
           </div>
         </div>
       </div>
-      <Loading data={datas}>
+      <Loading data={datas} stopLoad={stopLoad}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>
@@ -453,7 +455,7 @@ const Meet = () => {
           <div className="modal-content">
             <div className="modal-header border-0">
               <h4 className="modal-title text-meduim text-bold">
-                Status de la consultation
+                Statut de la consultation
               </h4>
               <button
                 type="button"

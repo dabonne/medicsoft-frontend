@@ -18,6 +18,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
+  const [stopLoad, setStopLoad] = useState(false);
   const [list, setList] = useState("");
   const [editValue, setEditValue] = useState();
   const [refresh, setRefresh] = useState(0);
@@ -36,6 +37,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
       .get(apiMedical.getPersonalList + "/" + user.cni, header)
       .then((res) => {
         console.log(res.data);
+        setStopLoad(true)
         setDatas(res.data);
       })
       .catch((error) => {
@@ -123,7 +125,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
         </div>
       </div>
 
-      <Loading data={datas}>
+      <Loading data={datas} stopLoad={stopLoad}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>

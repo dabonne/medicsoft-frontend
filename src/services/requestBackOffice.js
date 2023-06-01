@@ -45,7 +45,7 @@ requestBackOffice.interceptors.request.use(
           return requestBackOffice(originalConfig);
         } catch (e) {
           deleteUser()
-          window.location.replace("/login");
+          window.location.replace("/");
         }
       }
   

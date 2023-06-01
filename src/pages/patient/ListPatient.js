@@ -38,6 +38,7 @@ const ListPatient = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange, onCniChange } = authCtx;
   const [refresh, setRefresh] = useState(0);
+  const [stopLoad, setStopLoad] = useState(false);
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
@@ -60,6 +61,7 @@ const ListPatient = () => {
     requestPatient
       .get(apiPatient.getAll + "/" + user.organisationRef, header)
       .then((res) => {
+        setStopLoad(true)
         setDatas(res.data);
         console.table(res.data);
       })
@@ -213,7 +215,7 @@ const ListPatient = () => {
         </div>
       </div>
 
-      <Loading data={datas}>
+      <Loading data={datas} stopLoad={stopLoad}>
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
           {datas.map((data, idx) => {
             return (

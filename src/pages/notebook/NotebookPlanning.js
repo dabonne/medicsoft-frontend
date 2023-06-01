@@ -130,7 +130,8 @@ const NotebookPlanning = () => {
   const [employeList, setEmployeList] = useState([]);
   const [indexEvent, setIndexEvent] = useState(0);
   const [refresh, setRefresh] = useState(0);
-
+  const minTime = new Date();
+  minTime.setHours(5,0)
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -364,7 +365,7 @@ const NotebookPlanning = () => {
       <div className="row">
         <div className="col-12">
           <Calendar
-            onClick={() => alert("ok")}
+            min={minTime}
             defaultView="week"
             localizer={localizer}
             events={eventList}

@@ -60,6 +60,8 @@ const Login = () => {
   };
 
   const isAuth = () => {
+    console.log(`connexion reussi, isAuth: ${user}`);
+
     if (user.isAuth === true && user.token != null && user.token !== "") {
       console.log(`connexion reussi, isAuth: ${user}`);
       console.log(user);

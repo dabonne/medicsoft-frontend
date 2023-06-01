@@ -143,6 +143,7 @@ const PrescriptionListe = () => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);
+  const [stopLoad, setStopLoad] = useState(false);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
   const [modalView, setModalView] = useState("");
@@ -200,6 +201,7 @@ const PrescriptionListe = () => {
       .then((res) => {
         //console.log(res.data);
         setDatas(res.data);
+        setStopLoad(true)
       })
       .catch((error) => {
         console.log(error);
@@ -295,7 +297,7 @@ const PrescriptionListe = () => {
         </div>
       </div>
 
-      <Loading data={datas}>
+      <Loading data={datas} stopLoad={stopLoad}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -480,7 +482,7 @@ const PrescriptionListe = () => {
                   </div>
                 </div>
                 <div>
-                  <span>Date de délivrance</span> <br />
+                  <span>Prescription réalisée</span> <br />
                   <span className="fw-bold text-meduim">{viewPresc.date}</span>
                 </div>
               </div>

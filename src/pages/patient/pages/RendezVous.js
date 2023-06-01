@@ -29,6 +29,7 @@ const initData = {
 const RendezVous = ({ setLocation }) => {
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
+  const [stopLoad, setStopLoad] = useState(false);
   const [list, setList] = useState("");
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
@@ -95,6 +96,7 @@ const RendezVous = ({ setLocation }) => {
       .get(apiMedical.rendezVousListe + "/" + user.cni)
       .then((res) => {
         console.log(res.data);
+        setStopLoad(true)
         setDatas(res.data);
       })
       .catch((error) => {
@@ -385,7 +387,7 @@ const RendezVous = ({ setLocation }) => {
           </div>
         </div>
       </div>
-      <Loading data={datas}>
+      <Loading data={datas} stopLoad={stopLoad}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>

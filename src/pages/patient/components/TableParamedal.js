@@ -40,6 +40,7 @@ const TableParamedal = ({
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
+  const [stopLoad, setStopLoad] = useState(false);
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [editValue, setEditValue] = useState();
@@ -66,10 +67,12 @@ const TableParamedal = ({
       )
       .then((res) => {
         console.log(res.data);
-        setDatas(res.data);
+        //setDatas(res.data);
+        setStopLoad(true)
       })
       .catch((error) => {
         console.log(error);
+        setStopLoad(true)
       });
   };
 
@@ -167,7 +170,7 @@ const TableParamedal = ({
         </div>
       </div>
 
-      <Loading data={datas}>
+      <Loading data={datas} stopLoad={stopLoad}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>

@@ -142,6 +142,8 @@ const NotebookConsultation = () => {
   const [selectedOption, setSelectedOption] = useState([]);
   const [doctor, setDoctor] = useState("");
   const [rendezVous, setRendezVous] = useState([]);
+  const minTime = new Date();
+  minTime.setHours(5,0)
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -450,6 +452,7 @@ const NotebookConsultation = () => {
       <div className="row">
         <div className="col-12">
           <Calendar
+            min={minTime}
             onClick={() => alert("ok")}
             defaultView="week"
             localizer={localizer}

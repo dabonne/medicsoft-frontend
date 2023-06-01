@@ -45,7 +45,7 @@ requestDoctor.interceptors.request.use(
           return requestDoctor(originalConfig);
         } catch (e) {
           deleteUser()
-          window.location.replace("/login");
+          window.location.replace("/");
         }
       }
   

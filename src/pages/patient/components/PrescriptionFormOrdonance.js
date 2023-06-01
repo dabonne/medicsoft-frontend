@@ -348,7 +348,7 @@ const PrescriptionFormOrdonance = (type = "") => {
             renderMenuItemChildren={renderMenuItemChildren}
             selected={selectedDrug}
           />
-          <div className="form-label mt-3">Dosage/Forme galénique</div>
+          <div className="form-label mt-3">Dosages/Forme galénique</div>
           {/**
            * <InputField
             type={"select2"}

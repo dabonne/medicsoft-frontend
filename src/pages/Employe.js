@@ -23,6 +23,7 @@ const Employe = () => {
   const { user, onUserChange } = authCtx;
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState("");
+  const [stopLoad, setStopLoad] = useState(false);
   const [dele, setDelete] = useState([]);
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
@@ -39,6 +40,7 @@ const Employe = () => {
     classifications: {},
     email: "",
     phone: "",
+    doctorNationalId: "",
     medicalStaff: "",
   });
   const [lastName, setLastName] = useState("");
@@ -47,6 +49,7 @@ const Employe = () => {
   const [cnib, setCnib] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [doctorNationalId, setDoctorNationalId] = useState("");
   const [classification, setClassification] = useState("");
   const [specialisation, setSpecialisation] = useState("");
   const [userInfos, setUserInfos] = useState({
@@ -83,6 +86,7 @@ const Employe = () => {
         //setDatas(res.data.employeeResponseList);
         //setList(res.data.employeeResponseList);
         console.log(res.data)
+        setStopLoad(true)
         if(Object.keys(res.data).length !== 0){
           setDatas(res.data.content);
           setList(res.data.content);
@@ -98,7 +102,7 @@ const Employe = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
-    //console.log(jsData)
+    console.log(jsData)
     requestEmploye
       .post(apiEmploye.post, jsData, header)
       .then((res) => {
@@ -273,7 +277,7 @@ const Employe = () => {
       .get(`${apiEmploye.get}/${ref}`)
       .then((res) => {
         //setDatas(res.data.employeeResponseList);
-        //console.log(res.data);
+        console.log(res.data);
         setLastName(res.data.employeeResponseList[0].lastName);
         jsData.lastName = res.data.employeeResponseList[0].lastName;
         setFirstName(res.data.employeeResponseList[0].firstName);
@@ -286,6 +290,8 @@ const Employe = () => {
         jsData.email = res.data.employeeResponseList[0].email;
         setPhone(res.data.employeeResponseList[0].phone);
         jsData.phone = res.data.employeeResponseList[0].phone;
+        setDoctorNationalId(res.data.employeeResponseList[0].doctorNationalId);
+        jsData.doctorNationalId = res.data.employeeResponseList[0].doctorNationalId;
         setClassification(res.data.employeeResponseList[0].classification);
         jsData.classification = res.data.employeeResponseList[0].classification;
         setSpecialisation(res.data.employeeResponseList[0].specialisation);
@@ -308,12 +314,14 @@ const Employe = () => {
   };
 
   const viewEmploye = (data) => {
+    console.log(data)
     userInfos.lastName = data.lastName;
     userInfos.firstName = data.firstName;
     userInfos.cnib = data.cnib;
     userInfos.department = data.department;
     userInfos.birthDate = data.birthDate;
     userInfos.fonction = "?";
+    userInfos.classification = data.classification;
     userInfos.username = data.email;
     userInfos.accountIsActive = data.accountIsActive;
     userInfos.roles = data.roleList;
@@ -512,6 +520,28 @@ const Employe = () => {
                   />
                   <div className="invalid-feedback">
                     Veuillez entrer le numéro CNI
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="cni" className="form-label">
+                    Numéro d'ordre
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="cni"
+                    placeholder="Entrer le numéro d'ordre"
+                    value={doctorNationalId}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setDoctorNationalId(e.target.value);
+                      jsData.doctorNationalId = e.target.value;
+                      setJsData(jsData);
+                    }}
+                    
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer le muméro d'ordre
                   </div>
                 </div>
                 <div className="mb-3">
@@ -757,6 +787,28 @@ const Employe = () => {
                   </div>
                 </div>
                 <div className="mb-3">
+                  <label htmlFor="cni" className="form-label">
+                    Numéro d'ordre
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="cni"
+                    placeholder="Entrer le numéro d'ordre"
+                    value={doctorNationalId}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setDoctorNationalId(e.target.value);
+                      jsData.doctorNationalId = e.target.value;
+                      setJsData(jsData);
+                    }}
+                    
+                  />
+                  <div className="invalid-feedback">
+                    Veuillez entrer le muméro d'ordre
+                  </div>
+                </div>
+                <div className="mb-3">
                   <label htmlFor="email" className="form-label">
                     Email
                   </label>
@@ -959,8 +1011,8 @@ const Employe = () => {
                     <span className="text-bold">{userInfos.department}</span>
                   </div>
                   <div className="d-flex justify-content-between">
-                    <span>fonction:</span>
-                    <span className="text-bold">{userInfos.fonction}</span>
+                    <span>Classification:</span>
+                    <span className="text-bold">{userInfos.classification}</span>
                   </div>
                   <div className="d-flex justify-content-between">
                     <span>Date de naissance:</span>
@@ -1186,7 +1238,7 @@ const Employe = () => {
         </div>
       </div>
       <p className="text-ultra-small">{list.length} éléments affichés</p>
-      <Loading data={list}>
+      <Loading data={list} stopLoad={stopLoad}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>
