@@ -152,32 +152,49 @@ const PrescriptionForm = ({
     onSubmit: (values) => {
       console.log("selectedOption");
       console.log(selectedOption);
-      const presc = {
-        type: selectedOption[0].uuid, // values.type,
-        detail: values.detail,
-        topographicRegion:{
-          uuid:localisationSelected[0].uuid
+      let presc = {
+        type: "",
+        detail: ""
+      }
+      let dataTab = [...list.list];
+      if(type.includes("d'imagerie") && selectedOption.length !==0){
+        presc = {
+          type: selectedOption[0].uuid, // values.type,
+          detail: values.detail,
+          topographicRegion:{
+            uuid:localisationSelected[0].uuid
+          }
         }
-      };
+      }
+      if( !type.includes("d'imagerie") && selectedOption.length !==0){
+        presc = {
+          type: selectedOption[0].uuid, // values.type,
+          detail: values.detail,
+        }
+      }
+      console.log("presc");
+
       if (
         presc.type !== "" &&
         presc.type !== undefined &&
-        presc.detail !== ""
+        presc.detail !== "" 
       ) {
-        if (list.sendata) {
-          if (id !== undefined) {
-            handleEditSubmit([...list.list, presc]);
-          } else {
-            console.log(presc);
-            handleSubmit([...list.list, presc]);
-          }
-        }
+        dataTab = [...list.list, presc]
+        console.log("dataTab");
         setList({
           ...list,
           list: [...list.list, presc],
         });
         setSelectedOption([]);
         setLocalisationSelected([]);
+      }
+      if (list.sendata && dataTab.length !==0) {
+        if (id !== undefined) {
+          handleEditSubmit(dataTab);
+        } else {
+          console.log(presc);
+          handleSubmit(dataTab);
+        }
       }
       list.sendata = false;
       console.log(list);

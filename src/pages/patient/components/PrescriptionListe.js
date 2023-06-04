@@ -199,7 +199,7 @@ const PrescriptionListe = () => {
     requestDoctor
       .get(apiPrescription.getAllPrescri + "/" + user.cni, header)
       .then((res) => {
-        //console.log(res.data);
+        console.log(res.data);
         setDatas(res.data);
         setStopLoad(true)
       })

@@ -293,7 +293,7 @@ const CompteRendu = ({ setLocation }) => {
                             //window.location.href=apiMedical.printReport+"/"+data.id
                             window.open(
                               "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/report/" +
-                                data.id
+                                data.id+"/"+user.organisationRef
                             );
                           }}
                           src={print}
