@@ -148,7 +148,7 @@ const Home = () => {
             <div className="col text-center">
               <span className="text-48 text-bold">{stat.prescriptions}</span> <br />
               <span className="text-bold text-meduim">
-                Prescription(s) distribuée(s)
+                Prescription(s) réalisée(s)
               </span>
             </div>
           </div>

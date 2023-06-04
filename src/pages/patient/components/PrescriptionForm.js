@@ -62,13 +62,15 @@ const PrescriptionForm = ({
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedFamily, setSelectedFamily] = useState([]);
-  const [familyGroup,setFamilyGroup] = useState([])
+  const [LocalisationGroup, setLocalisationGroup] = useState([]);
+  const [localisationSelected, setLocalisationSelected] = useState([]);
+  const [familyGroup, setFamilyGroup] = useState([]);
   const { id } = useParams();
   useEffect(() => {
-    console.log(type)
-    if(type.includes("d'examen")){
-      getfamilyBiological()
-    }else{
+    console.log(type);
+    if (type.includes("d'examen")) {
+      getfamilyBiological();
+    } else {
       getList();
     }
     //console.log(data);
@@ -109,7 +111,7 @@ const PrescriptionForm = ({
 
   const getfamilyBiological = () => {
     requestBackOffice
-      .get(apiBackOffice.familyBiological,header)
+      .get(apiBackOffice.familyBiological, header)
       .then((res) => {
         setFamilyGroup(res.data);
       })
@@ -118,9 +120,24 @@ const PrescriptionForm = ({
       });
   };
 
+  const getLocalisationImagery = (id) => {
+    requestBackOffice
+      .get(
+        apiBackOffice.getLocalisationTypeImagery + "/" + id + "/localisation",
+        header
+      )
+      .then((res) => {
+        //console.log(res.data);
+        setLocalisationGroup(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const getfamilyBiologicalById = (id) => {
     requestBackOffice
-      .get(apiBackOffice.familyBiologicalById+"/"+id,header)
+      .get(apiBackOffice.familyBiologicalById + "/" + id, header)
       .then((res) => {
         console.log(res.data);
         setData(res.data);
@@ -138,6 +155,9 @@ const PrescriptionForm = ({
       const presc = {
         type: selectedOption[0].uuid, // values.type,
         detail: values.detail,
+        topographicRegion:{
+          uuid:localisationSelected[0].uuid
+        }
       };
       if (
         presc.type !== "" &&
@@ -148,7 +168,7 @@ const PrescriptionForm = ({
           if (id !== undefined) {
             handleEditSubmit([...list.list, presc]);
           } else {
-            console.log(presc)
+            console.log(presc);
             handleSubmit([...list.list, presc]);
           }
         }
@@ -157,6 +177,7 @@ const PrescriptionForm = ({
           list: [...list.list, presc],
         });
         setSelectedOption([]);
+        setLocalisationSelected([]);
       }
       list.sendata = false;
       console.log(list);
@@ -195,7 +216,7 @@ const PrescriptionForm = ({
 
   const handleSubmit = (tab) => {
     configNotify("loading", "", "Ajout des données en cours...");
-    //console.log(jsData)
+   
     requestDoctor
       .post(url.post + "/" + user.organisationRef + "/" + user.cni, tab, header)
       .then((res) => {
@@ -259,14 +280,24 @@ const PrescriptionForm = ({
     return filteredOptions;
   };
   const familyChange = (e) => {
-    console.log(e)
-    setSelectedFamily(e)
-    if(e.length !== 0){
-      getfamilyBiologicalById(e[0].uuid)
-    }else{
-      setSelectedOption([])
+    console.log(e);
+    setSelectedFamily(e);
+    if (e.length !== 0) {
+      getfamilyBiologicalById(e[0].uuid);
+    } else {
+      setSelectedOption([]);
     }
-  }
+  };
+
+  const imageryLocalisationChange = (e) => {
+    console.log(e);
+    setSelectedOption(e);
+    if (e.length !== 0) {
+      getLocalisationImagery(e[0].uuid);
+    } else {
+      setLocalisationSelected([]);
+    }
+  };
   const renderMenuItemChildren = (option, props) => {
     return <div key={option.uuid}>{option.label}</div>;
   };
@@ -327,7 +358,9 @@ const PrescriptionForm = ({
            */}
           {type.includes("d'examen") ? (
             <>
-            <div className="form-label mt-3">{"Sélectionnez une famille d'analyse biologique"}</div>
+              <div className="form-label mt-3">
+                {"Sélectionnez une famille d'analyse biologique"}
+              </div>
               <Typeahead
                 id="basic-typeahead-goupe"
                 labelKey="label"
@@ -338,7 +371,9 @@ const PrescriptionForm = ({
                 renderMenuItemChildren={renderMenuItemChildren}
                 selected={selectedFamily}
               />
-              <div className="form-label mt-3">{"Sélectionnez une analyse biologique"}</div>
+              <div className="form-label mt-3">
+                {"Sélectionnez une analyse biologique"}
+              </div>
               <Typeahead
                 id="basic-typeahead-family"
                 labelKey="label"
@@ -353,18 +388,46 @@ const PrescriptionForm = ({
           ) : (
             <>
               <div className="form-label mt-3">{type}</div>
-              <Typeahead
-                id="basic-typeahead-example"
-                labelKey="label"
-                options={data}
-                placeholder={
-                   "Veuillez choisir le type"
-                }
-                onChange={setSelectedOption}
-                onInputChange={handleInputChange}
-                renderMenuItemChildren={renderMenuItemChildren}
-                selected={selectedOption}
-              />
+              {type.includes("imagerie") ? (
+                <>
+                  <Typeahead
+                    id="basic-typeahead-example"
+                    labelKey="label"
+                    options={data}
+                    placeholder={"Veuillez choisir le type"}
+                    onChange={imageryLocalisationChange}
+                    onInputChange={handleInputChange}
+                    renderMenuItemChildren={renderMenuItemChildren}
+                    selected={selectedOption}
+                  />
+                  <div className="form-label mt-3">
+                {"Sélectionnez une localisation"}
+              </div>
+                  <Typeahead
+                    id="basic-typeahead-example"
+                    labelKey="label"
+                    options={LocalisationGroup}
+                    placeholder={"Veuillez choisir le type"}
+                    onChange={setLocalisationSelected}
+                    onInputChange={handleInputChange}
+                    renderMenuItemChildren={renderMenuItemChildren}
+                    selected={localisationSelected}
+                  />
+                </>
+              ) : (
+                <>
+                  <Typeahead
+                    id="basic-typeahead-example"
+                    labelKey="label"
+                    options={data}
+                    placeholder={"Veuillez choisir le type"}
+                    onChange={setSelectedOption}
+                    onInputChange={handleInputChange}
+                    renderMenuItemChildren={renderMenuItemChildren}
+                    selected={selectedOption}
+                  />
+                </>
+              )}
             </>
           )}
 

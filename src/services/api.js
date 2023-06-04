@@ -47,7 +47,8 @@ const apiParamedical = {
     "postMulti":"v2/add-multiple-paramedical",
     "get":"paramedicals",
     "put":"update-paramedical",
-    "delete":"delete-paramedical"
+    "delete":"delete-paramedical",
+    "synthese":"doctor/medical-record/synthesis"
 }
 
 const apiMedical = {
@@ -101,7 +102,8 @@ const apiPrescription = {
 
 const apiBackOffice = {
     "familyBiological":"settings/family-biological",
-    "familyBiologicalById":"settings/biological-analysis"
+    "familyBiologicalById":"settings/biological-analysis",
+    "getLocalisationTypeImagery":"settings/type-imagery"
 }
 
 export {

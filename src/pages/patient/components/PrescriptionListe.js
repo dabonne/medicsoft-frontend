@@ -252,7 +252,7 @@ const PrescriptionListe = () => {
     e.preventDefault();
     window.open(
       "https://doctor-management.herokuapp.com/doctor-management/external-api/prescription/report-prescription/" +
-        id
+        id+"/"+user.organisationRef
     );
   };
   return (
@@ -371,8 +371,8 @@ const PrescriptionListe = () => {
                           title="Éditer la prescription"
                           onClick={(e) => {
                             e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            editPrescr(data, data.keyType);
+                            console.log(data)
+                            editPrescr(data, data.type);
                           }}
                           src={edit}
                           alt=""
@@ -490,13 +490,34 @@ const PrescriptionListe = () => {
             <div className="modal-body">
               {viewPresc.prescriptions.map((data, idx) => {
                 return (
-                  <div key={idx} className="my-2">
-                    {viewPresc.type === "ORDINANCE" && <Ordonnance />}
+                  <div key={idx} className="my-2 border-bottom pb-3">
+                    {viewPresc.type === "ORDINANCE" ? <>
+                    <Ordonnance />
+                    <div className="d-inline ms-3"><span className="fw-bold"> {data.drugLabel}</span></div> <br />
+                    <div className="d-inline ms-5">Durée: <span className="fw-bold"> {data.during +" "+data.dayOrWeekOrMonthLabel}</span></div> <br />
+                    <div className="d-inline ms-5">Dosage: <span className="fw-bold"> {data.dosageLabel}</span></div><br />
+                    <div className="d-inline ms-5">Mode d'administration: <span className="fw-bold"> {data.administrationModeLabel}</span></div> <br />
+                    {
+                      data.periodPrescriptions.map((item,idx) =>{
+                  return <> <div className="d-inline ms-5">Periode: <span className="fw-bold"> {item.quantity} {item.periodLabel}</span></div> <br /></>
+                  
+                      })
+                    }
+                    <div className="d-inline ms-5">Prescision: <span className="fw-bold"> {data.precision}</span></div>
+                    </> :<>
                     {viewPresc.type === "BIOLOGICAL_ANALYSIS" && <AnaBiolo />}
                     {viewPresc.type === "MEDICAL_IMAGERY" && <Imagery />}
                     {viewPresc.type === "CONSULTATION" && <Doctor />}
 
-                    <div className="d-inline ms-3 fw-bold">{data.label}</div>
+                    <div className="d-inline ms-3 fw-bold">{data.label}</div> <br />
+                    {viewPresc.type === "MEDICAL_IMAGERY" && <>
+                    <div className="d-inline ms-5">Région topographique: <span className="fw-bold"> {data.topographicRegion.label}</span></div> <br />
+                    </>
+                    }
+                    <div className="d-inline ms-5">Detail: <span className="fw-bold"> {data.detail}</span></div> <br />
+
+                    </>}
+                    
                   </div>
                 );
               })}

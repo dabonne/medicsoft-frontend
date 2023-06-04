@@ -73,7 +73,7 @@ const Employe = () => {
   const [roleList, setRoleList] = useState([]);
   const [modalNotifyMsg, setModalNotifyMsg] = useState('')
   const header = {
-    headers: { Authorization: `${user.token}` },
+    headers: { Authorization: `Bearer ${user.token}` },
   };
   const closeRef = useRef();
   const closeEditRef = useRef();
@@ -188,7 +188,7 @@ const Employe = () => {
       })
       .then((res) => {
         
-        
+        //console.log(res.data)
         let list = Object.keys(res.data).map((key) => {
           return { value: key, label: res.data[key] };
         });

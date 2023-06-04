@@ -20,9 +20,9 @@ import DeleteModal from "../components/DeleteModal";
 import Loading from "../components/Loading";
 
 const initStatus = {
-  CANCEL: "Annuler",
-  END: "Terminer",
-  CONFIRM: "Confirmer",
+  CANCEL: "Annulé",
+  END: "Terminé",
+  CONFIRM: "Confirmé",
   WAIT: "En attente",
 };
 const Meet = () => {
@@ -252,7 +252,7 @@ const Meet = () => {
                     <span className="text-bold">{data.period}</span>
                     <br />
                     <span>
-                      <span className="text-bold">Heure:</span> {data.hour}
+                      <span className="text-bold">Heure:</span> {data.startHour}
                     </span>
                   </td>
                   <td>
@@ -268,7 +268,7 @@ const Meet = () => {
                     >
                       {data.status === "Terminer" && (
                         <button className="btn bg-success border-radius-2">
-                          Terminer
+                          Terminé
                         </button>
                       )}
                       {data.status === "En attente" && (
@@ -278,12 +278,12 @@ const Meet = () => {
                       )}
                       {data.status === "Annuler" && (
                         <button className="btn bg-danger border-radius-2">
-                          Annuler
+                          Annulé
                         </button>
                       )}
                       {data.status === "Confirmer" && (
                         <button className="btn bg-info border-radius-2">
-                          Confirmer
+                          Confirmé
                         </button>
                       )}
                     </div>
@@ -426,7 +426,7 @@ const Meet = () => {
                   <span className="text-bold text-meduim">{detail.period}</span>
                   <br />
                   <span className="text-bold">Heure:</span>
-                  <span className="text-bold text-meduim">{detail.hour}</span>
+                  <span className="text-bold text-meduim">{detail.startHour}</span>
                 </div>
 
                 <div className="col-12 pt-3 ">
@@ -479,7 +479,7 @@ const Meet = () => {
                       });
                     }}
                   >
-                    <option>{"Séletionnez un status"}</option>
+                    <option>{"Sélectionnez un statut"}</option>
                     {Object.keys(initStatus).map((key, idx) => (
                       <option key={"select2" + idx} value={key}>
                         {initStatus[key]}

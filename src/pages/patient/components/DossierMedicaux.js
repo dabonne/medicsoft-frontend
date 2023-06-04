@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { apiPatient } from "../../../services/api";
+import { apiParamedical, apiPatient } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import requestPatient from "../../../services/requestPatient";
+import requestDoctor from "../../../services/requestDoctor";
 
 const DossierMedicaux = () => {
   const authCtx = useContext(AppContext)
   const {user} = authCtx
   const [data, setData] = useState("")
+  const [syntheseList, setSyntheseList] = useState([])
   const header = {
     headers: { Authorization: `${user.token}` },
   };
 
   useEffect(() => {
-    
+    get()
+    synthese()
+  }, []);
+
+  const get = () => {
     requestPatient
       .get(apiPatient.get + "/" + user.cni, header)
       .then((res) => {
@@ -25,7 +31,20 @@ const DossierMedicaux = () => {
       .catch((error) => {
         //deconnect()
       });
-  }, []);
+  }
+
+  const synthese = () => {
+    requestDoctor
+      .get(apiParamedical.synthese + "/" + user.cni, header)
+      .then((res) => {
+        setSyntheseList(res.data);
+        console.log(res.data);
+        
+      })
+      .catch((error) => {
+        //deconnect()
+      });
+  }
   return (
     <>
       <div className="row my-3">
