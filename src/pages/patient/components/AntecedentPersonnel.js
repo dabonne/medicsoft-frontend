@@ -12,6 +12,7 @@ import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 import Loading from "../../../components/Loading";
+import requestDoctor from "../../../services/requestDoctor";
 
 const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const authCtx = useContext(AppContext);
@@ -33,8 +34,8 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   }, [refresh]);
 
   const get = () => {
-    requestPatient
-      .get(apiMedical.getPersonalList + "/" + user.cni, header)
+    requestDoctor
+      .get(apiMedical.antecedentRecord + "/" + user.cni, header)
       .then((res) => {
         console.log(res.data);
         setStopLoad(true)
@@ -85,6 +86,8 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
         console.log(error);
       });
   };
+
+  
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -133,8 +136,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
               <th scope="col" className="border-raduis-left">
                 Antécédent ID
               </th>
-              <th scope="col">Nom de maladie</th>
-              <th scope="col">Période</th>
+              <th scope="col">Antecedent</th>
               {/*<th scope="col">Lien de parenté</th>*/}
               <th scope="col" className="text-center">
                 Actions
@@ -150,12 +152,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
                     <span className="text-bold">PRESC-0218374</span>
                   </td>
                   <td>
-                    <span className="text-bold">{data.disease}</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">
-                      {data.startDate}
-                    </span>
+                    <span className="text-bold">{data.antecedentLabel}</span>
                   </td>
                   {/*<td>
                   {data.parent}

@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import requestPatient from "../services/requestPatient";
 import { apiMedical, apiParamedical } from "../services/api";
 import { AppContext } from "../services/context";
+import requestDoctor from "../services/requestDoctor";
 
 const initMedical = {
   cni: "",
@@ -45,6 +46,11 @@ const ModalMedicalAntecedent = ({
     headers: { Authorization: `${user.token}` },
   };
 
+  const [antePerso, setAntePerso] = useState({
+    cni: user.cni,
+    detail:"",
+    antecedent:""
+  })
   useEffect(() => {
     getForm()
     if(oldValue.disease !=""){
@@ -62,17 +68,10 @@ const ModalMedicalAntecedent = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    initMedical.cni = user.cni;
-    initMedical.disease = disease;
-    initMedical.isDiseaseGenetic = isDiseaseGenetic
-    initMedical.startDate = startDate;
-    initMedical.endDate = startDate;
-    initMedical.parent = "PERSONAL";
-    console.log(initMedical);
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
-    requestPatient
-      .post(apiMedical.postFamily + "/" + user.organisationRef, initMedical, header)
+    requestDoctor
+      .post(apiMedical.postAntecedent + "/" + user.organisationRef, antePerso, header)
       .then((res) => {
         console.log("enregistrement ok");
         configNotify(
@@ -137,10 +136,10 @@ const ModalMedicalAntecedent = ({
   const getForm = () => {
     
     //console.log(jsData)
-    requestPatient
-      .get(apiMedical.getPersonalForm, header)
+    requestDoctor
+      .get(apiMedical.antecedentForm, header)
       .then((res) => {
-        setList(res.data.parents)
+        setList(res.data.antecedents)
         console.log(res.data)
       })
       .catch((error) => {
@@ -205,6 +204,14 @@ const ModalMedicalAntecedent = ({
     console.log(date.getFullYear() + "-" + month + "-" + day);
     return date.getFullYear() + "-" + month + "-" + day;
   };
+
+  const onChange = (e) => {
+    console.log(e)
+    setAntePerso({
+      ...antePerso,
+      [e.target.name]:e.target.value
+    })
+  }
   return (
     <>
       <div className="modal fade" id={id}>
@@ -233,71 +240,41 @@ const ModalMedicalAntecedent = ({
               >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
-                    Nom de la maladie
+                    Antecedent
                   </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer le nom de la maladie"
-                    value={disease}
-                    onChange={(e) => setDisease(e.target.value)}
-                    required
-                  />
-                  <div className="invalid-feedback">Veuillez entrer le nom de la maladie</div>
-                </div>
-                <div className="mb-3 mt-3 d-flex">
-                  <div className="form-label me-auto">
-                    Est-ce une maladie génétique ?
-                  </div>
-                  <div>
-                    <div class="form-check d-inline-block mx-1">
-                      <input
-                        type="radio"
-                        class="form-check-input"
-                        id="radio1"
-                        name="radio"
-                        value="oui"
-                        onChange={() =>{
-                          setIsDiseaseGenetic(true)
-                        }}
-                        
-                      />
-                      
-                      <label class="form-check-label" for="radio1">Oui</label>
-                    </div>
-                    <div class="form-check d-inline-block mx-1">
-                      <input
-                        type="radio"
-                        class="form-check-input"
-                        id="radio2"
-                        name="radio"
-                        value="non"
-                        onChange={() =>{
-                          setIsDiseaseGenetic(false)
-                        }}
-                      />
-                      <label class="form-check-label" for="radio2">Non</label>
-                    </div>
-                  </div>
+                  
+                  <select 
+                    className="form-select"
+                    name="antecedent"
+                    value={antePerso.antecedent}
+                    onChange={onChange}
+                  >
+                    <option>Sélectionnez un antecedent</option>
+                    {
+                      Object.keys(list).map((key, idx) =>{
+
+                        return <option value={key} key={idx}>{list[key]}</option>
+                      })
+                    }
+                  </select>
                   <div className="invalid-feedback">Veuillez entrer le nom de la maladie</div>
                 </div>
 
                 <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                    Date de début
+                  <label htmlFor="detail" className="form-label">
+                    Detail
                   </label>
-                  <input
-                    type="date"
+                  <textarea
+                    type="text"
                     className="form-control"
-                    id="lname"
-                    placeholder="Entrer la date de début"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    min="1960-01-01" 
-                    max="2100-12-31"
+                    id="detail"
+                    name="detail"
+                    placeholder="Entrer les details"
+                    value={antePerso.detail}
+                    onChange={onChange}
+                    rows={6}
                     required
-                  />
+                  ></textarea>
                   <div className="invalid-feedback">Veuillez entrer une date valide</div>
                 </div>
                 {/*<div className="mb-3 mt-3">

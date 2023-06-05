@@ -78,7 +78,10 @@ const apiMedical = {
     "statusRendezVous":"appointment/update-appointment",
     "patientsReduce":"doctor/patients-reduce",
     "appointmentConfirmWait":"appointment/appointment-confirm-wait",
-    "statistique":"statistics/consultation-prescriptions"
+    "statistique":"statistics/consultation-prescriptions",
+    "antecedentForm":"doctor/antecedent-form",
+    "antecedentRecord":"doctor/medical-record/antecedent",
+    "postAntecedent":"doctor/medical-record/antecedent"
     
 }
 

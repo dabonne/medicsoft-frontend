@@ -20,10 +20,10 @@ import DeleteModal from "../components/DeleteModal";
 import Loading from "../components/Loading";
 
 const initStatus = {
+  WAIT: "En attente",
+  CONFIRM: "Confirmé",
   CANCEL: "Annulé",
   END: "Terminé",
-  CONFIRM: "Confirmé",
-  WAIT: "En attente",
 };
 const Meet = () => {
   const [refresh, setRefresh] = useState(0);
