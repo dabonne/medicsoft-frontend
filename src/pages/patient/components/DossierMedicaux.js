@@ -72,7 +72,16 @@ const DossierMedicaux = () => {
         </div>
         <div className="col-12 col-md-6">
           <div className="btn-group">
-            <div className="btn btn-secondary me-2">Synthèse</div>
+            <div className="btn btn-secondary me-2"
+            onClick={ e =>{
+              e.preventDefault()
+              window.open(
+                "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
+                  user.cni+"/"+user.organisationRef
+              );
+            }}
+            
+            >Synthèse</div>
             <div className="btn btn-primary me-2">Exporter le dossier</div>
           </div>
         </div>

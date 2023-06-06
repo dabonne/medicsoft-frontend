@@ -117,7 +117,15 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
-          <div className="btn btn-secondary me-2">Synthèse</div>
+          <div className="btn btn-secondary me-2"
+          onClick={ e =>{
+            e.preventDefault()
+            window.open(
+              "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
+                user.cni+"/"+user.organisationRef
+            );
+          }}
+          >Synthèse</div>
           <button
             className="btn btn-primary"
             data-bs-toggle="modal"

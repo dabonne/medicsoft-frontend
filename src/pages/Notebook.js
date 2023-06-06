@@ -32,7 +32,9 @@ const Notebook = () => {
                 Mes consultations
               </NavLink>
             </li>
-            <li className="nav-item">
+            {
+              /**
+               * <li className="nav-item">
             <NavLink
                 to="/dashboard/agenda/list"
                 className={({ isActive }) =>
@@ -42,6 +44,8 @@ const Notebook = () => {
                 Tout afficher
               </NavLink>
             </li>
+               */
+            }
           </ul>
 
           <div className="tab-content">
