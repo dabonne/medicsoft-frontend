@@ -424,19 +424,26 @@ const RendezVous = ({ setLocation }) => {
                     </span>
                   </td>
                   <td>
-                    {data.status === "Terminer" ? (
-                      <button className="btn bg-success border-radius-2">
-                        Terminer
-                      </button>
-                    ) : data.status === "En attente" ? (
-                      <button className="btn bg-warning border-radius-2">
-                        En attente
-                      </button>
-                    ) : (
-                      <button className="btn bg-danger border-radius-2">
-                        Annuler
-                      </button>
-                    )}
+                  {data.status === "Terminer" && (
+                        <button className="btn bg-success border-radius-2">
+                          Terminé
+                        </button>
+                      )}
+                      {data.status === "En attente" && (
+                        <button className="btn bg-warning border-radius-2">
+                          En attente
+                        </button>
+                      )}
+                      {data.status === "Annuler" && (
+                        <button className="btn bg-danger border-radius-2">
+                          Annulé
+                        </button>
+                      )}
+                      {data.status === "Confirmer" && (
+                        <button className="btn bg-info border-radius-2">
+                          Confirmé
+                        </button>
+                      )}
                   </td>
                   <td className="text-center">
                     <div className="btn-group">

@@ -81,7 +81,8 @@ const apiMedical = {
     "statistique":"statistics/consultation-prescriptions",
     "antecedentForm":"doctor/antecedent-form",
     "antecedentRecord":"doctor/medical-record/antecedent",
-    "postAntecedent":"doctor/medical-record/antecedent"
+    "postAntecedent":"doctor/medical-record/antecedent",
+    "putAntecedent":"doctor/medical-record/antecedent"
     
 }
 

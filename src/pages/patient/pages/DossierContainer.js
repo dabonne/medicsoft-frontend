@@ -20,7 +20,7 @@ const DossierContainer = ({setLocation, setPageName}) => {
   setLocation(window.location.pathname)
   const tabName = [
     "Dossier médical",
-    "Antécédents personnels et familiaux",
+    "Antécédents",
     "Compte rendu d’imagerie",
     "Compte rendu d’examens spécialisés",
     "Compte rendu d’analyses biologiques",
@@ -29,7 +29,7 @@ const DossierContainer = ({setLocation, setPageName}) => {
   const medicalType = [
     {
       id: "PERSONNAL_FAMILY_HISTORY",
-      title: "Antécédents personnels et familiaux",
+      title: "Antécédents",
     },
     {
       id: "IMAGERY",

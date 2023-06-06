@@ -85,8 +85,6 @@ const DossierMedicaux = () => {
           >
             <div className="text-center">
               <span className="text-bold">Antécédents</span> <br />
-              <span className="text-bold">personnels et</span> <br />
-              <span className="text-bold">familiaux</span> <br />
             </div>
           </Link>
         </div>

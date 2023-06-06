@@ -21,11 +21,10 @@ const ModalMedicalAntecedent = ({
   type,
   title,
   refresh = () => {},
-  oldValue = { id: "", startDate: "", endDate: "", parent:"" },
+  oldValue = { id: "",cni: "", detail:"", typeAntecedent:""},
 }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
-  const [medical, setMedical] = useState(initMedical);
 
   const [disease, setDisease] = useState("");
   const [isDiseaseGenetic, setIsDiseaseGenetic] = useState("");
@@ -53,18 +52,16 @@ const ModalMedicalAntecedent = ({
   })
   useEffect(() => {
     getForm()
-    if(oldValue.disease !=""){
-      setDisease(oldValue.disease)
-      setStartDate(oldValue.startDate)
-      setEndDate(oldValue.endDate)
-      Object.keys(list).map((key) => {
-        if(list[key] === oldValue.parent){
-          setParent(key)
-        }
-      })
+    if(oldValue.id !=""){
+      setAntePerso({
+        cni:user.cni,
+        antecedent:oldValue.typeAntecedent,
+        detail:oldValue.detail
+      })  
+      console.log(oldValue)  
     }
     
-  }, [oldValue.disease]);
+  }, [oldValue.id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -96,18 +93,13 @@ const ModalMedicalAntecedent = ({
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    initMedical.cni = user.cni;
-    initMedical.disease = disease;
-    initMedical.isDiseaseGenetic = isDiseaseGenetic
-    initMedical.startDate = startDate;
-    initMedical.endDate = startDate;
-    initMedical.parent = "PERSONAL";
-    console.log(initMedical);
+    const {id, ...ant} = antePerso
+    
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
-    requestPatient
+    requestDoctor
       .put(
-        apiMedical.putFamily +"/" + oldValue.id, initMedical,header)
+        apiMedical.putAntecedent +"/" + oldValue.id, ant,header)
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -156,45 +148,7 @@ const ModalMedicalAntecedent = ({
   const fValidate = (cl) => {
     setFormValidate(cl);
   };
-  const getDate = () => {
-    const mois = [
-      "janvier",
-      "février",
-      "mars",
-      "avril",
-      "mai",
-      "juin",
-      "juillet",
-      "août",
-      "septembre",
-      "octobre",
-      "novembre",
-      "décembre",
-    ];
-
-    function frenchTodayDate() {
-      let today = new Date();
-      let year = today.getFullYear();
-      let dayNumber = today.getDate();
-      let month = mois[today.getMonth()];
-      let weekday = today.toLocaleDateString("fr-FR", { weekday: "long" });
-      let hours = today.getHours();
-      let minutes = today.getMinutes();
-      hours = hours < 10 ? "0" + hours : hours;
-      minutes = minutes < 10 ? "0" + minutes : minutes;
-      return { weekday, dayNumber, month, year, hours, minutes };
-    }
-
-    const capitalize = ([first, ...rest]) =>
-      first.toUpperCase() + rest.join("").toLowerCase();
-    const { weekday, dayNumber, month, year, hours, minutes } =
-      frenchTodayDate();
-    const aujourdhui = `${capitalize(
-      weekday
-    )} ${dayNumber} ${month} ${year} - ${hours}H:${minutes}`;
-
-    return aujourdhui;
-  };
+  
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
     const month =

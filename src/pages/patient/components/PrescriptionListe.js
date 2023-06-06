@@ -511,7 +511,7 @@ const PrescriptionListe = () => {
 
                     <div className="d-inline ms-3 fw-bold">{data.label}</div> <br />
                     {viewPresc.type === "MEDICAL_IMAGERY" && <>
-                    <div className="d-inline ms-5">Région topographique: <span className="fw-bold"> {data.topographicRegion.label}</span></div> <br />
+                    <div className="d-inline ms-5">Région topographique: <span className="fw-bold"> {data.topographicRegion?.label}</span></div> <br />
                     </>
                     }
                     <div className="d-inline ms-5">Detail: <span className="fw-bold"> {data.detail}</span></div> <br />
