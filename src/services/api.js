@@ -40,7 +40,7 @@ const apiPatient = {
     "getAll":"patient-list",
     "get":"patient-information",
     "post":"patient",
-    "put":"doctor/patient"
+    "putOrDelete":"doctor/patient",
 }
 
 const apiParamedical = {

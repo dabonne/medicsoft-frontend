@@ -146,7 +146,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
     console.log(patient);
     configNotify("loading", "", "Modification des données en cours...");
     requestDoctor
-      .put(apiPatient.put, patient, header)
+      .put(apiPatient.putOrDelete, patient, header)
       .then((res) => {
         console.log("enregistrement ok");
         console.log(res.data);

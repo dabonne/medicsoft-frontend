@@ -1,5 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import profile from "../../assets/imgs/profile.png";
 import back from "../../assets/imgs/bck.png";
 import RendezVous from "./pages/RendezVous";
@@ -10,43 +18,44 @@ import requestPatient from "../../services/requestPatient";
 import { apiPatient } from "../../services/api";
 import { AppContext } from "../../services/context";
 import ModalPatient from "../../components/ModalPatient";
+import DeleteModal from "../../components/DeleteModal";
+import requestDoctor from "../../services/requestDoctor";
 
 const initPatient = {
-    "firstname": "",
-    "lastname": "",
-    "cni": "",
-    "age": "",
-    "gender": "",
-    "birthdate": "",
-    "phoneNumber": "",
-    "country": "Burkina Faso",
-    "city": "",
-    "weight": "",
-    "height": ""
-}
+  firstname: "",
+  lastname: "",
+  cni: "",
+  age: "",
+  gender: "",
+  birthdate: "",
+  phoneNumber: "",
+  country: "Burkina Faso",
+  city: "",
+  weight: "",
+  height: "",
+};
 const InfoPatient = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange, onDataSharedChange } = authCtx;
   const [datas, setDatas] = useState([]);
-  const [pageName, setPageName] = useState("Dossier médical")
+  const [pageName, setPageName] = useState("Dossier médical");
   const [location, setLocation] = useState(window.location.pathname);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
   const [isLoad, setIsLoad] = useState(false);
-  const [patient, setPatient] = useState(initPatient)
- 
+  const [patient, setPatient] = useState(initPatient);
+  const navigate = useNavigate()
   const header = {
     headers: { Authorization: `${user.token}` },
   };
   useEffect(() => {
-    
     requestPatient
       .get(apiPatient.get + "/" + user.cni, header)
       .then((res) => {
         setDatas(res.data);
         console.log("isLoad");
-        setPatient(res.data)
-        setIsLoad(true)
+        setPatient(res.data);
+        setIsLoad(true);
       })
       .catch((error) => {
         //deconnect()
@@ -78,10 +87,20 @@ const InfoPatient = () => {
     dd !== [] ? setList(dd) : setList(datas);
   };
 
+  const onDelete = (id) => {
+    requestDoctor
+      .delete(apiPatient.putOrDelete+"/"+id, header)
+      .then((res) => {
+        console.log(res.data);
+        navigate("/dashboard/patient")
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <>
-        
-
       <div className="row">
         <h1 className="h2 text-bold">{}</h1>
       </div>
@@ -95,14 +114,16 @@ const InfoPatient = () => {
               className="d-block text-bold text-meduim mb-3"
               style={{ fontSize: "2rem" }}
             >
-              {patient.lastname + " " +patient.firstname}
+              {patient.lastname + " " + patient.firstname}
             </span>
             <span className="d-block my-1">
               <span>ID Patient: </span>
               <span className="text-bold">{patient.patientId}</span>
             </span>
             <span className="d-block my-1">
-              <span className="text-bold">{patient.age} ans . {patient.gender}</span>
+              <span className="text-bold">
+                {patient.age} ans . {patient.gender}
+              </span>
             </span>
             <span className="d-block my-1">
               <span className="">Date de naissance: </span>
@@ -117,14 +138,22 @@ const InfoPatient = () => {
               <span className="text-bold">{patient.country}</span>
             </span>
             <span className="d-inline-block mt-3 me-3">
-              <Link to="#" className="text-black" data-bs-toggle="modal"
-            data-bs-target="#newPatient">
+              <Link
+                to="#"
+                className="text-black"
+                data-bs-toggle="modal"
+                data-bs-target="#newPatient"
+              >
                 Modifier
               </Link>
             </span>
             <span className="d-inline-block mt-3">
-              <Link to="#" className="text-danger" data-bs-toggle="modal"
-            data-bs-target="#newPatient1">
+              <Link
+                to="#"
+                className="text-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#delete"
+              >
                 supprimer
               </Link>
             </span>
@@ -140,8 +169,8 @@ const InfoPatient = () => {
             <li className="nav-item">
               <NavLink
                 className={({ isActive }) =>
-                      isActive ? "nav-link active" : "nav-link"
-                    }
+                  isActive ? "nav-link active" : "nav-link"
+                }
                 to="rendez-vous"
               >
                 Rendez-vous
@@ -150,8 +179,8 @@ const InfoPatient = () => {
             <li className="nav-item">
               <NavLink
                 className={({ isActive }) =>
-                isActive ? "nav-link active" : "nav-link"
-              }
+                  isActive ? "nav-link active" : "nav-link"
+                }
                 to="prescriptions"
               >
                 Prescriptions
@@ -160,47 +189,77 @@ const InfoPatient = () => {
             <li className="nav-item">
               <NavLink
                 className={({ isActive }) =>
-                isActive ? "nav-link active" : "nav-link"
-              }
+                  isActive ? "nav-link active" : "nav-link"
+                }
                 to="dossiers-medicaux"
               >
                 Dossiers médicaux
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink className={({ isActive }) =>
-                      isActive ? "nav-link active" : "nav-link"
-                    } to="comptes-rendus">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+                to="comptes-rendus"
+              >
                 Comptes rendus
               </NavLink>
             </li>
           </ul>
 
           <div className="px-1">
-            <Link to="/dashboard/patient/details/dossiers-medicaux" className="d-inline-block my-2 text-black text-decoration-none">
-              {
-                (location.includes("dossiers-medicaux")) && <>
-                <span><img src={back} alt="" onClick={(e) => {
-                  
-                  setPageName("Dossier médical")
-                }}/></span> <span className="text-bold">{" "+pageName}</span>
+            <Link
+              to="/dashboard/patient/details/dossiers-medicaux"
+              className="d-inline-block my-2 text-black text-decoration-none"
+            >
+              {location.includes("dossiers-medicaux") && (
+                <>
+                  <span>
+                    <img
+                      src={back}
+                      alt=""
+                      onClick={(e) => {
+                        setPageName("Dossier médical");
+                      }}
+                    />
+                  </span>{" "}
+                  <span className="text-bold">{" " + pageName}</span>
                 </>
-              }
-              
+              )}
             </Link>
             <Routes>
-              <Route path="/" element={<RendezVous setLocation={setLocation} />} />
-              <Route path="/rendez-vous" element={<RendezVous setLocation={setLocation} />} />
-              <Route path="/prescriptions/*" element={<Prescription setLocation={setLocation} />} />
-              <Route path="/dossiers-medicaux/*" element={<DossierContainer setLocation={setLocation} setPageName={setPageName} />} />
-              <Route path="/comptes-rendus" element={<CompteRendu setLocation={setLocation} />} />
+              <Route
+                path="/"
+                element={<RendezVous setLocation={setLocation} />}
+              />
+              <Route
+                path="/rendez-vous"
+                element={<RendezVous setLocation={setLocation} />}
+              />
+              <Route
+                path="/prescriptions/*"
+                element={<Prescription setLocation={setLocation} />}
+              />
+              <Route
+                path="/dossiers-medicaux/*"
+                element={
+                  <DossierContainer
+                    setLocation={setLocation}
+                    setPageName={setPageName}
+                  />
+                }
+              />
+              <Route
+                path="/comptes-rendus"
+                element={<CompteRendu setLocation={setLocation} />}
+              />
             </Routes>
           </div>
         </div>
       </div>
-      {
-       <ModalPatient edit={true} />
-      }
+      {<ModalPatient edit={true} />}
+      <DeleteModal title={"Suppression du patient"} id={user.cni} modal={"delete"} onDelete={onDelete} />
     </>
   );
 };
