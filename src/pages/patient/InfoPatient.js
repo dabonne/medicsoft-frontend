@@ -78,7 +78,7 @@ const InfoPatient = () => {
 
   return (
     <>
-        <ModalPatient edit={true} />
+        
 
       <div className="row">
         <h1 className="h2 text-bold">{}</h1>
@@ -190,6 +190,9 @@ const InfoPatient = () => {
           </div>
         </div>
       </div>
+      {
+        patient && <ModalPatient edit={true} />
+      }
     </>
   );
 };
