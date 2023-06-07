@@ -9,6 +9,7 @@ import DossierContainer from "./pages/DossierContainer";
 import requestPatient from "../../services/requestPatient";
 import { apiPatient } from "../../services/api";
 import { AppContext } from "../../services/context";
+import ModalPatient from "../../components/ModalPatient";
 
 const initPatient = {
     "firstname": "",
@@ -77,6 +78,8 @@ const InfoPatient = () => {
 
   return (
     <>
+        <ModalPatient edit={true} />
+
       <div className="row">
         <h1 className="h2 text-bold">{}</h1>
       </div>
@@ -110,6 +113,12 @@ const InfoPatient = () => {
             <span className="d-block my-1">
               <span className="">{patient.city}, </span>
               <span className="text-bold">{patient.country}</span>
+            </span>
+            <span className="d-block mt-3">
+              <Link to="#" className="text-black" data-bs-toggle="modal"
+            data-bs-target="#newPatient">
+                Modifier
+              </Link>
             </span>
             <span className="d-block mt-3">
               <Link to="#" className="text-black">

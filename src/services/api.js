@@ -40,6 +40,7 @@ const apiPatient = {
     "getAll":"patient-list",
     "get":"patient-information",
     "post":"patient",
+    "put":"doctor/patient"
 }
 
 const apiParamedical = {
