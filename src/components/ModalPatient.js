@@ -47,14 +47,10 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  console.log(edit)
+  console.log(edit);
   useEffect(() => {
     //setDatas([...Array(20).keys()]);
     getJsData();
-    
-    if(edit){
-        getPatient()
-    }
   }, [edit]);
 
   const getJsData = () => {
@@ -75,6 +71,9 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
         //console.log(patient);
         setFormValidate("needs-validation");
         configNotify("", "", "");
+        if (edit) {
+          getPatient();
+        }
       })
       .catch((error) => {
         //get dataForm faille
@@ -87,17 +86,31 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
       .get(apiPatient.get + "/" + user.cni, header)
       .then((res) => {
         //setDatas(res.data);
-       // console.log(res.data);
+        console.log(res.data);
+        const {
+          countryId,
+          cityId,
+          countryMinorId,
+          cityMinorId,
+          genderId,
+          ...resData
+        } = res.data;
         setPatient({
-            ...patient,
-            ...res.data,
-            organisationRef:user.organisationRef
-        })
+          ...patient,
+          ...res.data,
+          organisationRef: user.organisationRef,
+          ...resData,
+          country: countryId,
+          city: cityId,
+          countryMinor: countryMinorId,
+          cityMinor: cityMinorId,
+          gender: genderId,
+        });
       })
       .catch((error) => {
         //deconnect()
       });
-  }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(patient);
@@ -139,14 +152,14 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
         console.log(res.data);
         //setRefresh(refresh + 1);
         configNotify(
-            "success",
-            "Modification réussi",
-            "Les informations ont bien été modifiées"
-          );
-          setModalNotifyMsg("Les informations ont bien été modifiées");
+          "success",
+          "Modification réussi",
+          "Les informations ont bien été modifiées"
+        );
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         closeRef.current.click();
         notifyRef.current.click();
-       // refresh();
+        // refresh();
       })
       .catch((error) => {
         console.log(error);
@@ -181,9 +194,9 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
           <div className="modal-content">
             <div className="modal-header border-0">
               <h4 className="modal-title text-meduim text-bold">
-                {
-                    edit ? "Modification des informations du patient" : "Ajout d’un(e) patient(e)"
-                }
+                {edit
+                  ? "Modification des informations du patient"
+                  : "Ajout d’un(e) patient(e)"}
               </h4>
               <button
                 type="button"
@@ -199,7 +212,11 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
                   message={notifyMessage}
                 />
               ) : null}
-              <form className={formValidate} onSubmit={ edit ? handleEditSubmit : handleSubmit } noValidate>
+              <form
+                className={formValidate}
+                onSubmit={edit ? handleEditSubmit : handleSubmit}
+                noValidate
+              >
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
                     Nom

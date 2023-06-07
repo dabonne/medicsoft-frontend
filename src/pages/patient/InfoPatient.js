@@ -26,12 +26,13 @@ const initPatient = {
 }
 const InfoPatient = () => {
   const authCtx = useContext(AppContext);
-  const { user, onUserChange } = authCtx;
+  const { user, onUserChange, onDataSharedChange } = authCtx;
   const [datas, setDatas] = useState([]);
   const [pageName, setPageName] = useState("Dossier médical")
   const [location, setLocation] = useState(window.location.pathname);
   const [search, setSearch] = useState("");
   const [list, setList] = useState("");
+  const [isLoad, setIsLoad] = useState(false);
   const [patient, setPatient] = useState(initPatient)
  
   const header = {
@@ -43,8 +44,9 @@ const InfoPatient = () => {
       .get(apiPatient.get + "/" + user.cni, header)
       .then((res) => {
         setDatas(res.data);
-        console.log(res.data);
+        console.log("isLoad");
         setPatient(res.data)
+        setIsLoad(true)
       })
       .catch((error) => {
         //deconnect()
@@ -114,10 +116,16 @@ const InfoPatient = () => {
               <span className="">{patient.city}, </span>
               <span className="text-bold">{patient.country}</span>
             </span>
-            <span className="d-block mt-3">
+            <span className="d-inline-block mt-3 me-3">
               <Link to="#" className="text-black" data-bs-toggle="modal"
             data-bs-target="#newPatient">
                 Modifier
+              </Link>
+            </span>
+            <span className="d-inline-block mt-3">
+              <Link to="#" className="text-danger" data-bs-toggle="modal"
+            data-bs-target="#newPatient1">
+                supprimer
               </Link>
             </span>
             <span className="d-block mt-3">
@@ -191,7 +199,7 @@ const InfoPatient = () => {
         </div>
       </div>
       {
-        patient && <ModalPatient edit={true} />
+       <ModalPatient edit={true} />
       }
     </>
   );
