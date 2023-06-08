@@ -93,6 +93,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
           countryMinorId,
           cityMinorId,
           genderId,
+          parent,
           ...resData
         } = res.data;
         setPatient({
@@ -105,6 +106,11 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
           countryMinor: countryMinorId,
           cityMinor: cityMinorId,
           gender: genderId,
+          parentFirstname: parent.firstname,
+          parentLastname: parent.lastname,
+          parentCnib: parent.cni,
+          //parentPhoneNumber: parent,
+          linkParental: parent.linkParentalId,
         });
       })
       .catch((error) => {
