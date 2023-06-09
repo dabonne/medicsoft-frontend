@@ -201,8 +201,7 @@ const Settings = () => {
           "?password=" +
           password.new +
           "&oldPassword=" +
-          password.old,
-        header
+          password.old
       )
       .then((res) => {
         console.log(res.data);
