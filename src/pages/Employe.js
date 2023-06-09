@@ -70,6 +70,7 @@ const Employe = () => {
   const [formValidate, setFormValidate] = useState("needs-validation");
   const [roles, setRoles] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
   const [roleList, setRoleList] = useState([]);
   const [modalNotifyMsg, setModalNotifyMsg] = useState('')
   const [fail, setFail] = useState(false)
@@ -91,7 +92,10 @@ const Employe = () => {
         if(Object.keys(res.data).length !== 0){
           setDatas(res.data.content);
           setList(res.data.content);
+          setTotalPage(parseInt(res.data.totalPages))
+
         }
+
         //console.log(res.data.employeeResponseList);
         getRoles();
       })
@@ -400,6 +404,16 @@ const Employe = () => {
     deleteUser();
     onUserChange(initialUser);
   };
+
+  const pagination = (e,page) =>{
+    e.preventDefault()
+    if(page === "suiv" && pageNumber < Number(totalPage) - 1){
+      setPageNumber(pageNumber + 1);
+    }
+    if(page === "prece" && pageNumber >= 1){
+      setPageNumber(pageNumber - 1);
+    }
+  }
 
   return (
     <>
@@ -1226,17 +1240,19 @@ const Employe = () => {
           <div className="btn-group">
             <div 
               className="d-inline-block my-1 mx-1"
+              onClick={e => pagination(e,"prece")}
             >
               <img src={back} alt="" />
             </div>
             <div 
               className="d-inline-block my-1 mx-1"
+              onClick={e => pagination(e,"suiv")}
               >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+            {pageNumber + 1}/{totalPage}
           </div>
         </div>
       </div>
