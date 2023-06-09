@@ -10,6 +10,7 @@ import { apiPatient } from "../../services/api";
 import { AppContext } from "../../services/context";
 import Loading from "../../components/Loading";
 import ModalPatient from "../../components/ModalPatient";
+import { onSearch } from "../../services/service";
 
 const initPatient = {
   organisationId: "",
@@ -43,7 +44,7 @@ const ListPatient = () => {
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
   let navigate = useNavigate();
 
   const header = {
@@ -51,23 +52,24 @@ const ListPatient = () => {
   };
   useEffect(() => {
     //setDatas([...Array(20).keys()]);
-    get()
+    get();
   }, []);
 
   const get = () => {
     requestPatient
       .get(apiPatient.getAll + "/" + user.organisationRef, header)
       .then((res) => {
-        setStopLoad(true)
+        setStopLoad(true);
+        setList(res.data);
         setDatas(res.data);
         console.table(res.data);
       })
       .catch((error) => {
-        setStopLoad(true)
-        setFail(true)
+        console.log(error);
+        setStopLoad(true);
+        setFail(true);
       });
-  }
-
+  };
 
   const navigateToPatientInfo = (e, idx) => {
     e.preventDefault();
@@ -76,29 +78,16 @@ const ListPatient = () => {
     return navigate(`details`);
   };
 
-  const onSearch = (e) => {
+  const makeSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+    onSearch(e, setList, datas, [
+      "firstname",
+      "lastname",
+      "age",
+      "phoneNumber",
+      "cni",
+      "gender",
+    ]);
   };
   return (
     <>
@@ -110,7 +99,7 @@ const ListPatient = () => {
             type="button"
             data-bs-toggle="modal"
             data-bs-target="#newPatient"
-           // onClick={(e) => getJsData(e)}
+            // onClick={(e) => getJsData(e)}
           >
             +
           </button>
@@ -126,7 +115,7 @@ const ListPatient = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                onSearch(e, search);
+                makeSearch(e);
               }}
             />
           </div>
@@ -146,7 +135,7 @@ const ListPatient = () => {
 
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
-          {datas.map((data, idx) => {
+          {list.map((data, idx) => {
             return (
               <div
                 key={idx}

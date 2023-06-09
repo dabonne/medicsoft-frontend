@@ -28,37 +28,38 @@ import { apiUser } from "./services/api";
 const Dashboard = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
-  const [userLocal, setUserLocal] = useState("")
+  const [org, setOrg] = useState("");
+  const [userLocal, setUserLocal] = useState("");
   let navigate = useNavigate();
   const [userImg, setUserImg] = useState(userp);
   useEffect(() => {
     //return navigate("/dashboard/")
-    setUserImg(user.profile)
+    setUserImg(user.profile);
     requestUser
-          .get(apiUser.get+"/"+user.organisationRef,{
-            headers: { Authorization: `Bearer ${user.token}`, },
-          })
-          .then((res) => {
-            //console.log(res.data.photo);
-            user.profile = "data:image/jpeg;base64,"+res.data.photo
-            setUserImg("data:image/jpeg;base64,"+res.data.photo)
-            onUserChange(user)
-            //console.log(res.data.employeeResponseList);
-          })
-          .catch((error) => {
-            console.log("user error");
-            console.log(error);
-          });
-    setUserLocal(getUser())
+      .get(apiUser.get + "/" + user.organisationRef, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+      .then((res) => {
+        //console.log(res.data.photo);
+        user.profile = "data:image/jpeg;base64," + res.data.photo;
+        setUserImg("data:image/jpeg;base64," + res.data.photo);
+        onUserChange(user);
+        //console.log(res.data.employeeResponseList);
+      })
+      .catch((error) => {
+        console.log("user error");
+        console.log(error);
+      });
+    setUserLocal(getUser());
     isAuth();
   }, [user]);
-  
+
   const isAuth = () => {
     if (user.isAuth == false || user.token == null || user.token == "") {
       console.log(`connexion échoué, isAuth`);
       console.log(user);
 
-      //return navigate("/");
+      return navigate("/");
     } else {
       console.log("isAuth true");
     }
@@ -273,12 +274,13 @@ const Dashboard = () => {
                       <img src={user} alt="" />
                     </span>
                     <span className="d-block d-md-none border border-2 d-lg-block wd-80 p-2">
-                      <img 
-                        className="rounded-circle" 
-                        width="30px" 
-                        src={userImg} alt="" 
+                      <img
+                        className="rounded-circle"
+                        width="30px"
+                        src={userImg}
+                        alt=""
                         style={{ marginLeft: "-6px", marginTop: "-6px" }}
-                        />
+                      />
                       <span className="d-inline-block ms-2">{user.name}</span>
                     </span>
                   </Link>
@@ -313,43 +315,99 @@ const Dashboard = () => {
             <div className="d-flex justify-content-between py-3">
               <div className="d-inline-block">
                 <span className="d-inline-block me-2">
-                <img src={bk} alt="" />
-
+                  <img src={bk} alt="" />
                 </span>
                 <span className="d-inline-block text-bold">retour</span>
               </div>
               <div className="d-inline-block btn btn-gray">
                 <span>{user.organisation} - </span>
-                <span 
+                <span
                   className="text-bold text-decoration-underline"
                   data-bs-toggle="modal"
                   data-bs-target="#changeOrganisation"
-                  >Changer d’organisation</span>
+                >
+                  Changer d’organisation
+                </span>
               </div>
-
             </div>
-          <Routes>
-              <Route path="/" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Home /></ProtectedRoute> } />
-              <Route path="/personnel" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Employe /></ProtectedRoute>} />
-              <Route path="/rendez-vous" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Meet /></ProtectedRoute>} />
-              <Route path="/agenda/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Notebook /></ProtectedRoute>} />
-              <Route path="/patient/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
-              <Route path="/hospitalisation/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Patient /></ProtectedRoute>} />
-              <Route path="/planning/*" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Planning /></ProtectedRoute>} />
-              <Route path="/parametre" element={<ProtectedRoute isAllowed={user.isAuth } redirectPath= "/"><Settings /></ProtectedRoute>} />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/personnel"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Employe />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/rendez-vous"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Meet />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/agenda/*"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Notebook />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/patient/*"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Patient />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hospitalisation/*"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Patient />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/planning/*"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Planning />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/parametre"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </main>
           <div className="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4 text-center text-md-start">
-          <div className="text-small d-inline-block  my-1 me-2">
+            <div className="text-small d-inline-block  my-1 me-2">
               © Laafi Vision Médical, Tous droits réservés.
             </div>
             <div className="d-inline-block ms-md-5">
-            <Link to="#" className="text-small link d-inline-block my-1 me-2">
-              Conditions générales
-            </Link>
-            <Link to="#" className="text-small link d-inline-block my-1">
-              Politiques de confidentialités
-            </Link>
+              <Link to="#" className="text-small link d-inline-block my-1 me-2">
+                Conditions générales
+              </Link>
+              <Link to="#" className="text-small link d-inline-block my-1">
+                Politiques de confidentialités
+              </Link>
             </div>
           </div>
         </div>
@@ -359,9 +417,7 @@ const Dashboard = () => {
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                
-              </h4>
+              <h4 className="modal-title text-meduim text-bold"></h4>
               <button
                 type="button"
                 className="btn-close"
@@ -370,25 +426,32 @@ const Dashboard = () => {
             </div>
 
             <div className="modal-body">
-            <select
-                    id="clst"
-                    className="form-select"
-                    value={""}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      
-                    }}
-                    required
-                  >
-                    <option value="">Choisir l'organisation</option>
-                    {user.organisations && Object.keys(user.organisations).map((key) => {
-                      return (
-                        <option key={key} value={user.organisations[key]}>
-                          {user.organisations[key]}
-                        </option>
-                      );
-                    })}
-                  </select>
+              <select
+                id="clst"
+                className="form-select"
+                value={org}
+                onChange={(e) => {
+                  e.preventDefault();
+                  const value = e.target.value;
+                  if (value !== "") {
+                    setOrg(value);
+                    user.organisation = user.organisations[value];
+                    user.organisationRef = value;
+                    onUserChange(user);
+                  }
+                }}
+                required
+              >
+                <option value="">Choisir l'organisation</option>
+                {user.organisations &&
+                  Object.keys(user.organisations).map((key) => {
+                    return (
+                      <option key={key} value={key}>
+                        {user.organisations[key]}
+                      </option>
+                    );
+                  })}
+              </select>
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
@@ -396,8 +459,8 @@ const Dashboard = () => {
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={(e) =>{
-                 /// e.preventDefault()
+                onClick={(e) => {
+                  /// e.preventDefault()
                   //setModalNotifyMsg('')
                 }}
               >

@@ -13,6 +13,7 @@ import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 import Loading from "../../../components/Loading";
 import requestDoctor from "../../../services/requestDoctor";
+import { onSearch } from "../../../services/service";
 
 const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const authCtx = useContext(AppContext);
@@ -20,14 +21,14 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
   const [stopLoad, setStopLoad] = useState(false);
-  const [list, setList] = useState("");
+  const [list, setList] = useState([]);
   const [editValue, setEditValue] = useState();
   const [refresh, setRefresh] = useState(0);
   const notify = useRef();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
 
   setNameIdx(1);
   useEffect(() => {
@@ -40,38 +41,24 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
       .get(apiMedical.antecedentRecord + "/" + user.cni, header)
       .then((res) => {
         console.log(res.data);
-        setStopLoad(true)
+        setStopLoad(true);
+        setList(res.data);
         setDatas(res.data);
       })
       .catch((error) => {
         console.log(error);
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
   };
-  const onSearch = (e) => {
+  const makeSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+    onSearch(e, setList, datas, [
+      "antecedentLabel",
+      "typeAntecedent",
+      "cni",
+      "detail",
+    ]);
   };
   const onDelete = (id) => {
     //e.preventDefault();
@@ -91,7 +78,6 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
       });
   };
 
-  
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -104,7 +90,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                onSearch(e, search);
+                makeSearch(e);
               }}
             />
           </div>
@@ -121,15 +107,20 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
-          <div className="btn btn-secondary me-2"
-          onClick={ e =>{
-            e.preventDefault()
-            window.open(
-              "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
-                user.cni+"/"+user.organisationRef
-            );
-          }}
-          >Synthèse</div>
+          <div
+            className="btn btn-secondary me-2"
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(
+                "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
+                  user.cni +
+                  "/" +
+                  user.organisationRef
+              );
+            }}
+          >
+            Synthèse
+          </div>
           <button
             className="btn btn-primary"
             data-bs-toggle="modal"
@@ -141,79 +132,79 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
       </div>
 
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-lg">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                Antécédent ID
-              </th>
-              <th scope="col">Antecedent</th>
-              {/*<th scope="col">Lien de parenté</th>*/}
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {datas.map((data, idx) => {
-              //data.checkValue = false
-              return (
-                <tr key={idx}>
-                  <td>
-                    <span className="text-bold">PRESC-0218374</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.antecedentLabel}</span>
-                  </td>
-                  {/*<td>
+        <div className="table-responsive-lg">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  Antécédent ID
+                </th>
+                <th scope="col">Antecedent</th>
+                {/*<th scope="col">Lien de parenté</th>*/}
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                //data.checkValue = false
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <span className="text-bold">PRESC-0218374</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.antecedentLabel}</span>
+                    </td>
+                    {/*<td>
                   {data.parent}
                   </td>*/}
-                  <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Éditer les données"
-                          data-bs-toggle="modal"
-                          data-bs-target={"#modalEdit" + type.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setEditValue(data);
-                            //setDelete(["" + data.employeeReference]);
-                          }}
-                          src={edit}
-                          alt=""
+                    <td className="text-center">
+                      <div className="btn-group">
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Éditer les données"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#modalEdit" + type.id}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setEditValue(data);
+                              //setDelete(["" + data.employeeReference]);
+                            }}
+                            src={edit}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Supprimer les données"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#deleteData" + data.id}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              //setDelete(["" + data.employeeReference]);
+                              setEditValue(data);
+                            }}
+                            src={del}
+                            alt=""
+                          />
+                        </div>
+                        <DeleteModal
+                          id={data.id}
+                          modal={"deleteData" + data.id}
+                          title={"Supprimer les données"}
+                          data={editValue}
+                          onDelete={onDelete}
                         />
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Supprimer les données"
-                          data-bs-toggle="modal"
-                          data-bs-target={"#deleteData" + data.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            setEditValue(data);
-                          }}
-                          src={del}
-                          alt=""
-                        />
-                      </div>
-                      <DeleteModal
-                        id={data.id}
-                        modal={"deleteData" + data.id}
-                        title={"Supprimer les données"}
-                        data={editValue}
-                        onDelete={onDelete}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
 
       <ModalMedicalAntecedent

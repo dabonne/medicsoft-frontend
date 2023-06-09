@@ -12,6 +12,7 @@ import { AppContext } from "../../../services/context";
 import { Link, useNavigate } from "react-router-dom";
 import DeleteModal from "../../../components/DeleteModal";
 import Loading from "../../../components/Loading";
+import { onSearch } from "../../../services/service";
 
 const Ordonnance = () => {
   return (
@@ -145,7 +146,7 @@ const PrescriptionListe = () => {
   const [datas, setDatas] = useState([]);
   const [stopLoad, setStopLoad] = useState(false);
   const [search, setSearch] = useState("");
-  const [list, setList] = useState("");
+  const [list, setList] = useState([]);
   const [modalView, setModalView] = useState("");
 
   const [notifyBg, setNotifyBg] = useState("");
@@ -154,7 +155,7 @@ const PrescriptionListe = () => {
   const notifyRef = useRef();
   const [refresh, setRefresh] = useState(0);
   const [deleteId, setDeleteId] = useState("");
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -171,29 +172,9 @@ const PrescriptionListe = () => {
     getList();
   }, [refresh]);
 
-  const onSearch = (e) => {
+  const makeSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+    onSearch(e, setList, datas, ["date", "hour", "author", "id", "type"]);
   };
 
   const getList = () => {
@@ -201,13 +182,14 @@ const PrescriptionListe = () => {
       .get(apiPrescription.getAllPrescri + "/" + user.cni, header)
       .then((res) => {
         console.log(res.data);
+        setList(res.data);
         setDatas(res.data);
-        setStopLoad(true)
+        setStopLoad(true);
       })
       .catch((error) => {
         console.log(error);
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
   };
 
@@ -255,7 +237,9 @@ const PrescriptionListe = () => {
     e.preventDefault();
     window.open(
       "https://doctor-management.herokuapp.com/doctor-management/external-api/prescription/report-prescription/" +
-        id+"/"+user.organisationRef
+        id +
+        "/" +
+        user.organisationRef
     );
   };
   return (
@@ -270,7 +254,7 @@ const PrescriptionListe = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                //onSearch(e, search);
+                makeSearch(e);
               }}
             />
           </div>
@@ -301,107 +285,109 @@ const PrescriptionListe = () => {
       </div>
 
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-lg">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                Prescription ID
-              </th>
-              <th scope="col">Type</th>
-              <th scope="col">Date de délivrance</th>
-              <th scope="col">Délivrée par</th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {datas.map((data, idx) => {
-              //data.checkValue = false
-              return (
-                <tr key={idx}>
-                  <td>
-                    <span className="text-bold">PRESC-0218374</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.type}</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.date}</span>
-                    <br />
-                    <span>
-                      <span className="text-bold">Heure:</span> {data.hour}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="d-inline-block me-2 align-middle">
-                      <img src={user} alt="" />
-                    </div>
-                    <div className="d-inline-block align-middle">
-                      <span className="text-bold">{data.author}</span>
+        <div className="table-responsive-lg">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  Prescription ID
+                </th>
+                <th scope="col">Type</th>
+                <th scope="col">Date de délivrance</th>
+                <th scope="col">Délivrée par</th>
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                //data.checkValue = false
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <span className="text-bold">PRESC-0218374</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.type}</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.date}</span>
                       <br />
-                      <span>Psychiatre</span>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Voir la prescription"
-                          data-bs-toggle="modal"
-                          data-bs-target="#viewPrescriptionModal"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            //viewEmploye(data);
-                            getPrescriptionById(data.id);
-                          }}
-                          src={view}
-                          alt=""
-                        />
+                      <span>
+                        <span className="text-bold">Heure:</span> {data.hour}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="d-inline-block me-2 align-middle">
+                        <img src={user} alt="" />
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Imprimer la prescription"
-                          onClick={(e) => {printPresciption(e,data.id)}}
-                          src={print}
-                          alt=""
-                        />
+                      <div className="d-inline-block align-middle">
+                        <span className="text-bold">{data.author}</span>
+                        <br />
+                        <span>Psychiatre</span>
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Éditer la prescription"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            console.log(data)
-                            editPrescr(data, data.type);
-                          }}
-                          src={edit}
-                          alt=""
-                        />
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group">
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Voir la prescription"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewPrescriptionModal"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              //setDelete(["" + data.employeeReference]);
+                              //viewEmploye(data);
+                              getPrescriptionById(data.id);
+                            }}
+                            src={view}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Imprimer la prescription"
+                            onClick={(e) => {
+                              printPresciption(e, data.id);
+                            }}
+                            src={print}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Éditer la prescription"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              console.log(data);
+                              editPrescr(data, data.type);
+                            }}
+                            src={edit}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Supprimer la prescription"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deletePresc"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setDeleteId(data.id);
+                            }}
+                            src={del}
+                            alt=""
+                          />
+                        </div>
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Supprimer la prescription"
-                          data-bs-toggle="modal"
-                          data-bs-target="#deletePresc"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setDeleteId(data.id);
-                          }}
-                          src={del}
-                          alt=""
-                        />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
 
       <div className="modal fade" id="viewPrescriptionModal">
@@ -433,7 +419,9 @@ const PrescriptionListe = () => {
                   <div className="d-inline-block mx-1">
                     <img
                       title="Imprimer la prescription"
-                      onClick={(e) => {printPresciption(e,viewPresc.id)}}
+                      onClick={(e) => {
+                        printPresciption(e, viewPresc.id);
+                      }}
                       src={print}
                       alt=""
                     />
@@ -494,33 +482,84 @@ const PrescriptionListe = () => {
               {viewPresc.prescriptions.map((data, idx) => {
                 return (
                   <div key={idx} className="my-2 border-bottom pb-3">
-                    {viewPresc.type === "ORDINANCE" ? <>
-                    <Ordonnance />
-                    <div className="d-inline ms-3"><span className="fw-bold"> {data.drugLabel}</span></div> <br />
-                    <div className="d-inline ms-5">Durée: <span className="fw-bold"> {data.during +" "+data.dayOrWeekOrMonthLabel}</span></div> <br />
-                    <div className="d-inline ms-5">Dosage: <span className="fw-bold"> {data.dosageLabel}</span></div><br />
-                    <div className="d-inline ms-5">Mode d'administration: <span className="fw-bold"> {data.administrationModeLabel}</span></div> <br />
-                    {
-                      data.periodPrescriptions.map((item,idx) =>{
-                  return <> <div className="d-inline ms-5">Periode: <span className="fw-bold"> {item.quantity} {item.periodLabel}</span></div> <br /></>
-                  
-                      })
-                    }
-                    <div className="d-inline ms-5">Précisions: <span className="fw-bold"> {data.precision}</span></div>
-                    </> :<>
-                    {viewPresc.type === "BIOLOGICAL_ANALYSIS" && <AnaBiolo />}
-                    {viewPresc.type === "MEDICAL_IMAGERY" && <Imagery />}
-                    {viewPresc.type === "CONSULTATION" && <Doctor />}
-
-                    <div className="d-inline ms-3 fw-bold">{data.label}</div> <br />
-                    {viewPresc.type === "MEDICAL_IMAGERY" && <>
-                    <div className="d-inline ms-5">Région topographique: <span className="fw-bold"> {data.topographicRegion?.label}</span></div> <br />
-                    </>
-                    }
-                    <div className="d-inline ms-5">Detail: <span className="fw-bold"> {data.detail}</span></div> <br />
-
-                    </>}
-                    
+                    {viewPresc.type === "ORDINANCE" ? (
+                      <>
+                        <Ordonnance />
+                        <div className="d-inline ms-3">
+                          <span className="fw-bold"> {data.drugLabel}</span>
+                        </div>{" "}
+                        <br />
+                        <div className="d-inline ms-5">
+                          Durée:{" "}
+                          <span className="fw-bold">
+                            {" "}
+                            {data.during + " " + data.dayOrWeekOrMonthLabel}
+                          </span>
+                        </div>{" "}
+                        <br />
+                        <div className="d-inline ms-5">
+                          Dosage:{" "}
+                          <span className="fw-bold"> {data.dosageLabel}</span>
+                        </div>
+                        <br />
+                        <div className="d-inline ms-5">
+                          Mode d'administration:{" "}
+                          <span className="fw-bold">
+                            {" "}
+                            {data.administrationModeLabel}
+                          </span>
+                        </div>{" "}
+                        <br />
+                        {data.periodPrescriptions.map((item, idx) => {
+                          return (
+                            <>
+                              {" "}
+                              <div className="d-inline ms-5">
+                                Periode:{" "}
+                                <span className="fw-bold">
+                                  {" "}
+                                  {item.quantity} {item.periodLabel}
+                                </span>
+                              </div>{" "}
+                              <br />
+                            </>
+                          );
+                        })}
+                        <div className="d-inline ms-5">
+                          Précisions:{" "}
+                          <span className="fw-bold"> {data.precision}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {viewPresc.type === "BIOLOGICAL_ANALYSIS" && (
+                          <AnaBiolo />
+                        )}
+                        {viewPresc.type === "MEDICAL_IMAGERY" && <Imagery />}
+                        {viewPresc.type === "CONSULTATION" && <Doctor />}
+                        <div className="d-inline ms-3 fw-bold">
+                          {data.label}
+                        </div>{" "}
+                        <br />
+                        {viewPresc.type === "MEDICAL_IMAGERY" && (
+                          <>
+                            <div className="d-inline ms-5">
+                              Région topographique:{" "}
+                              <span className="fw-bold">
+                                {" "}
+                                {data.topographicRegion?.label}
+                              </span>
+                            </div>{" "}
+                            <br />
+                          </>
+                        )}
+                        <div className="d-inline ms-5">
+                          Detail:{" "}
+                          <span className="fw-bold"> {data.detail}</span>
+                        </div>{" "}
+                        <br />
+                      </>
+                    )}
                   </div>
                 );
               })}

@@ -13,6 +13,7 @@ import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 import requestDoctor from "../../../services/requestDoctor";
 import Loading from "../../../components/Loading";
+import { onSearch } from "../../../services/service";
 
 const initSelected = {
   idData: "",
@@ -34,12 +35,12 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
 
   const notify = useRef();
   useEffect(() => {
     console.log(type);
-    getListe()
+    getListe();
     get();
   }, [refresh]);
 
@@ -57,70 +58,57 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   }
 
   const getListe = () => {
-    console.log(type)
-    var url = ""
-    if(type.id==="IMAGERY"){
-      url = apiMedical.getListImagery
+    console.log(type);
+    var url = "";
+    if (type.id === "IMAGERY") {
+      url = apiMedical.getListImagery;
     }
-    if(type.id==="BIOLOGIC_ANALYSE"){
-      url = apiMedical.getListBiology
+    if (type.id === "BIOLOGIC_ANALYSE") {
+      url = apiMedical.getListBiology;
     }
-    if(type.id==="SPECIALIZED_EXAM"){
-      url = apiMedical.getListExamen
+    if (type.id === "SPECIALIZED_EXAM") {
+      url = apiMedical.getListExamen;
     }
-    url !== "" && requestDoctor
-      .get(url, header)
-      .then((res) => {
-        //console.log(res.data);
-        setList(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    url !== "" &&
+      requestDoctor
+        .get(url, header)
+        .then((res) => {
+          //console.log(res.data);
+          setList(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
   };
   const get = () => {
     requestPatient
       .get(apiMedical.get + "/" + user.cni + "?medicalType=" + type.id, header)
       .then((res) => {
         console.log(res.data);
-        setStopLoad(true)
+        setStopLoad(true);
+        setList(res.data);
         setDatas(res.data);
       })
       .catch((error) => {
         console.log(error);
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
   };
-  const onSearch = (e) => {
+  const makeSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+    onSearch(e, setList, datas, [
+      "entitled",
+      "detail",
+      "doctor",
+      "dateElaboration",
+    ]);
   };
   const onDelete = (id) => {
     //e.preventDefault();
     console.log(id);
     requestPatient
-      .delete(apiMedical.delete + "/" + id + "?type="+type.id)
+      .delete(apiMedical.delete + "/" + id + "?type=" + type.id)
       .then((res) => {
         console.log("suppression ok");
         setRefresh(refresh + 1);
@@ -145,7 +133,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                onSearch(e, search);
+                makeSearch(e);
               }}
             />
           </div>
@@ -166,8 +154,8 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
             className="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target={"#modalEdit" + type.id}
-            onClick={e => {
-              setEditValue({ id: "", entitled: "", content: "" })
+            onClick={(e) => {
+              setEditValue({ id: "", entitled: "", content: "" });
             }}
           >
             Ajouter
@@ -176,48 +164,48 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
       </div>
 
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-lg">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                Compte rendu ID
-              </th>
-              <th scope="col">Intitulé</th>
-              <th scope="col">Date d’élobaration</th>
-              <th scope="col">Auteur</th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {datas.map((data, idx) => {
-              //data.checkValue = false
-              return (
-                <tr key={idx}>
-                  <td>
-                    <span className="text-bold">CR-0218374</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.entitled}</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.dateElaboration}</span>
-                  </td>
-                  <td>
-                    <div className="d-inline-block me-2 align-middle">
-                      <img src={user} alt="" />
-                    </div>
-                    <div className="d-inline-block align-middle">
-                      <span className="text-bold">{data.doctor}</span>
-                      <br />
-                      <span>Psychiatre</span>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <div className="btn-group">
-                      {/**
+        <div className="table-responsive-lg">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  Compte rendu ID
+                </th>
+                <th scope="col">Intitulé</th>
+                <th scope="col">Date d’élobaration</th>
+                <th scope="col">Auteur</th>
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                //data.checkValue = false
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <span className="text-bold">CR-0218374</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.entitled}</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.dateElaboration}</span>
+                    </td>
+                    <td>
+                      <div className="d-inline-block me-2 align-middle">
+                        <img src={user} alt="" />
+                      </div>
+                      <div className="d-inline-block align-middle">
+                        <span className="text-bold">{data.doctor}</span>
+                        <br />
+                        <span>Psychiatre</span>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group">
+                        {/**
                          * <div className="d-inline-block mx-1">
                         <img
                           title="Voir la prescription"
@@ -233,53 +221,53 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                         />
                       </div>
                          */}
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Éditer les données"
-                          data-bs-toggle="modal"
-                          data-bs-target={"#modalEdit" + type.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setEditValue({
-                              id: data.id,
-                              entitled: data.entitled,
-                              content: data.detail,
-                            });
-                          }}
-                          src={edit}
-                          alt=""
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Éditer les données"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#modalEdit" + type.id}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setEditValue({
+                                id: data.id,
+                                entitled: data.entitled,
+                                content: data.detail,
+                              });
+                            }}
+                            src={edit}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Supprimer les données"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#deleteData" + data.id}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              initSelected.idData = data.id;
+                              initSelected.title = "type.title";
+                              setSelectedData(initSelected);
+                            }}
+                            src={del}
+                            alt=""
+                          />
+                        </div>
+                        <DeleteModal
+                          id={data.id}
+                          modal={"deleteData" + data.id}
+                          title={"Supprimer " + seletedData.title}
+                          data={seletedData}
+                          onDelete={onDelete}
                         />
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Supprimer les données"
-                          data-bs-toggle="modal"
-                          data-bs-target={"#deleteData" + data.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            initSelected.idData = data.id;
-                            initSelected.title = "type.title";
-                            setSelectedData(initSelected);
-                          }}
-                          src={del}
-                          alt=""
-                        />
-                      </div>
-                      <DeleteModal
-                        id={data.id}
-                        modal={"deleteData" + data.id}
-                        title={"Supprimer " + seletedData.title}
-                        data={seletedData}
-                        onDelete={onDelete}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
       <ModalMedical
         id={"modalEdit" + type.id}
@@ -287,7 +275,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         type={type.id}
         oldValue={editValue}
         refresh={get}
-        list = {list}
+        list={list}
       />
 
       <div className="modal fade" id="notify">

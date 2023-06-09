@@ -17,6 +17,7 @@ import requestPatient from "../../../services/requestPatient";
 import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import Loading from "../../../components/Loading";
+import { onSearch } from "../../../services/service";
 
 const CompteRendu = ({ setLocation }) => {
   const authCtx = useContext(AppContext);
@@ -24,7 +25,7 @@ const CompteRendu = ({ setLocation }) => {
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
   const [stopLoad, setStopLoad] = useState(false);
-  const [list, setList] = useState("");
+  const [list, setList] = useState([]);
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
@@ -38,36 +39,23 @@ const CompteRendu = ({ setLocation }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
 
   useEffect(() => {
     get();
     setLocation(window.location.pathname);
   }, [refresh]);
 
-  const onSearch = (e) => {
+  const makeSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+    onSearch(e, setList, datas, [
+      "editDate",
+      "editBy",
+      "description",
+      "nameDoctor",
+      "specialityDoctor",
+      "numberOrder",
+    ]);
   };
 
   const handleSubmit = (e) => {
@@ -153,13 +141,14 @@ const CompteRendu = ({ setLocation }) => {
       .get(apiMedical.getReport + "/" + user.cni, header)
       .then((res) => {
         console.log(res.data);
-        setStopLoad(true)
+        setStopLoad(true);
+        setList(res.data);
         setDatas(res.data);
       })
       .catch((error) => {
         console.log(error);
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
   };
   const viewCompteRendu = (id) => {
@@ -206,7 +195,7 @@ const CompteRendu = ({ setLocation }) => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                onSearch(e, search);
+                makeSearch(e);
               }}
             />
           </div>
@@ -235,113 +224,115 @@ const CompteRendu = ({ setLocation }) => {
       </div>
 
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-lg">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                Rapport ID
-              </th>
-              <th scope="col">Date d’édition</th>
-              <th scope="col">Editer par</th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {datas.map((data, idx) => {
-              //data.checkValue = false
-              return (
-                <tr key={idx}>
-                  <td>
-                    <span className="text-bold">RAPP-0218374</span>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.editDate}</span>
-                  </td>
-                  <td>
-                    <div className="d-inline-block me-2 align-middle">
-                      <img src={user} alt="" />
-                    </div>
-                    <div className="d-inline-block align-middle">
-                      <span className="text-bold">{data.editBy}</span>
-                      <br />
-                      <span>Psychiatre</span>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Voir le rapport"
-                          data-bs-toggle="modal"
-                          data-bs-target="#viewCompteRenduModal"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            viewCompteRendu(data.id);
-                          }}
-                          src={view}
-                          alt=""
-                        />
+        <div className="table-responsive-lg">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  Rapport ID
+                </th>
+                <th scope="col">Date d’édition</th>
+                <th scope="col">Editer par</th>
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                //data.checkValue = false
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <span className="text-bold">RAPP-0218374</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.editDate}</span>
+                    </td>
+                    <td>
+                      <div className="d-inline-block me-2 align-middle">
+                        <img src={user} alt="" />
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Imprimer le rapport"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            //viewEmploye(data);
-                            //window.location.href=apiMedical.printReport+"/"+data.id
-                            window.open(
-                              "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/report/" +
-                                data.id+"/"+user.organisationRef
-                            );
-                          }}
-                          src={print}
-                          alt=""
-                        />
+                      <div className="d-inline-block align-middle">
+                        <span className="text-bold">{data.editBy}</span>
+                        <br />
+                        <span>Psychiatre</span>
                       </div>
-                      {0 === 0 && (
-                        <>
-                          <div className="d-inline-block mx-1">
-                            <img
-                              title="Éditer le rapport"
-                              data-bs-target="#compteRenduModal"
-                              data-bs-toggle="modal"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                viewCompteRendu(data.id);
-                                setEditMode(data.id);
-                              }}
-                              src={edit}
-                              alt=""
-                            />
-                          </div>
-                          <div className="d-inline-block mx-1">
-                            <img
-                              title="Supprimer le rapport"
-                              data-bs-target="#deleteModal"
-                              data-bs-toggle="modal"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setDeleteId(data.id);
-                              }}
-                              src={del}
-                              alt=""
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group">
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Voir le rapport"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewCompteRenduModal"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              //setDelete(["" + data.employeeReference]);
+                              viewCompteRendu(data.id);
+                            }}
+                            src={view}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Imprimer le rapport"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              //setDelete(["" + data.employeeReference]);
+                              //viewEmploye(data);
+                              //window.location.href=apiMedical.printReport+"/"+data.id
+                              window.open(
+                                "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/report/" +
+                                  data.id +
+                                  "/" +
+                                  user.organisationRef
+                              );
+                            }}
+                            src={print}
+                            alt=""
+                          />
+                        </div>
+                        {0 === 0 && (
+                          <>
+                            <div className="d-inline-block mx-1">
+                              <img
+                                title="Éditer le rapport"
+                                data-bs-target="#compteRenduModal"
+                                data-bs-toggle="modal"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  viewCompteRendu(data.id);
+                                  setEditMode(data.id);
+                                }}
+                                src={edit}
+                                alt=""
+                              />
+                            </div>
+                            <div className="d-inline-block mx-1">
+                              <img
+                                title="Supprimer le rapport"
+                                data-bs-target="#deleteModal"
+                                data-bs-toggle="modal"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setDeleteId(data.id);
+                                }}
+                                src={del}
+                                alt=""
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
 
       <div className="modal fade" id="compteRenduModal">

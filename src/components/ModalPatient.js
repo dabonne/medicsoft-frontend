@@ -47,7 +47,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  console.log(edit);
+  //console.log(edit);
   useEffect(() => {
     //setDatas([...Array(20).keys()]);
     getJsData();

@@ -18,6 +18,7 @@ import requestAgenda from "../services/requestAgenda";
 import requestDoctor from "../services/requestDoctor";
 import DeleteModal from "../components/DeleteModal";
 import Loading from "../components/Loading";
+import { onSearch } from "../services/service";
 
 const initStatus = {
   WAIT: "En attente",
@@ -111,6 +112,7 @@ const Meet = () => {
       .then((res) => {
         setStopLoad(true)
         setDatas(res.data);
+        setList(res.data);
         console.log(res.data);
       })
       .catch((error) => {
@@ -149,29 +151,15 @@ const Meet = () => {
       });
   };
 
-  const onSearch = (e) => {
+  const makeSearch = (e) => {
     e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+    onSearch(e,setList,datas,["doctor",
+      "specialityDoctor",
+      "period",
+      "status",
+      "patient",
+      "startHour",
+      "numberPatient"])
   };
 
   const fValidate = (cl) => {
@@ -200,7 +188,7 @@ const Meet = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                onSearch(e, search);
+                makeSearch(e);
               }}
             />
           </div>
@@ -233,7 +221,7 @@ const Meet = () => {
             </tr>
           </thead>
           <tbody>
-            {datas.map((data, idx) => {
+            {list.map((data, idx) => {
               //data.checkValue = false
               return (
                 <tr key={idx}>

@@ -17,6 +17,7 @@ import requestDoctor from "../../../services/requestDoctor";
 import DeleteModal from "../../../components/DeleteModal";
 import { Link } from "react-router-dom";
 import Loading from "../../../components/Loading";
+import { onSearch } from "../../../services/service";
 
 const initData = {
   doctorUuid: "",
@@ -30,7 +31,7 @@ const RendezVous = ({ setLocation }) => {
   const [datas, setDatas] = useState([]);
   const [search, setSearch] = useState("");
   const [stopLoad, setStopLoad] = useState(false);
-  const [list, setList] = useState("");
+  const [list, setList] = useState([]);
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
@@ -67,30 +68,6 @@ const RendezVous = ({ setLocation }) => {
     get();
   }, [refresh]);
 
-  const onSearch = (e) => {
-    e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
-  };
   const get = () => {
     //configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
     //console.log(jsData)
@@ -99,6 +76,7 @@ const RendezVous = ({ setLocation }) => {
       .then((res) => {
         console.log(res.data);
         setStopLoad(true)
+        setList(res.data);
         setDatas(res.data);
       })
       .catch((error) => {
@@ -222,6 +200,17 @@ const RendezVous = ({ setLocation }) => {
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
+
+  const makeSearch = (e) => {
+    e.preventDefault();
+    onSearch(e,setList,datas,["doctor",
+      "specialityDoctor",
+      "period",
+      "status",
+      "patient",
+      "startHour",
+      "numberPatient"])
+  };
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -234,7 +223,7 @@ const RendezVous = ({ setLocation }) => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                //onSearch(e, search);
+                makeSearch(e, search);
               }}
             />
           </div>
@@ -398,7 +387,7 @@ const RendezVous = ({ setLocation }) => {
             </tr>
           </thead>
           <tbody>
-            {datas.map((data, idx) => {
+            {list.map((data, idx) => {
               return (
                 <tr key={idx}>
                   <td>
