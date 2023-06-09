@@ -309,7 +309,13 @@ const PrescriptionListe = () => {
                       <span className="text-bold">PRESC-0218374</span>
                     </td>
                     <td>
-                      <span className="text-bold">{data.type}</span>
+                      <span className="text-bold">
+                        {data.type === "ORDINANCE" && "Ordonnance"}
+                        {data.type === "BIOLOGICAL_ANALYSIS" && "Analyses biologiques"}
+                        {data.type === "MEDICAL_IMAGERY" && "Imagerie médicale"}
+                        {data.type === "CONSULTATION" && "Consultation et/ou examen spécialisé"}
+                          
+                      </span>
                     </td>
                     <td>
                       <span className="text-bold">{data.date}</span>

@@ -404,7 +404,7 @@ const RendezVous = ({ setLocation }) => {
                     <span className="text-bold">{data.period}</span>
                     <br />
                     <span>
-                      <span className="text-bold">Heure:</span> {data.hour}
+                      <span className="text-bold">Heure:</span> {data.startHour}
                     </span>
                   </td>
                   <td>
