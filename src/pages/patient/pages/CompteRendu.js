@@ -17,7 +17,7 @@ import requestPatient from "../../../services/requestPatient";
 import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import Loading from "../../../components/Loading";
-import { onSearch } from "../../../services/service";
+import { matrice, onSearch } from "../../../services/service";
 
 const CompteRendu = ({ setLocation }) => {
   const authCtx = useContext(AppContext);
@@ -36,6 +36,9 @@ const CompteRendu = ({ setLocation }) => {
   const [deleteId, setDeleteId] = useState("");
   const closeRef = useRef();
   const notifyRef = useRef();
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [pagination, setPagination] = useState([]);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -142,8 +145,15 @@ const CompteRendu = ({ setLocation }) => {
       .then((res) => {
         console.log(res.data);
         setStopLoad(true);
-        setList(res.data);
-        setDatas(res.data);
+        const data = matrice(res.data);
+        setPagination(data.list);
+        if (data.list.length !== 0) {
+          setDatas(data.list[0]);
+          setList(data.list[0]);
+          setTotalPage(data.counter);
+        } else {
+          setTotalPage(data.counter + 1);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -183,6 +193,19 @@ const CompteRendu = ({ setLocation }) => {
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
+      setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
+    }
+    if (page === "prece" && pageNumber >= 1) {
+      setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
+    }
+  };
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -200,15 +223,19 @@ const CompteRendu = ({ setLocation }) => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "prece")}
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+          {pageNumber + 1}/{totalPage}
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">

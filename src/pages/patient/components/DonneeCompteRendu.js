@@ -13,7 +13,7 @@ import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 import requestDoctor from "../../../services/requestDoctor";
 import Loading from "../../../components/Loading";
-import { onSearch } from "../../../services/service";
+import { matrice, onSearch } from "../../../services/service";
 
 const initSelected = {
   idData: "",
@@ -29,9 +29,13 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   const [search, setSearch] = useState("");
   const [stopLoad, setStopLoad] = useState(false);
   const [list, setList] = useState([]);
+  const [dataList, setDataList] = useState([]);
   const [editValue, setEditValue] = useState();
   const [refresh, setRefresh] = useState(0);
   const [seletedData, setSelectedData] = useState(initSelected);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [pagination, setPagination] = useState([]);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -40,7 +44,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   const notify = useRef();
   useEffect(() => {
     console.log(type);
-    getListe();
+    //getListe();
     get();
   }, [refresh]);
 
@@ -74,7 +78,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         .get(url, header)
         .then((res) => {
           //console.log(res.data);
-          setList(res.data);
+          setDataList(res.data);
         })
         .catch((error) => {
           console.log(error);
@@ -86,8 +90,15 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
       .then((res) => {
         console.log(res.data);
         setStopLoad(true);
-        setList(res.data);
-        setDatas(res.data);
+        const data = matrice(res.data);
+        setPagination(data.list);
+        if (data.list.length !== 0) {
+          setDatas(data.list[0]);
+          setList(data.list[0]);
+          setTotalPage(data.counter);
+        } else {
+          setTotalPage(data.counter + 1);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -121,6 +132,19 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         console.log(error);
       });
   };
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
+      setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
+    }
+    if (page === "prece" && pageNumber >= 1) {
+      setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
+    }
+  };
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -138,15 +162,21 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "prece")}
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+            {pageNumber + 1}/{totalPage}
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
@@ -275,7 +305,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         type={type.id}
         oldValue={editValue}
         refresh={get}
-        list={list}
+        list={dataList}
       />
 
       <div className="modal fade" id="notify">

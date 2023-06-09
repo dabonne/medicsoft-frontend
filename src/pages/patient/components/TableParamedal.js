@@ -12,7 +12,7 @@ import { AppContext } from "../../../services/context";
 import ModalParamedical from "../../../components/ModalParamedical";
 import DeleteModal from "../../../components/DeleteModal";
 import Loading from "../../../components/Loading";
-import { onSearch } from "../../../services/service";
+import { matrice, onSearch } from "../../../services/service";
 
 const initSelected = {
   idData: "",
@@ -47,6 +47,9 @@ const TableParamedal = ({
   const [editValue, setEditValue] = useState();
   const [refresh, setRefresh] = useState(0);
   const notify = useRef();
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [pagination, setPagination] = useState([]);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -70,9 +73,15 @@ const TableParamedal = ({
       )
       .then((res) => {
         console.log(res.data);
-        setList(res.data);
-        setDatas(res.data);
-        setStopLoad(true);
+        const data = matrice(res.data);
+        setPagination(data.list);
+        if (data.list.length !== 0) {
+          setDatas(data.list[0]);
+          setList(data.list[0]);
+          setTotalPage(data.counter);
+        } else {
+          setTotalPage(data.counter + 1);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -105,6 +114,19 @@ const TableParamedal = ({
       "arterialPressure",
     ]);
   };
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
+      setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
+    }
+    if (page === "prece" && pageNumber >= 1) {
+      setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
+    }
+  };
   return (
     <div className="container-fluid">
       <div className="row">
@@ -130,15 +152,19 @@ const TableParamedal = ({
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "prece")}
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+          {pageNumber + 1}/{totalPage}
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">

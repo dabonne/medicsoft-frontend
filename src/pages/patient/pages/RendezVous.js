@@ -17,7 +17,7 @@ import requestDoctor from "../../../services/requestDoctor";
 import DeleteModal from "../../../components/DeleteModal";
 import { Link } from "react-router-dom";
 import Loading from "../../../components/Loading";
-import { onSearch } from "../../../services/service";
+import { matrice, onSearch } from "../../../services/service";
 
 const initData = {
   doctorUuid: "",
@@ -43,7 +43,7 @@ const RendezVous = ({ setLocation }) => {
     endDate: "",
     list: [],
   });
-  const [dateList, setDateList] = useState([])
+  const [dateList, setDateList] = useState([]);
   const [deleteId, setDeleteId] = useState("");
   const [detail, setDetail] = useState({
     doctor: "",
@@ -58,11 +58,14 @@ const RendezVous = ({ setLocation }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
 
   const closeRef = useRef();
   const notifyRef = useRef();
   const [refresh, setRefresh] = useState(0);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [pagination, setPagination] = useState([]);
   useEffect(() => {
     setLocation(window.location.pathname);
     get();
@@ -75,14 +78,21 @@ const RendezVous = ({ setLocation }) => {
       .get(apiMedical.rendezVousListe + "/" + user.cni)
       .then((res) => {
         console.log(res.data);
-        setStopLoad(true)
-        setList(res.data);
-        setDatas(res.data);
+        setStopLoad(true);
+        const data = matrice(res.data);
+        setPagination(data.list);
+        if (data.list.length !== 0) {
+          setDatas(data.list[0]);
+          setList(data.list[0]);
+          setTotalPage(data.counter);
+        } else {
+          setTotalPage(data.counter + 1);
+        }
       })
       .catch((error) => {
         console.log(error);
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
   };
   const getDetail = (id) => {
@@ -123,7 +133,6 @@ const RendezVous = ({ setLocation }) => {
       })
       .catch((error) => {
         console.log(error);
-        
       });
   };
 
@@ -203,13 +212,28 @@ const RendezVous = ({ setLocation }) => {
 
   const makeSearch = (e) => {
     e.preventDefault();
-    onSearch(e,setList,datas,["doctor",
+    onSearch(e, setList, datas, [
+      "doctor",
       "specialityDoctor",
       "period",
       "status",
       "patient",
       "startHour",
-      "numberPatient"])
+      "numberPatient",
+    ]);
+  };
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
+      setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
+    }
+    if (page === "prece" && pageNumber >= 1) {
+      setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
+    }
   };
   return (
     <div className="container-fluid">
@@ -228,18 +252,23 @@ const RendezVous = ({ setLocation }) => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "prece")}
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+            {pageNumber + 1}/{totalPage}
           </div>
         </div>
-        
       </div>
       <div className="modal fade" id="newMeet">
         <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -296,18 +325,23 @@ const RendezVous = ({ setLocation }) => {
                     className="form-select"
                     name={"doctorUuid"}
                     value={formik.values["doctorUuid"]}
-                    onChange={e =>{
-                      formik.handleChange(e)
-                      doctor.list.map(data => {
-                        if(formik.values["doctorUuid"] === data.employeeReference){
-                          setDateList(data.daysAvailable)
+                    onChange={(e) => {
+                      formik.handleChange(e);
+                      doctor.list.map((data) => {
+                        if (
+                          formik.values["doctorUuid"] === data.employeeReference
+                        ) {
+                          setDateList(data.daysAvailable);
                         }
-                      })
+                      });
                     }}
                   >
                     <option>{"Séletionnez un docteur"}</option>
                     {doctor.list.map((data, idx) => (
-                      <option key={"select2" + idx} value={data.employeeReference}>
+                      <option
+                        key={"select2" + idx}
+                        value={data.employeeReference}
+                      >
                         {data.lastName + " " + data.firstName}
                       </option>
                     ))}
@@ -372,43 +406,44 @@ const RendezVous = ({ setLocation }) => {
         </div>
       </div>
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-sm">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                Practiciens
-              </th>
-              <th scope="col">Date et heure</th>
-              <th scope="col">Statut</th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((data, idx) => {
-              return (
-                <tr key={idx}>
-                  <td>
-                    <div className="d-inline-block me-2 align-middle">
-                      <img src={user} alt="" />
-                    </div>
-                    <div className="d-inline-block align-middle">
-                      <span className="text-bold">Dr. {data.doctor}</span>
+        <div className="table-responsive-sm">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  Practiciens
+                </th>
+                <th scope="col">Date et heure</th>
+                <th scope="col">Statut</th>
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <div className="d-inline-block me-2 align-middle">
+                        <img src={user} alt="" />
+                      </div>
+                      <div className="d-inline-block align-middle">
+                        <span className="text-bold">Dr. {data.doctor}</span>
+                        <br />
+                        <span>{data.specialityDoctor}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.period}</span>
                       <br />
-                      <span>{data.specialityDoctor}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.period}</span>
-                    <br />
-                    <span>
-                      <span className="text-bold">Heure:</span> {data.startHour}
-                    </span>
-                  </td>
-                  <td>
-                  {data.status === "Terminer" && (
+                      <span>
+                        <span className="text-bold">Heure:</span>{" "}
+                        {data.startHour}
+                      </span>
+                    </td>
+                    <td>
+                      {data.status === "Terminer" && (
                         <button className="btn bg-success border-radius-2">
                           Terminé
                         </button>
@@ -428,46 +463,46 @@ const RendezVous = ({ setLocation }) => {
                           Confirmé
                         </button>
                       )}
-                  </td>
-                  <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Voir le patient"
-                          data-bs-toggle="modal"
-                          data-bs-target="#detailRendezVous"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            getDetail(data.uuid);
-                          }}
-                          src={view}
-                          alt=""
-                        />
-                      </div>
-                      {0 === 0 && (
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group">
                         <div className="d-inline-block mx-1">
                           <img
-                            title="Supprimer le patient"
+                            title="Voir le patient"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteRendezVous"
+                            data-bs-target="#detailRendezVous"
                             onClick={(e) => {
                               e.preventDefault();
-                              setDeleteId(data.uuid);
-                              //setDelete(["" + data.employeeReference]);
+                              getDetail(data.uuid);
                             }}
-                            src={del}
+                            src={view}
                             alt=""
                           />
                         </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                        {0 === 0 && (
+                          <div className="d-inline-block mx-1">
+                            <img
+                              title="Supprimer le patient"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteRendezVous"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setDeleteId(data.uuid);
+                                //setDelete(["" + data.employeeReference]);
+                              }}
+                              src={del}
+                              alt=""
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
       <div className="modal fade" id="notifyRef">
         <div className="modal-dialog modal-dialog-centered modal-md">

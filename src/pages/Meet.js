@@ -18,7 +18,7 @@ import requestAgenda from "../services/requestAgenda";
 import requestDoctor from "../services/requestDoctor";
 import DeleteModal from "../components/DeleteModal";
 import Loading from "../components/Loading";
-import { onSearch } from "../services/service";
+import { matrice, onSearch } from "../services/service";
 
 const initStatus = {
   WAIT: "En attente",
@@ -57,8 +57,11 @@ const Meet = () => {
 
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
-  const [fail, setFail] = useState(false)
+  const [fail, setFail] = useState(false);
   let navigate = useNavigate();
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
+  const [pagination, setPagination] = useState([]);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -91,8 +94,7 @@ const Meet = () => {
         header
       )
       .then((res) => {
-        
-        get()
+        get();
       })
       .catch((error) => {
         console.log(error);
@@ -110,15 +112,21 @@ const Meet = () => {
     requestDoctor
       .get(apiMedical.rendezVousDoctor + "/" + user.organisationRef, header)
       .then((res) => {
-        setStopLoad(true)
-        setDatas(res.data);
-        setList(res.data);
-        console.log(res.data);
+        setStopLoad(true);
+        const data = matrice(res.data);
+        setPagination(data.list);
+        if (data.list.length !== 0) {
+          setDatas(data.list[0]);
+          setList(data.list[0]);
+          setTotalPage(data.counter);
+        } else {
+          setTotalPage(data.counter + 1);
+        }
       })
       .catch((error) => {
         console.log(error);
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
   };
 
@@ -153,13 +161,15 @@ const Meet = () => {
 
   const makeSearch = (e) => {
     e.preventDefault();
-    onSearch(e,setList,datas,["doctor",
+    onSearch(e, setList, datas, [
+      "doctor",
       "specialityDoctor",
       "period",
       "status",
       "patient",
       "startHour",
-      "numberPatient"])
+      "numberPatient",
+    ]);
   };
 
   const fValidate = (cl) => {
@@ -170,6 +180,20 @@ const Meet = () => {
     setNotifyBg(bg);
     setNotifyTitle(title);
     setNotifyMessage(message);
+  };
+
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
+      setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
+    }
+    if (page === "prece" && pageNumber >= 1) {
+      setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
+    }
   };
 
   return (
@@ -193,126 +217,131 @@ const Meet = () => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "prece")}
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+          {pageNumber + 1}/{totalPage}
           </div>
         </div>
       </div>
       <Loading data={datas} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-sm">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                Patients
-              </th>
-              <th scope="col">Date et heure</th>
-              <th scope="col">Statut</th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((data, idx) => {
-              //data.checkValue = false
-              return (
-                <tr key={idx}>
-                  <td>
-                    <div className="d-inline-block me-2 align-middle">
-                      <img src={user} alt="" />
-                    </div>
-                    <div className="d-inline-block align-middle">
-                      <span className="text-bold">{data.patient}</span>
-                      <br />
-                    </div>
-                  </td>
-                  <td>
-                    <span className="text-bold">{data.period}</span>
-                    <br />
-                    <span>
-                      <span className="text-bold">Heure:</span> {data.startHour}
-                    </span>
-                  </td>
-                  <td>
-                    <div
-                      data-bs-toggle="modal"
-                      data-bs-target="#statusRendezVous"
-                      onClick={(e) => {
-                        setStatus({
-                          ...status,
-                          id: data.uuid,
-                        });
-                      }}
-                    >
-                      {data.status === "Terminer" && (
-                        <button className="btn bg-success border-radius-2">
-                          Terminé
-                        </button>
-                      )}
-                      {data.status === "En attente" && (
-                        <button className="btn bg-warning border-radius-2">
-                          En attente
-                        </button>
-                      )}
-                      {data.status === "Annuler" && (
-                        <button className="btn bg-danger border-radius-2">
-                          Annulé
-                        </button>
-                      )}
-                      {data.status === "Confirmer" && (
-                        <button className="btn bg-info border-radius-2">
-                          Confirmé
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Voir le rendez vous"
-                          data-bs-toggle="modal"
-                          data-bs-target="#detailRendezVous"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            getDetail(data.uuid);
-                          }}
-                          src={view}
-                          alt=""
-                        />
+        <div className="table-responsive-sm">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  Patients
+                </th>
+                <th scope="col">Date et heure</th>
+                <th scope="col">Statut</th>
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                //data.checkValue = false
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <div className="d-inline-block me-2 align-middle">
+                        <img src={user} alt="" />
                       </div>
-                      {0 === 0 && (
+                      <div className="d-inline-block align-middle">
+                        <span className="text-bold">{data.patient}</span>
+                        <br />
+                      </div>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.period}</span>
+                      <br />
+                      <span>
+                        <span className="text-bold">Heure:</span>{" "}
+                        {data.startHour}
+                      </span>
+                    </td>
+                    <td>
+                      <div
+                        data-bs-toggle="modal"
+                        data-bs-target="#statusRendezVous"
+                        onClick={(e) => {
+                          setStatus({
+                            ...status,
+                            id: data.uuid,
+                          });
+                        }}
+                      >
+                        {data.status === "Terminer" && (
+                          <button className="btn bg-success border-radius-2">
+                            Terminé
+                          </button>
+                        )}
+                        {data.status === "En attente" && (
+                          <button className="btn bg-warning border-radius-2">
+                            En attente
+                          </button>
+                        )}
+                        {data.status === "Annuler" && (
+                          <button className="btn bg-danger border-radius-2">
+                            Annulé
+                          </button>
+                        )}
+                        {data.status === "Confirmer" && (
+                          <button className="btn bg-info border-radius-2">
+                            Confirmé
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <div className="btn-group">
                         <div className="d-inline-block mx-1">
                           <img
-                            title="Supprimer le rendez vous"
+                            title="Voir le rendez vous"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteRendezVous"
+                            data-bs-target="#detailRendezVous"
                             onClick={(e) => {
                               e.preventDefault();
-                              setDeleteId(data.uuid);
-                              //setDelete(["" + data.employeeReference]);
+                              getDetail(data.uuid);
                             }}
-                            src={del}
+                            src={view}
                             alt=""
                           />
                         </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                        {0 === 0 && (
+                          <div className="d-inline-block mx-1">
+                            <img
+                              title="Supprimer le rendez vous"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteRendezVous"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setDeleteId(data.uuid);
+                                //setDelete(["" + data.employeeReference]);
+                              }}
+                              src={del}
+                              alt=""
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
       <DeleteModal
         title={"Suppression du rendez vous"}
@@ -412,7 +441,9 @@ const Meet = () => {
                   <span className="text-bold text-meduim">{detail.period}</span>
                   <br />
                   <span className="text-bold">Heure:</span>
-                  <span className="text-bold text-meduim">{detail.startHour}</span>
+                  <span className="text-bold text-meduim">
+                    {detail.startHour}
+                  </span>
                 </div>
 
                 <div className="col-12 pt-3 ">
@@ -424,7 +455,6 @@ const Meet = () => {
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
-              
               <button
                 type="button"
                 className="btn btn-primary"

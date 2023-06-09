@@ -10,7 +10,7 @@ import { apiPatient } from "../../services/api";
 import { AppContext } from "../../services/context";
 import Loading from "../../components/Loading";
 import ModalPatient from "../../components/ModalPatient";
-import { onSearch } from "../../services/service";
+import { matrice, onSearch } from "../../services/service";
 
 const initPatient = {
   organisationId: "",
@@ -46,7 +46,9 @@ const ListPatient = () => {
   const [search, setSearch] = useState("");
   const [fail, setFail] = useState(false);
   let navigate = useNavigate();
-
+  const [pageNumber, setPageNumber] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+  const [pagination, setPagination] = useState([]);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -60,8 +62,15 @@ const ListPatient = () => {
       .get(apiPatient.getAll + "/" + user.organisationRef, header)
       .then((res) => {
         setStopLoad(true);
-        setList(res.data);
-        setDatas(res.data);
+        const data = matrice(res.data);
+        setPagination(data.list);
+        if (data.list.length !== 0) {
+          setDatas(data.list[0]);
+          setList(data.list[0]);
+          setTotalPage(data.counter);
+        } else {
+          setTotalPage(data.counter + 1);
+        }
         console.table(res.data);
       })
       .catch((error) => {
@@ -88,6 +97,20 @@ const ListPatient = () => {
       "cni",
       "gender",
     ]);
+  };
+
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
+      setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
+    }
+    if (page === "prece" && pageNumber >= 1) {
+      setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
+    }
   };
   return (
     <>
@@ -120,15 +143,19 @@ const ListPatient = () => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "prece")}
+            >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1">
+            <div className="d-inline-block my-1 mx-1"
+            onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-            1/10
+          {pageNumber + 1}/{totalPage}
           </div>
         </div>
       </div>

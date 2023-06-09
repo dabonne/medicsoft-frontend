@@ -58,7 +58,7 @@ const Settings = () => {
     requestUser
       .get(apiUser.get + "/" + user.organisationRef, header)
       .then((res) => {
-        console.log(res.data.photo);
+        ///console.log(res.data.photo);
         setImgProfile("data:image/jpeg;base64," + res.data.photo);
         //console.log(res.data.employeeResponseList);
         setLastName(res.data.lastName);
@@ -142,18 +142,18 @@ const Settings = () => {
         setRefresh(refresh + 1);
         configNotify(
           "success",
-          "Ajout réussi",
-          "Les informations ont bien été enrégistrées"
+          "Modification réussi",
+          "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg("Les informations ont modifier");
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
         configNotify(
           "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
         );
       });
   };
@@ -172,16 +172,12 @@ const Settings = () => {
         //console.log("enregistrement ok");
         //setRefresh(refresh + 1);
         updateProfile();
-        setModalNotifyMsg("La photo a été modifier");
+        setModalNotifyMsg("La photo a été modifiée");
         notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
-        configNotify(
-          "danger",
-          "Ouppss!!",
-          "Une erreur est survenue, veuillez reesayer plus tard..."
-        );
+      
       });
   };
   const fValidate = (cl) => {
@@ -195,23 +191,24 @@ const Settings = () => {
 
   const changePassword = (e) => {
     e.preventDefault();
+    console.log(password)
     requestUser
       .post(
         apiUser.changePassword +
           "?password=" +
           password.new +
           "&oldPassword=" +
-          password.old
+          password.old,{},
+          header
       )
       .then((res) => {
         console.log(res.data);
-        console.log("modification ok");
-        setModalNotifyMsg("Les informations ont modifier");
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
-        setModalNotifyMsg("Echec de la modification");
+        setModalNotifyMsg("La modification a échoué");
         notifyRef.current.click();
       });
   };
@@ -513,6 +510,7 @@ const Settings = () => {
             </div>
 
             <div className="modal-body">
+              <p className="fw-bold text-danger">Le mot de passe doit comporter au moins 8 caractères, incluant au moins une lettre majuscule, un caractère spécial et des chiffres ou des lettres.</p>
               <div>
                 <div className="mb-3 mt-3">
                   <label htmlFor="newMdp" className="form-label">

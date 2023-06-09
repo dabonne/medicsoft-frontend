@@ -16,7 +16,7 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { deleteUser } from "../services/storage";
 import Loading from "../components/Loading";
-
+import { matrice } from "../services/service";
 
 const Employe = () => {
   const authCtx = useContext(AppContext);
@@ -70,46 +70,53 @@ const Employe = () => {
   const [formValidate, setFormValidate] = useState("needs-validation");
   const [roles, setRoles] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
-  const [totalPage, setTotalPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(1);
   const [roleList, setRoleList] = useState([]);
-  const [modalNotifyMsg, setModalNotifyMsg] = useState('')
-  const [fail, setFail] = useState(false)
+  const [modalNotifyMsg, setModalNotifyMsg] = useState("");
+  const [fail, setFail] = useState(false);
+  const [pagination, setPagination] = useState([]);
   const header = {
     headers: { Authorization: `Bearer ${user.token}` },
   };
   const closeRef = useRef();
   const closeEditRef = useRef();
-  const notifyRef = useRef()
+  const notifyRef = useRef();
 
   useEffect(() => {
+    get();
+  }, [refresh]);
+
+  const get = () => {
     requestEmploye
-      .get(apiEmploye.getPage+""+pageNumber, header)
+      .get(apiEmploye.getAll, header)
       .then((res) => {
         //setDatas(res.data.employeeResponseList);
         //setList(res.data.employeeResponseList);
-        console.log(res.data)
-        setStopLoad(true)
-        if(Object.keys(res.data).length !== 0){
-          setDatas(res.data.content);
-          setList(res.data.content);
-          setTotalPage(parseInt(res.data.totalPages))
-
-        }
+        console.log(res.data);
+        setStopLoad(true);
+        const data = matrice(res.data.employeeResponseList);
+          setPagination(data.list);
+          if (data.list.length !== 0) {
+            setDatas(data.list[0]);
+            setList(data.list[0]);
+            setTotalPage(data.counter);
+          } else {
+            setTotalPage(data.counter + 1);
+          }
 
         //console.log(res.data.employeeResponseList);
         getRoles();
       })
       .catch((error) => {
         //deconnect()
-        setStopLoad(true)
-        setFail(true)
+        setStopLoad(true);
+        setFail(true);
       });
-  }, [refresh,pageNumber]);
-
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
-    console.log(jsData)
+    console.log(jsData);
     requestEmploye
       .post(apiEmploye.post, jsData, header)
       .then((res) => {
@@ -120,10 +127,9 @@ const Employe = () => {
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("L'employé a été ajouté avec succès")
-        closeRef.current.click()
-        notifyRef.current.click()
-        
+        setModalNotifyMsg("L'employé a été ajouté avec succès");
+        closeRef.current.click();
+        notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
@@ -148,11 +154,10 @@ const Employe = () => {
           "Modification réussi",
           "Les informations ont été enrégistrées"
         );
-        closeEditRef.current.click()
-        setModalNotifyMsg("Les informations ont été modifiées")
+        closeEditRef.current.click();
+        setModalNotifyMsg("Les informations ont été modifiées");
 
-        notifyRef.current.click()
-        
+        notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
@@ -170,7 +175,7 @@ const Employe = () => {
       .get(apiEmploye.getJsData)
       .then((res) => {
         //get dataForm success
-        res.data.birthdate = "2000-01-01"
+        res.data.birthdate = "2000-01-01";
         setJsData(res.data);
         setLastName("");
         setFirstName("");
@@ -190,11 +195,10 @@ const Employe = () => {
   };
   const getRoles = () => {
     requestUser
-      .get(apiUser.getRoles,{
+      .get(apiUser.getRoles, {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => {
-        
         //console.log(res.data)
         let list = Object.keys(res.data).map((key) => {
           return { value: key, label: res.data[key] };
@@ -208,7 +212,6 @@ const Employe = () => {
       });
   };
   const activeUserRoles = () => {
-    
     requestEmploye
       .post(
         apiEmploye.active,
@@ -226,56 +229,63 @@ const Employe = () => {
         //get dataForm success
         console.log(res.data);
         setRefresh(refresh + 1);
-        setModalNotifyMsg("Le(s) droit(s) ont été attribués")
-        notifyRef.current.click()
-        setRoles([])
+        setModalNotifyMsg("Le(s) droit(s) ont été attribués");
+        notifyRef.current.click();
+        setRoles([]);
       })
       .catch((error) => {
         //get dataForm faille
-        setModalNotifyMsg("Échec de l'attribution du ou des droits")
-        notifyRef.current.click()
-        setRoles([])
+        setModalNotifyMsg("Échec de l'attribution du ou des droits");
+        notifyRef.current.click();
+        setRoles([]);
         console.log(error);
       });
   };
 
   const disableAccount = () => {
-    
     requestEmploye
-      .put(apiEmploye.disableAccount,{ 
-        "employeeReference": userInfos.employeeReference,
-        "organisationId": user.organisationRef,
-    },header)
+      .put(
+        apiEmploye.disableAccount,
+        {
+          employeeReference: userInfos.employeeReference,
+          organisationId: user.organisationRef,
+        },
+        header
+      )
       .then((res) => {
         //console.log("Compte bloquer ok");
         setRefresh(refresh + 1);
-        setModalNotifyMsg("Le compte a été bloqué !")
-        notifyRef.current.click()
-  
+        setModalNotifyMsg("Le compte a été bloqué !");
+        notifyRef.current.click();
       })
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   const deleteRole = (role) => {
-    
     requestEmploye
-      .delete(apiEmploye.deleteRole, {data:{ 
-        "employeeReference": userInfos.employeeReference,
-        "role": role,
-        "organisationId": user.organisationRef,
-    }},header)
+      .delete(
+        apiEmploye.deleteRole,
+        {
+          data: {
+            employeeReference: userInfos.employeeReference,
+            role: role,
+            organisationId: user.organisationRef,
+          },
+        },
+        header
+      )
       .then((res) => {
         console.log("suppression ok");
-        setModalNotifyMsg("Suppression réussie !")
-        notifyRef.current.click()
+        setModalNotifyMsg("Suppression réussie !");
+        notifyRef.current.click();
         setRefresh(refresh + 1);
       })
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   const getEmploye = (e, ref) => {
     e.preventDefault();
@@ -298,7 +308,8 @@ const Employe = () => {
         setPhone(res.data.employeeResponseList[0].phone);
         jsData.phone = res.data.employeeResponseList[0].phone;
         setDoctorNationalId(res.data.employeeResponseList[0].doctorNationalId);
-        jsData.doctorNationalId = res.data.employeeResponseList[0].doctorNationalId;
+        jsData.doctorNationalId =
+          res.data.employeeResponseList[0].doctorNationalId;
         setClassification(res.data.employeeResponseList[0].classification);
         jsData.classification = res.data.employeeResponseList[0].classification;
         setSpecialisation(res.data.employeeResponseList[0].specialisation);
@@ -321,7 +332,7 @@ const Employe = () => {
   };
 
   const viewEmploye = (data) => {
-    console.log(data)
+    console.log(data);
     userInfos.lastName = data.lastName;
     userInfos.firstName = data.firstName;
     userInfos.cnib = data.cnib;
@@ -342,8 +353,8 @@ const Employe = () => {
       .delete(apiEmploye.delete, { data: dele })
       .then((res) => {
         console.log("suppression ok");
-        setModalNotifyMsg("Suppression réussie !")
-        notifyRef.current.click()
+        setModalNotifyMsg("Suppression réussie !");
+        notifyRef.current.click();
         setDelete([]);
         setRefresh(refresh + 1);
       })
@@ -405,15 +416,19 @@ const Employe = () => {
     onUserChange(initialUser);
   };
 
-  const pagination = (e,page) =>{
-    e.preventDefault()
-    if(page === "suiv" && pageNumber < Number(totalPage) - 1){
+  const makePagination = (e, page) => {
+    e.preventDefault();
+    if (page === "suiv" && pageNumber < Number(totalPage) - 1) {
       setPageNumber(pageNumber + 1);
+      setList(pagination[pageNumber + 1]);
+      setDatas(pagination[pageNumber + 1]);
     }
-    if(page === "prece" && pageNumber >= 1){
+    if (page === "prece" && pageNumber >= 1) {
       setPageNumber(pageNumber - 1);
+      setList(pagination[pageNumber - 1]);
+      setDatas(pagination[pageNumber - 1]);
     }
-  }
+  };
 
   return (
     <>
@@ -555,7 +570,6 @@ const Employe = () => {
                       jsData.doctorNationalId = e.target.value;
                       setJsData(jsData);
                     }}
-                    
                   />
                   <div className="invalid-feedback">
                     Veuillez entrer le muméro d'ordre
@@ -670,8 +684,8 @@ const Employe = () => {
                     data-bs-dismiss="modal"
                     ref={closeRef}
                     onClick={(e) => {
-                      e.preventDefault()
-                      fValidate("needs-validation")
+                      e.preventDefault();
+                      fValidate("needs-validation");
                     }}
                   >
                     Fermer
@@ -819,7 +833,6 @@ const Employe = () => {
                       jsData.doctorNationalId = e.target.value;
                       setJsData(jsData);
                     }}
-                    
                   />
                   <div className="invalid-feedback">
                     Veuillez entrer le muméro d'ordre
@@ -1029,7 +1042,9 @@ const Employe = () => {
                   </div>
                   <div className="d-flex justify-content-between">
                     <span>Classification:</span>
-                    <span className="text-bold">{userInfos.classification}</span>
+                    <span className="text-bold">
+                      {userInfos.classification}
+                    </span>
                   </div>
                   <div className="d-flex justify-content-between">
                     <span>Date de naissance:</span>
@@ -1041,72 +1056,79 @@ const Employe = () => {
                     <p className="fw-bold">Rôles et Droits</p>
                     {userInfos.roles.map((role, idx) => {
                       return (
-                        <button className="btn btn-gray me-1 my-1" key={idx}
-                        data-bs-dismiss="modal"
+                        <button
+                          className="btn btn-gray me-1 my-1"
+                          key={idx}
+                          data-bs-dismiss="modal"
                         >
-                          {role +" "} <span onClick={(e) =>{
-                            e.preventDefault()
-                            deleteRole(role)
-                          }}>X</span>
+                          {role + " "}{" "}
+                          <span
+                            onClick={(e) => {
+                              e.preventDefault();
+                              deleteRole(role);
+                            }}
+                          >
+                            X
+                          </span>
                         </button>
                       );
                     })}
                     <div className="my-4">
-                    
-
-                      {
-                        userInfos.accountIsActive ? <>
-                        <button 
-                      className="btn btn-secondary me-1" 
-                      data-bs-dismiss="modal"
-                      onClick={(e) =>{
-                        e.preventDefault()
-                        var myModal = new Modal(
-                          document.getElementById("activeEmploye"),
-                          {}
-                        );
-                        myModal.show();
-                      }}
-                      >Ajouter un role</button>
-                        <button
-                        type="button"
-                        className="btn btn-danger"
-                        data-bs-dismiss="modal"
-                        onClick={(e) =>{
-                          e.preventDefault()
-                          disableAccount()
-                        }}
-                      >
-                        Bloquer le compte
-                      </button>
-                        </> :<>
-                        <button
-                      type="button"
-                      className="btn btn-danger me-2"
-                      data-bs-toggle="modal"
-                      data-bs-target="#deleteEmploye"
-                    >
-                      Supprimer
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      data-bs-dismiss="modal"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        /*var myModal = new Modal(
+                      {userInfos.accountIsActive ? (
+                        <>
+                          <button
+                            className="btn btn-secondary me-1"
+                            data-bs-dismiss="modal"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              var myModal = new Modal(
+                                document.getElementById("activeEmploye"),
+                                {}
+                              );
+                              myModal.show();
+                            }}
+                          >
+                            Ajouter un role
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            data-bs-dismiss="modal"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              disableAccount();
+                            }}
+                          >
+                            Bloquer le compte
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-danger me-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteEmploye"
+                          >
+                            Supprimer
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            data-bs-dismiss="modal"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              /*var myModal = new Modal(
                           document.getElementById("activeEmploye"),
                           {}
                         );
                         myModal.show();*/
-                      }}
-                    >
-                      Réactiver le compte
-                    </button>
+                            }}
+                          >
+                            Réactiver le compte
+                          </button>
                         </>
-                      
-                      }
-                      
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -1116,7 +1138,7 @@ const Employe = () => {
                       className="btn btn-danger"
                       data-bs-dismiss="modal"
                       onClick={(e) => {
-                        e.preventDefault()
+                        e.preventDefault();
                         var myModal = new Modal(
                           document.getElementById("deleteEmploye"),
                           {}
@@ -1194,9 +1216,7 @@ const Employe = () => {
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                
-              </h4>
+              <h4 className="modal-title text-meduim text-bold"></h4>
               <button
                 type="button"
                 className="btn-close"
@@ -1211,9 +1231,9 @@ const Employe = () => {
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={(e) =>{
-                  e.preventDefault()
-                  setModalNotifyMsg('')
+                onClick={(e) => {
+                  e.preventDefault();
+                  setModalNotifyMsg("");
                 }}
               >
                 Ok
@@ -1238,16 +1258,16 @@ const Employe = () => {
             />
           </div>
           <div className="btn-group">
-            <div 
+            <div
               className="d-inline-block my-1 mx-1"
-              onClick={e => pagination(e,"prece")}
+              onClick={(e) => makePagination(e, "prece")}
             >
               <img src={back} alt="" />
             </div>
-            <div 
+            <div
               className="d-inline-block my-1 mx-1"
-              onClick={e => pagination(e,"suiv")}
-              >
+              onClick={(e) => makePagination(e, "suiv")}
+            >
               <img src={sui} alt="" />
             </div>
           </div>
@@ -1258,85 +1278,85 @@ const Employe = () => {
       </div>
       <p className="text-ultra-small">{list.length} éléments affichés</p>
       <Loading data={list} stopLoad={stopLoad} fail={fail}>
-      <div className="table-responsive-sm">
-        <table className="table table-striped align-middle">
-          <thead>
-            <tr className="align-middle">
-              <th scope="col" className="border-raduis-left">
-                #
-              </th>
-              <th scope="col">Nom et Prénom(s)</th>
-              <th scope="col">Département</th>
-              <th scope="col" className="text-center">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((data, idx) => {
-              //data.checkValue = false
-              return (
-                <tr key={idx}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      value="seleted"
-                      onChange={() => {
-                        deleteList(data);
-                      }}
-                    />
-                  </td>
-                  <td>{data.firstName + " " + data.lastName}</td>
-                  <td>{data.department}</td>
-                  <td className="text-center">
-                    <div className="btn-group">
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Voir l'employé"
-                          data-bs-toggle="modal"
-                          data-bs-target="#viewEmploye"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setDelete(["" + data.employeeReference]);
-                            viewEmploye(data);
-                          }}
-                          src={view}
-                          alt=""
-                        />
+        <div className="table-responsive-sm">
+          <table className="table table-striped align-middle">
+            <thead>
+              <tr className="align-middle">
+                <th scope="col" className="border-raduis-left">
+                  #
+                </th>
+                <th scope="col">Nom et Prénom(s)</th>
+                <th scope="col">Département</th>
+                <th scope="col" className="text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((data, idx) => {
+                //data.checkValue = false
+                return (
+                  <tr key={idx}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        value="seleted"
+                        onChange={() => {
+                          deleteList(data);
+                        }}
+                      />
+                    </td>
+                    <td>{data.firstName + " " + data.lastName}</td>
+                    <td>{data.department}</td>
+                    <td className="text-center">
+                      <div className="btn-group">
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Voir l'employé"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewEmploye"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setDelete(["" + data.employeeReference]);
+                              viewEmploye(data);
+                            }}
+                            src={view}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Éditer l'employé"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editEmploye"
+                            onClick={(e) => {
+                              getEmploye(e, data.employeeReference);
+                            }}
+                            src={edit}
+                            alt=""
+                          />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Supprimer l'employé"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteEmploye"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setDelete(["" + data.employeeReference]);
+                            }}
+                            src={del}
+                            alt=""
+                          />
+                        </div>
                       </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Éditer l'employé"
-                          data-bs-toggle="modal"
-                          data-bs-target="#editEmploye"
-                          onClick={(e) => {
-                            getEmploye(e, data.employeeReference);
-                          }}
-                          src={edit}
-                          alt=""
-                        />
-                      </div>
-                      <div className="d-inline-block mx-1">
-                        <img
-                          title="Supprimer l'employé"
-                          data-bs-toggle="modal"
-                          data-bs-target="#deleteEmploye"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setDelete(["" + data.employeeReference]);
-                          }}
-                          src={del}
-                          alt=""
-                        />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Loading>
       <div className="d-inline-block my-1 me-1">
         <img
@@ -1347,10 +1367,16 @@ const Employe = () => {
           alt=""
         />
       </div>
-      <input type="hidden" ref={notifyRef} data-bs-toggle="modal" data-bs-target="#notifyRef" onClick={(e) =>{
-                    e.preventDefault()
-                    setNotifyBg("")
-                  }} />
+      <input
+        type="hidden"
+        ref={notifyRef}
+        data-bs-toggle="modal"
+        data-bs-target="#notifyRef"
+        onClick={(e) => {
+          e.preventDefault();
+          setNotifyBg("");
+        }}
+      />
     </>
   );
 };

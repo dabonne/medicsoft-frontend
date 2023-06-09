@@ -5,6 +5,7 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
   useParams,
 } from "react-router-dom";
 import profile from "../../assets/imgs/profile.png";
@@ -22,6 +23,9 @@ import ButtonParamedical from "../../components/ButtonParamedical";
 import ModalParamedical from "../../components/ModalParamedical";
 import ContentParamedical from "./components/ContentParamedical";
 import TableParamedal from "./components/TableParamedal";
+import ModalPatient from "../../components/ModalPatient";
+import DeleteModal from "../../components/DeleteModal";
+import requestDoctor from "../../services/requestDoctor";
 
 const initPatient = {
   firstname: "",
@@ -123,8 +127,9 @@ const DossierParamedical = () => {
     "ARTERIAL_PRESSURE",
     "BODY_TEMPERATURE",
     "WEIGHT",
-  ]
+  ];
   const [patient, setPatient] = useState(initPatient);
+  const navigate = useNavigate()
   useEffect(() => {
     requestPatient
       .get(apiPatient.get + "/" + user.cni, header)
@@ -138,35 +143,23 @@ const DossierParamedical = () => {
       });
   }, [location]);
 
-  const onSearch = (e) => {
-    e.preventDefault();
-    let str = e.target.value;
-    let dd = datas.filter((data) => {
-      const fullNameOne = data.lastName + " " + data.firstName;
-      const fullNameTwo = data.firstName + " " + data.lastName;
-      const fullNameOneDepart =
-        data.lastName + " " + data.firstName + " " + data.department;
-      const fullNameTwoDepart =
-        data.firstName + " " + data.lastName + " " + data.department;
-
-      return (
-        data.lastName.toLowerCase().includes(str.toLowerCase()) ||
-        data.firstName.toLowerCase().includes(str.toLowerCase()) ||
-        data.department.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwo.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameOneDepart.toLowerCase().includes(str.toLowerCase()) ||
-        fullNameTwoDepart.toLowerCase().includes(str.toLowerCase())
-      );
-    });
-
-    dd !== [] ? setList(dd) : setList(datas);
+  const onDelete = (id) => {
+    requestDoctor
+      .delete(apiPatient.putOrDelete+"/"+id, header)
+      .then((res) => {
+        console.log(res.data);
+        navigate("/dashboard/patient")
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-
   return (
     <>
       <div className="row">
-        <h1 className="h2 text-bold">Dossier paramédical de {patient.lastname + " " + patient.firstname}</h1>
+        <h1 className="h2 text-bold">
+          Dossier paramédical de {patient.lastname + " " + patient.firstname}
+        </h1>
       </div>
       <div className="row my-4">
         <div className="col-10 col-sm-8 mx-auto col-md-5 col-lg-3">
@@ -182,10 +175,12 @@ const DossierParamedical = () => {
             </span>
             <span className="d-block my-1">
               <span>ID Patient: </span>
-              <span className="text-bold">P12902</span>
+              <span className="text-bold">{patient.patientId}</span>
             </span>
             <span className="d-block my-1">
-              <span className="text-bold">{patient.age} ans . {patient.gender}</span>
+              <span className="text-bold">
+                {patient.age} ans . {patient.gender}
+              </span>
             </span>
             <span className="d-block my-1">
               <span className="">Date de naissance: </span>
@@ -193,13 +188,31 @@ const DossierParamedical = () => {
             </span>
             <span className="d-block my-1">
               <span className="">Téléphone: </span>
-              <span className="text-bold">
-                (00226) {patient.phoneNumber}
-              </span>
+              <span className="text-bold">(00226) {patient.phoneNumber}</span>
             </span>
             <span className="d-block my-1">
               <span className="">{patient.city}, </span>
               <span className="text-bold">{patient.country}</span>
+            </span>
+            <span className="d-inline-block mt-3 me-3">
+              <Link
+                to="#"
+                className="text-black"
+                data-bs-toggle="modal"
+                data-bs-target="#newPatient"
+              >
+                Modifier
+              </Link>
+            </span>
+            <span className="d-inline-block mt-3">
+              <Link
+                to="#"
+                className="text-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#delete"
+              >
+                supprimer
+              </Link>
             </span>
             <span className="d-block mt-3">
               <Link to="#" className="text-black">
@@ -207,19 +220,107 @@ const DossierParamedical = () => {
               </Link>
             </span>
           </div>
+          <ModalPatient edit={true} />
+          <DeleteModal
+            title={"Suppression du patient"}
+            id={user.cni}
+            modal={"delete"}
+            onDelete={onDelete}
+          />
         </div>
         <div className="col-12 col-sm-12 col-md-7 col-lg-9 mx-auto">
           <Routes>
             <Route path="/" element={<ContentParamedical />} />
-            <Route path="transmissions" element={<TableParamedal unite="" label={['Note','Note']} type={paramedicalButton[0]}/>} />
-            <Route path="frequence" element={<TableParamedal unite="bpm" label={['Fréquence','Fréquence c.']} type={paramedicalButton[1]}/>} />
-            <Route path="glycemie" element={<TableParamedal unite="mg/dL" label={['Glycémie','Glycémie']} type={paramedicalButton[2]}/>} />
-            <Route path="saturation" element={<TableParamedal unite="% SaO2" label={['Saturation','Saturation']} type={paramedicalButton[3]}/>} />
-            <Route path="pression" element={<TableParamedal unite="mmHg" label={['Pression','Pression A. Systolique']} type={paramedicalButton[4]}/>} />
-            <Route path="temperature" element={<TableParamedal unite="°C" label={['Température','Température']} type={paramedicalButton[5]}/>} />
-            <Route path="poids" element={<TableParamedal unite="Kg" label={['Poids','Poids']} type={paramedicalButton[6]}/>} />
-            <Route path="taille" element={<TableParamedal unite="m" label={['Taille','Taille']} type={paramedicalButton[7]}/>} />
-            <Route path="groupe-sanguin" element={<TableParamedal unite="" label={['Groupe sanguin','Groupe sanguin']} type={paramedicalButton[8]}/>} />
+            <Route
+              path="transmissions"
+              element={
+                <TableParamedal
+                  unite=""
+                  label={["Note", "Note"]}
+                  type={paramedicalButton[0]}
+                />
+              }
+            />
+            <Route
+              path="frequence"
+              element={
+                <TableParamedal
+                  unite="bpm"
+                  label={["Fréquence", "Fréquence c."]}
+                  type={paramedicalButton[1]}
+                />
+              }
+            />
+            <Route
+              path="glycemie"
+              element={
+                <TableParamedal
+                  unite="mg/dL"
+                  label={["Glycémie", "Glycémie"]}
+                  type={paramedicalButton[2]}
+                />
+              }
+            />
+            <Route
+              path="saturation"
+              element={
+                <TableParamedal
+                  unite="% SaO2"
+                  label={["Saturation", "Saturation"]}
+                  type={paramedicalButton[3]}
+                />
+              }
+            />
+            <Route
+              path="pression"
+              element={
+                <TableParamedal
+                  unite="mmHg"
+                  label={["Pression", "Pression A. Systolique"]}
+                  type={paramedicalButton[4]}
+                />
+              }
+            />
+            <Route
+              path="temperature"
+              element={
+                <TableParamedal
+                  unite="°C"
+                  label={["Température", "Température"]}
+                  type={paramedicalButton[5]}
+                />
+              }
+            />
+            <Route
+              path="poids"
+              element={
+                <TableParamedal
+                  unite="Kg"
+                  label={["Poids", "Poids"]}
+                  type={paramedicalButton[6]}
+                />
+              }
+            />
+            <Route
+              path="taille"
+              element={
+                <TableParamedal
+                  unite="m"
+                  label={["Taille", "Taille"]}
+                  type={paramedicalButton[7]}
+                />
+              }
+            />
+            <Route
+              path="groupe-sanguin"
+              element={
+                <TableParamedal
+                  unite=""
+                  label={["Groupe sanguin", "Groupe sanguin"]}
+                  type={paramedicalButton[8]}
+                />
+              }
+            />
           </Routes>
         </div>
       </div>
