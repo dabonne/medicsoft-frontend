@@ -72,6 +72,7 @@ const Employe = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [roleList, setRoleList] = useState([]);
   const [modalNotifyMsg, setModalNotifyMsg] = useState('')
+  const [fail, setFail] = useState(false)
   const header = {
     headers: { Authorization: `Bearer ${user.token}` },
   };
@@ -96,6 +97,8 @@ const Employe = () => {
       })
       .catch((error) => {
         //deconnect()
+        setStopLoad(true)
+        setFail(true)
       });
   }, [refresh,pageNumber]);
 
@@ -1238,7 +1241,7 @@ const Employe = () => {
         </div>
       </div>
       <p className="text-ultra-small">{list.length} éléments affichés</p>
-      <Loading data={list} stopLoad={stopLoad}>
+      <Loading data={list} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>

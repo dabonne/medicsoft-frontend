@@ -38,6 +38,7 @@ const CompteRendu = ({ setLocation }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+  const [fail, setFail] = useState(false)
 
   useEffect(() => {
     get();
@@ -157,6 +158,8 @@ const CompteRendu = ({ setLocation }) => {
       })
       .catch((error) => {
         console.log(error);
+        setStopLoad(true)
+        setFail(true)
       });
   };
   const viewCompteRendu = (id) => {
@@ -231,7 +234,7 @@ const CompteRendu = ({ setLocation }) => {
         </div>
       </div>
 
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>

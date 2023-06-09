@@ -78,6 +78,7 @@ const PrescriptionFormOrdonance = (type = "") => {
   const [selectedDrug, setSelectedDrug] = useState([]);
   const [selectedDosage, setSelectedDosage] = useState([]);
   const [selectedAdministation, setSelectedAdministation] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const notifyRef = useRef();
   const header = {
@@ -135,36 +136,47 @@ const PrescriptionFormOrdonance = (type = "") => {
     onSubmit: (values) => {
       //console.log(selectedOption);
       const data = {
-        drug: selectedDrug[0].uuid,
-        dosage: selectedDosage[0].uuid,
-        during: values.during,
-        dayOrWeekOrMonth: values.dayOrWeekOrMonth,
+        drug: selectedDrug[0]?.uuid,
+        dosage: selectedDosage[0]?.uuid,
+        during: values?.during,
+        dayOrWeekOrMonth: values?.dayOrWeekOrMonth,
         periodEnumStringMap: {
-          MORNING: values.MORNING,
-          NIGHT: values.NIGHT,
-          EVENING: values.EVENING,
-          MIDDAY: values.MIDDAY,
+          MORNING: values?.MORNING,
+          NIGHT: values?.NIGHT,
+          EVENING: values?.EVENING,
+          MIDDAY: values?.MIDDAY,
         },
         hourPrescription: {
-          frequency: values.frequency,
-          quantity: values.quantity,
+          frequency: values?.frequency,
+          quantity: values?.quantity,
         },
-        administrationMode: selectedAdministation[0].uuid,
-        precision: values.precision,
+        administrationMode: selectedAdministation[0]?.uuid,
+        precision: values?.precision,
       };
-      console.log(data)
-      if (list.sendata) {
-        if (id !== undefined) {
-          handleEditSubmit([...list.list, data]);
-        } else {
-          handleSubmit([...list.list, data]);
+      let dataTab = [...list.list]
+      if(data.drug !== undefined && data.dosage !== undefined){
+        dataTab = [...list.list,data]
+        setErrorMsg("")
+      }else{
+        if(!list.sendata){
+          setErrorMsg("Certains champs n'ont pas été remplis")
         }
       }
       setList({
         ...list,
-        list: [...list.list, data],
+        list: dataTab,
       });
-      console.log([...list.list, data]);
+      //console.log(data)
+
+      if (list.sendata && dataTab.length !== 0) {
+        if (id !== undefined) {
+          handleEditSubmit(dataTab);
+        } else {
+          handleSubmit(dataTab);
+        }
+      }
+      
+      //console.log([...list.list, data]);
       setPeriodeChecked({
         MORNING: false,
         NIGHT: false,
@@ -288,7 +300,16 @@ const PrescriptionFormOrdonance = (type = "") => {
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
-  
+   const verifyData = (dataToVerify) =>{
+    Object.keys(dataToVerify).forEach(key =>{
+      console.log(dataToVerify[key] === undefined  )
+      if(dataToVerify[key] === undefined || dataToVerify[key] === ""){
+
+        return false
+      }
+    })
+    return true
+   }
   const renderMenuItemChildren = (option, props) => {
     return <div key={option.uuid}>{option.label}</div>;
   };
@@ -504,7 +525,9 @@ const PrescriptionFormOrdonance = (type = "") => {
             formik={formik}
             options={[]}
           />
-
+          {
+            errorMsg !=="" && <p className="fw-bold text-danger">{errorMsg}</p>
+          }
           <div className="modal-footer d-flex justify-content-start border-0">
             <button type="submit" className="btn btn-secondary me-2">
               Valider et ajouter

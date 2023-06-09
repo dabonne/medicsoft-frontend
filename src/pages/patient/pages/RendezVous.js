@@ -57,6 +57,8 @@ const RendezVous = ({ setLocation }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+  const [fail, setFail] = useState(false)
+
   const closeRef = useRef();
   const notifyRef = useRef();
   const [refresh, setRefresh] = useState(0);
@@ -101,11 +103,8 @@ const RendezVous = ({ setLocation }) => {
       })
       .catch((error) => {
         console.log(error);
-        configNotify(
-          "danger",
-          "Oups !",
-          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
-        );
+        setStopLoad(true)
+        setFail(true)
       });
   };
   const getDetail = (id) => {
@@ -146,11 +145,7 @@ const RendezVous = ({ setLocation }) => {
       })
       .catch((error) => {
         console.log(error);
-        configNotify(
-          "danger",
-          "Oups !",
-          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
-        );
+        
       });
   };
 
@@ -387,7 +382,7 @@ const RendezVous = ({ setLocation }) => {
           </div>
         </div>
       </div>
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>

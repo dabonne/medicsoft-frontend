@@ -93,6 +93,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
           countryMinorId,
           cityMinorId,
           genderId,
+          minor,
           parent,
           ...resData
         } = res.data;
@@ -111,6 +112,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
           parentCnib: parent.cni,
           //parentPhoneNumber: parent,
           linkParental: parent.linkParentalId,
+          mineur:minor ? "mineur" : ""
         });
       })
       .catch((error) => {

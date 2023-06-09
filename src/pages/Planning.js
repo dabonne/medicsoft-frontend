@@ -276,9 +276,9 @@ const Planning = () => {
           <button
             className="btn btn-primary"
             type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#newEmploye"
-            onClick={(e) => getJsData(e)}
+            //data-bs-toggle="modal"
+            //data-bs-target="#newEmploye"
+            //onClick={(e) => getJsData(e)}
           >
             +
           </button>
@@ -678,7 +678,7 @@ const Planning = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {[...Array(9).keys()].map((data, idx) => {
+                    {[].map((data, idx) => {
                       //data.checkValue = false
                       return (
                         <tr key={idx}>

@@ -43,6 +43,7 @@ const ListPatient = () => {
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
+  const [fail, setFail] = useState(false)
   let navigate = useNavigate();
 
   const header = {
@@ -51,7 +52,7 @@ const ListPatient = () => {
   useEffect(() => {
     //setDatas([...Array(20).keys()]);
     get()
-  }, [refresh]);
+  }, []);
 
   const get = () => {
     requestPatient
@@ -62,7 +63,8 @@ const ListPatient = () => {
         console.table(res.data);
       })
       .catch((error) => {
-        //deconnect()
+        setStopLoad(true)
+        setFail(true)
       });
   }
 
@@ -142,7 +144,7 @@ const ListPatient = () => {
         </div>
       </div>
 
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
           {datas.map((data, idx) => {
             return (

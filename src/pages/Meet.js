@@ -56,6 +56,7 @@ const Meet = () => {
 
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
+  const [fail, setFail] = useState(false)
   let navigate = useNavigate();
   const header = {
     headers: { Authorization: `${user.token}` },
@@ -114,11 +115,8 @@ const Meet = () => {
       })
       .catch((error) => {
         console.log(error);
-        configNotify(
-          "danger",
-          "Oups !",
-          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
-        );
+        setStopLoad(true)
+        setFail(true)
       });
   };
 
@@ -219,7 +217,7 @@ const Meet = () => {
           </div>
         </div>
       </div>
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-sm">
         <table className="table table-striped align-middle">
           <thead>

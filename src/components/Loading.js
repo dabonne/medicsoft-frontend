@@ -1,4 +1,4 @@
-const Loading = ({ children, data = [], stopLoad = false }) => {
+const Loading = ({ children, data = [], stopLoad = false, fail = false }) => {
   return (
     <>
       {data.length !== 0 ? (
@@ -23,7 +23,13 @@ const Loading = ({ children, data = [], stopLoad = false }) => {
               </div>
             </div>
           ) : (
-            <p className="fw-bold">Pas de donnée disponible</p>
+            <>
+              {fail ? (
+                <p className="fw-bold text-danger">Une erreur s'est produite lors du chargement des données</p>
+              ) : (
+                <p className="fw-bold">Pas de donnée disponible</p>
+              )}
+            </>
           )}
         </div>
       )}

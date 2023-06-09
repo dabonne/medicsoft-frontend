@@ -27,6 +27,8 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const header = {
     headers: { Authorization: `${user.token}` },
   };
+  const [fail, setFail] = useState(false)
+
   setNameIdx(1);
   useEffect(() => {
     console.log(type);
@@ -43,6 +45,8 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
       })
       .catch((error) => {
         console.log(error);
+        setStopLoad(true)
+        setFail(true)
       });
   };
   const onSearch = (e) => {
@@ -136,7 +140,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
         </div>
       </div>
 
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>

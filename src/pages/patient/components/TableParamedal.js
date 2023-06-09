@@ -55,6 +55,8 @@ const TableParamedal = ({
     overflow: "hidden",
     textOverflow: "ellipsis",
   };
+  const [fail, setFail] = useState(false)
+
   useEffect(() => {
     get();
   }, [refresh]);
@@ -73,6 +75,7 @@ const TableParamedal = ({
       .catch((error) => {
         console.log(error);
         setStopLoad(true)
+        setFail(true)
       });
   };
 
@@ -170,7 +173,7 @@ const TableParamedal = ({
         </div>
       </div>
 
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>

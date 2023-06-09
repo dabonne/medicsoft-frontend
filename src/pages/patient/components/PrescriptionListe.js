@@ -154,6 +154,7 @@ const PrescriptionListe = () => {
   const notifyRef = useRef();
   const [refresh, setRefresh] = useState(0);
   const [deleteId, setDeleteId] = useState("");
+  const [fail, setFail] = useState(false)
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -205,6 +206,8 @@ const PrescriptionListe = () => {
       })
       .catch((error) => {
         console.log(error);
+        setStopLoad(true)
+        setFail(true)
       });
   };
 
@@ -297,7 +300,7 @@ const PrescriptionListe = () => {
         </div>
       </div>
 
-      <Loading data={datas} stopLoad={stopLoad}>
+      <Loading data={datas} stopLoad={stopLoad} fail={fail}>
       <div className="table-responsive-lg">
         <table className="table table-striped align-middle">
           <thead>
@@ -503,7 +506,7 @@ const PrescriptionListe = () => {
                   
                       })
                     }
-                    <div className="d-inline ms-5">Prescision: <span className="fw-bold"> {data.precision}</span></div>
+                    <div className="d-inline ms-5">Précisions: <span className="fw-bold"> {data.precision}</span></div>
                     </> :<>
                     {viewPresc.type === "BIOLOGICAL_ANALYSIS" && <AnaBiolo />}
                     {viewPresc.type === "MEDICAL_IMAGERY" && <Imagery />}

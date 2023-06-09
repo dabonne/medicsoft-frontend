@@ -33,7 +33,7 @@ requestPatient.interceptors.request.use(
     },
     async (error) => {
       const originalConfig = error.config;
-  
+      console.log(error)
       if (error.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
   
@@ -49,6 +49,7 @@ requestPatient.interceptors.request.use(
           window.location.replace("/");
         }
       }
+      //window.location.reload(true);
   
       return Promise.reject(error);
     }
