@@ -82,6 +82,7 @@ const TableParamedal = ({
         } else {
           setTotalPage(data.counter + 1);
         }
+        setStopLoad(true);
       })
       .catch((error) => {
         console.log(error);
