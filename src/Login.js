@@ -14,11 +14,13 @@ const Login = () => {
   const authCtx = useContext(AppContext);
   const { user, onUserChange } = authCtx;
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
   const [inputType, setInputType] = useState("password");
   const [loginFail, setLoginFail] = useState(false);
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState({
+    username: "",
+    password: "",
+  });
+  const [isSend,setIsSend] = useState(false)
 
   useEffect(() => {
     isAuth();
@@ -26,18 +28,11 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({
-      username: userId,
-      password: password,
-    });
-    setLoginFail(false)
+    setLoginFail(false);
     requestUser
-      .post(apiUser.login, {
-        username: userId,
-        password: password,
-      })
+      .post(apiUser.login, login)
       .then((res) => {
-        console.log(res.data)
+        console.log(res.data);
         onUserChange({
           isAuth: true,
           type: "",
@@ -45,13 +40,13 @@ const Login = () => {
           organisation: res.data.roles[0].organisation,
           organisationRef: Object.keys(res.data.organisation)[0],
           organisations: res.data.organisation,
-          profile:"",
+          profile: "",
           roles: res.data.roles,
           token: res.data.accessToken,
           refreshToken: res.data.refreshToken,
-          cni:""
+          cni: "",
         });
-          isAuth();
+        isAuth();
       })
       .catch((error) => {
         setLoginFail(true);
@@ -70,6 +65,27 @@ const Login = () => {
     }
   };
 
+  const onChange = (e) => {
+    e.preventDefault();
+    setLogin({
+      ...login,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const restPassword = (e) => {
+    e.preventDefault();
+    const data = { email: login.username };
+    console.log(data);
+    requestUser
+      .post(apiUser.forget + "?email=" + login.username)
+      .then((res) => {
+        console.log(res.data);
+        setIsSend(true)
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <>
       <div className="d-none d-lg-block col-lg-5 h-100 illustration-img">
@@ -105,8 +121,9 @@ const Login = () => {
                   className="form-control"
                   id="floatingInput"
                   placeholder="name@example.com"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
+                  name="username"
+                  value={login.username}
+                  onChange={onChange}
                 />
                 <label htmlFor="floatingInput">Email</label>
               </div>
@@ -116,8 +133,9 @@ const Login = () => {
                   className="form-control"
                   id="floatingPassword"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={login.password}
+                  onChange={onChange}
                 />
                 <label htmlFor="floatingPassword">Mots de passe</label>
                 <img
@@ -164,12 +182,12 @@ const Login = () => {
               © Laafi Vision Médical, Tous droits réservés.
             </div>
             <div className="d-inline-block">
-            <Link to="#" className="text-small link d-inline-block my-1 me-2">
-              Conditions générales
-            </Link>
-            <Link to="#" className="text-small link d-inline-block my-1">
-              Politiques de confidentialités
-            </Link>
+              <Link to="#" className="text-small link d-inline-block my-1 me-2">
+                Conditions générales
+              </Link>
+              <Link to="#" className="text-small link d-inline-block my-1">
+                Politiques de confidentialités
+              </Link>
             </div>
           </div>
         </div>
@@ -196,34 +214,48 @@ const Login = () => {
                 <img src={pwd} alt="" />
               </div>
               <h4 className="modal-title text-center text-meduim text-bold mt-4 mb-3">
-                Mot de passe oublié?
+                {
+                  !isSend ? "Mot de passe oublié?" : "Le lien de réinitialisation a été envoyé"
+                }
               </h4>
-              <p className="text-center">
-                Veuillez renseigner votre email et nous vous enverrons un mail
-                contenant les instructions pour réinitialiser votre mot de passe{" "}
-              </p>
-              <form className="">
-                <div className="mb-3 mt-3">
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Entrer votre adresse mail"
-                    value={email}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setEmail(e.target.value);
-                    }}
-                    required
-                  />
-                  <input
-                    type="submit"
-                    data-bs-dismiss="modal"
-                    className="form-control btn btn-primary my-3"
-                    value="Envoyer le mail de réinitialisation"
-                  />
-                  <div className="invalid-feedback">Veuillez entrer un nom</div>
-                </div>
-              </form>
+              {!isSend && (
+                <>
+                  <p className="text-center">
+                    Veuillez renseigner votre adresse e-mail, et nous vous
+                    enverrons un courriel contenant les instructions pour
+                    réinitialiser votre mot de passe.{" "}
+                  </p>
+                  <form className="" onSubmit={restPassword}>
+                    <div className="mb-3 mt-3">
+                      <input
+                        type="email"
+                        className="form-control"
+                        placeholder="Entrer votre adresse mail"
+                        name="username"
+                        value={login.username}
+                        onChange={onChange}
+                        required
+                      />
+                      <input
+                        type="submit"
+                        
+                        className="form-control btn btn-primary my-3"
+                        value="Envoyer le mail de réinitialisation"
+                      />
+                      <div className="invalid-feedback">
+                        Veuillez entrer une adresse mail
+                      </div>
+                    </div>
+                  </form>
+                </>
+              )}
+              {isSend && (
+                <>
+                  <p className="text-center">
+                  Votre lien de réinitialisation a été envoyé. Veuillez vérifier votre compte.{" "}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>

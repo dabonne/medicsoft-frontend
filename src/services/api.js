@@ -21,7 +21,8 @@ const apiUser = {
     "profile":"user/user-photo",
     //"delete":"user/remove-role"
     "refreshToken":"auth/login-refresh-token",
-    "changePassword":"user/update-password"
+    "changePassword":"user/update-password",
+    "forget":"user/forgot-password"
 }
 
 const apiAgenda = {
