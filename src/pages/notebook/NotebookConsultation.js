@@ -1116,7 +1116,7 @@ const NotebookConsultation = () => {
                     id="basic-typeahead-example"
                     labelKey="label"
                     options={patientList}
-                    placeholder="Veuillez choisir le nom du médicament"
+                    placeholder="Veuillez choisir le nom du patient"
                     onChange={setSelectedOption}
                     onInputChange={handleInputChange}
                     renderMenuItemChildren={renderMenuItemChildren}
