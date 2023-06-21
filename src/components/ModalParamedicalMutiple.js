@@ -344,7 +344,7 @@ const ModalParamedicalMutiple = ({
           </div>
         </div>
       </div>
-      <div className="modal fade" id="notifyRef">
+      <div className="modal fade" id="notifyRef1">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
@@ -378,7 +378,7 @@ const ModalParamedicalMutiple = ({
         type="hidden"
         ref={notifyRef}
         data-bs-toggle="modal"
-        data-bs-target="#notifyRef"
+        data-bs-target="#notifyRef1"
         onClick={(e) => {
           e.preventDefault();
           setNotifyBg("");

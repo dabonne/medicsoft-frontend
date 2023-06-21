@@ -154,32 +154,32 @@ const PrescriptionForm = ({
       console.log(selectedOption);
       let presc = {
         type: "",
-        detail: ""
-      }
+        detail: "",
+      };
       let dataTab = [...list.list];
-      if(type.includes("d'imagerie") && selectedOption.length !==0){
+      if (type.includes("d'imagerie") && selectedOption.length !== 0) {
         presc = {
           type: selectedOption[0].uuid, // values.type,
           detail: values.detail,
-          topographicRegion:{
-            uuid:localisationSelected[0].uuid
-          }
-        }
+          topographicRegion: {
+            uuid: localisationSelected[0].uuid,
+          },
+        };
       }
-      if( !type.includes("d'imagerie") && selectedOption.length !==0){
+      if (!type.includes("d'imagerie") && selectedOption.length !== 0) {
         presc = {
           type: selectedOption[0].uuid, // values.type,
           detail: values.detail,
-        }
+        };
       }
       console.log("presc");
 
       if (
         presc.type !== "" &&
         presc.type !== undefined &&
-        presc.detail !== "" 
+        presc.detail !== ""
       ) {
-        dataTab = [...list.list, presc]
+        dataTab = [...list.list, presc];
         console.log("dataTab");
         setList({
           ...list,
@@ -188,7 +188,7 @@ const PrescriptionForm = ({
         setSelectedOption([]);
         setLocalisationSelected([]);
       }
-      if (list.sendata && dataTab.length !==0) {
+      if (list.sendata && dataTab.length !== 0) {
         if (id !== undefined) {
           handleEditSubmit(dataTab);
         } else {
@@ -233,7 +233,7 @@ const PrescriptionForm = ({
 
   const handleSubmit = (tab) => {
     configNotify("loading", "", "Ajout des données en cours...");
-   
+
     requestDoctor
       .post(url.post + "/" + user.organisationRef + "/" + user.cni, tab, header)
       .then((res) => {
@@ -330,7 +330,18 @@ const PrescriptionForm = ({
                 <Doc />
                 <span className="ms-2 fw-bold">
                   {data.map((d) => {
-                    return d.uuid === dta.type && d.label;
+                    if (type.includes("imagerie")) {
+                      return (
+                        d.uuid === dta.type && (
+                          <>
+                            <span className="me-2"> {d.label}</span>
+                            <span> ( {dta.topographicRegion.label} )</span>
+                          </>
+                        )
+                      );
+                    } else {
+                      return d.uuid === dta.type && d.label;
+                    }
                   })}
                 </span>
               </div>
@@ -418,8 +429,8 @@ const PrescriptionForm = ({
                     selected={selectedOption}
                   />
                   <div className="form-label mt-3">
-                {"Sélectionnez une localisation"}
-              </div>
+                    {"Sélectionnez une localisation"}
+                  </div>
                   <Typeahead
                     id="basic-typeahead-example"
                     labelKey="label"
