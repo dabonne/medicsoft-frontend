@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+export const URLLVM = "https://laafivisionmedical.com/"
 const URL = "https://medicsoft-user-management.herokuapp.com/"
 const URL_BACKOFFICE = "user-management/external-api/"
 

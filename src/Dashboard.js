@@ -22,7 +22,7 @@ import { deleteUser, getUser } from "./services/storage";
 import { AppContext, initialUser } from "./services/context";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Planning from "./pages/Planning";
-import requestUser from "./services/requestUser";
+import requestUser, { URLLVM } from "./services/requestUser";
 import { apiUser } from "./services/api";
 
 const Dashboard = () => {
@@ -40,9 +40,9 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => {
-        //console.log(res.data.photo);
-        user.profile = "data:image/jpeg;base64," + res.data.photo;
-        setUserImg("data:image/jpeg;base64," + res.data.photo);
+        //console.log(res.data);
+        user.profile = res.data.photoFileName;
+        setUserImg(res.data.photoFileName);
         onUserChange(user);
         //console.log(res.data.employeeResponseList);
       })
@@ -277,7 +277,7 @@ const Dashboard = () => {
                       <img
                         className="rounded-circle"
                         width="30px"
-                        src={userImg}
+                        src={URLLVM+""+ userImg}
                         alt=""
                         style={{ marginLeft: "-6px", marginTop: "-6px" }}
                       />

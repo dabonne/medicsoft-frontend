@@ -32,7 +32,7 @@ const Login = () => {
     requestUser
       .post(apiUser.login, login)
       .then((res) => {
-        console.log(res.data);
+        //console.log(res.data);
         onUserChange({
           isAuth: true,
           type: "",

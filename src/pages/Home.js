@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import DPicker from "../components/DPicker";
 import { Calendar } from "react-calendar";
 import "../assets/css/Calendar.css";
-import requestUser from "../services/requestUser";
+import requestUser, { URLLVM } from "../services/requestUser";
 import { apiMedical, apiUser } from "../services/api";
 import requestDoctor from "../services/requestDoctor";
 
@@ -35,8 +35,8 @@ const Home = () => {
       })
       .then((res) => {
         ///console.log(res.data.photo);
-        user.profile = "data:image/jpeg;base64," + res.data.photo;
-        setUserImg("data:image/jpeg;base64," + res.data.photo);
+        user.profile = res.data.photoFileName;
+        setUserImg(res.data.photoFileName);
         onUserChange(user);
         //console.log(res.data.employeeResponseList);
       })
@@ -120,7 +120,7 @@ const Home = () => {
               <img
                 className="rounded-circle"
                 width="100px"
-                src={userImg}
+                src={URLLVM+""+ userImg}
                 alt=""
               />
             </div>

@@ -68,7 +68,7 @@ const apiMedical = {
     "getReportByID": "report-id",
     "updateReport":"update-report",
     "deleteReport":"delete-report",
-    "printReport":"medical-record/report",
+    "printReport":"doctor/medical-record/report",
     "getListImagery":"prescription/param-type-imagery",
     "getListBiology":"prescription/param-biological-analysis",
     "getListExamen":"prescription/param-consultation",
@@ -103,7 +103,8 @@ const apiPrescription = {
     "postTypeConsultation":"prescription/add-consultation-exam",
     "updateTypeConsultation":"prescription/update-consultation-exam",
     "deletePresc":"prescription/delete-prescription",
-    "getPrescriptionById":"prescription/prescription-id"
+    "getPrescriptionById":"prescription/prescription-id",
+    "pdfPescription":"prescription/report-prescription"
 }
 
 const apiBackOffice = {

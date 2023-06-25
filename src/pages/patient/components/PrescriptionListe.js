@@ -245,12 +245,19 @@ const PrescriptionListe = () => {
 
   const printPresciption = (e, id) => {
     e.preventDefault();
-    window.open(
-      "https://doctor-management.herokuapp.com/doctor-management/external-api/prescription/report-prescription/" +
-        id +
-        "/" +
-        user.organisationRef
-    );
+    requestDoctor
+      .get(
+        apiPrescription.pdfPescription + "/" + id + "/" + user.organisationRef
+      )
+      .then((res) => {
+        console.log(res.data);
+        window.open(
+          "https://laafivisionmedical.com/"+res.data
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   const makePagination = (e, page) => {
     e.preventDefault();
@@ -282,19 +289,21 @@ const PrescriptionListe = () => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1"
-            onClick={(e) => makePagination(e, "prece")}
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "prece")}
             >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1"
-            onClick={(e) => makePagination(e, "suiv")}
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "suiv")}
             >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-          {pageNumber + 1}/{totalPage}
+            {pageNumber + 1}/{totalPage}
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
@@ -338,10 +347,11 @@ const PrescriptionListe = () => {
                     <td>
                       <span className="text-bold">
                         {data.type === "ORDINANCE" && "Ordonnance"}
-                        {data.type === "BIOLOGICAL_ANALYSIS" && "Analyses biologiques"}
+                        {data.type === "BIOLOGICAL_ANALYSIS" &&
+                          "Analyses biologiques"}
                         {data.type === "MEDICAL_IMAGERY" && "Imagerie médicale"}
-                        {data.type === "CONSULTATION" && "Consultation et/ou examen spécialisé"}
-                          
+                        {data.type === "CONSULTATION" &&
+                          "Consultation et/ou examen spécialisé"}
                       </span>
                     </td>
                     <td>

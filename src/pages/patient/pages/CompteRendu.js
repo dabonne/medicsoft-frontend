@@ -18,6 +18,7 @@ import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import Loading from "../../../components/Loading";
 import { matrice, onSearch } from "../../../services/service";
+import requestDoctor from "../../../services/requestDoctor";
 
 const CompteRendu = ({ setLocation }) => {
   const authCtx = useContext(AppContext);
@@ -206,6 +207,23 @@ const CompteRendu = ({ setLocation }) => {
       setDatas(pagination[pageNumber - 1]);
     }
   };
+
+  const printCompteRendu = (e, id) => {
+    e.preventDefault();
+    requestDoctor
+      .get(
+        apiMedical.printReport + "/" + id + "/" + user.organisationRef
+      )
+      .then((res) => {
+        console.log(res.data);
+        window.open(
+          "https://laafivisionmedical.com/"+res.data
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -307,15 +325,7 @@ const CompteRendu = ({ setLocation }) => {
                             title="Imprimer le rapport"
                             onClick={(e) => {
                               e.preventDefault();
-                              //setDelete(["" + data.employeeReference]);
-                              //viewEmploye(data);
-                              //window.location.href=apiMedical.printReport+"/"+data.id
-                              window.open(
-                                "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/report/" +
-                                  data.id +
-                                  "/" +
-                                  user.organisationRef
-                              );
+                              printCompteRendu(e,data.id )
                             }}
                             src={print}
                             alt=""
