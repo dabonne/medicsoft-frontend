@@ -250,7 +250,6 @@ const PrescriptionListe = () => {
         apiPrescription.pdfPescription + "/" + id + "/" + user.organisationRef
       )
       .then((res) => {
-        console.log(res.data);
         window.open(
           "https://laafivisionmedical.com/"+res.data
         );
