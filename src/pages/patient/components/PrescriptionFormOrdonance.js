@@ -29,6 +29,7 @@ const initOrdonnance = {
   quantity: "",
   administrationMode: "",
   precision: "",
+  drugToSave:""
 };
 
 const Doc = () => {
@@ -79,6 +80,7 @@ const PrescriptionFormOrdonance = (type = "") => {
   const [selectedDosage, setSelectedDosage] = useState([]);
   const [selectedAdministation, setSelectedAdministation] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [autre, setAutre] = useState(false);
   const navigate = useNavigate();
   const notifyRef = useRef();
   const header = {
@@ -97,19 +99,22 @@ const PrescriptionFormOrdonance = (type = "") => {
   }, [list]);
 
   const getList = () => {
-    const dosage = []
-    const mode = []
+    const dosage = [];
+    const mode = [];
     requestDoctor
       .get(apiPrescription.getListPresc)
       .then((res) => {
         //console.log(res.data)
-        Object.keys(res.data.dosage).map(key => dosage.push({uuid:key,label:res.data.dosage[key]}))
-        Object.keys(res.data.mode).map(key => mode.push({uuid:key,label:res.data.mode[key]}))
-        res.data.dosage = dosage
-        res.data.mode = mode
+        Object.keys(res.data.dosage).map((key) =>
+          dosage.push({ uuid: key, label: res.data.dosage[key] })
+        );
+        Object.keys(res.data.mode).map((key) =>
+          mode.push({ uuid: key, label: res.data.mode[key] })
+        );
+        res.data.dosage = dosage;
+        res.data.mode = mode;
         setData(res.data);
-        console.log(data)
-
+        console.log(data);
       })
       .catch((error) => {
         console.log(error);
@@ -134,10 +139,11 @@ const PrescriptionFormOrdonance = (type = "") => {
     initialValues: initOrdonnance,
 
     onSubmit: (values) => {
-      //console.log(selectedOption);
+      //console.log(values);
       const data = {
         drug: selectedDrug[0]?.uuid,
         dosage: selectedDosage[0]?.uuid,
+        drugToSave: values?.drugToSave,
         during: values?.during,
         dayOrWeekOrMonth: values?.dayOrWeekOrMonth,
         periodEnumStringMap: {
@@ -153,13 +159,14 @@ const PrescriptionFormOrdonance = (type = "") => {
         administrationMode: selectedAdministation[0]?.uuid,
         precision: values?.precision,
       };
-      let dataTab = [...list.list]
-      if(data.drug !== undefined && data.dosage !== undefined){
-        dataTab = [...list.list,data]
-        setErrorMsg("")
-      }else{
-        if(!list.sendata){
-          setErrorMsg("Certains champs n'ont pas été remplis")
+      console.log(data)
+      let dataTab = [...list.list];
+      if ((data.drug !== undefined && data.dosage !== undefined) || data.drugToSave !=="") {
+        dataTab = [...list.list, data];
+        setErrorMsg("");
+      } else {
+        if (!list.sendata) {
+          setErrorMsg("Certains champs n'ont pas été remplis");
         }
       }
       setList({
@@ -175,7 +182,7 @@ const PrescriptionFormOrdonance = (type = "") => {
           handleSubmit(dataTab);
         }
       }
-      
+
       //console.log([...list.list, data]);
       setPeriodeChecked({
         MORNING: false,
@@ -183,9 +190,9 @@ const PrescriptionFormOrdonance = (type = "") => {
         EVENING: false,
         MIDDAY: false,
       });
-      setSelectedAdministation([])
-      setSelectedDosage([])
-      setSelectedDrug([])
+      setSelectedAdministation([]);
+      setSelectedDosage([]);
+      setSelectedDrug([]);
       formik.resetForm();
     },
   });
@@ -208,6 +215,7 @@ const PrescriptionFormOrdonance = (type = "") => {
       formik.setFieldValue("quantity", data.quantity);
       formik.setFieldValue("administrationMode", data.administrationMode);
       formik.setFieldValue("precision", data.precision);
+      formik.setFieldValue("drugToSave", data.drugToSave);
     });
 
     setList({
@@ -300,16 +308,15 @@ const PrescriptionFormOrdonance = (type = "") => {
     setNotifyTitle(title);
     setNotifyMessage(message);
   };
-   const verifyData = (dataToVerify) =>{
-    Object.keys(dataToVerify).forEach(key =>{
-      console.log(dataToVerify[key] === undefined  )
-      if(dataToVerify[key] === undefined || dataToVerify[key] === ""){
-
-        return false
+  const verifyData = (dataToVerify) => {
+    Object.keys(dataToVerify).forEach((key) => {
+      console.log(dataToVerify[key] === undefined);
+      if (dataToVerify[key] === undefined || dataToVerify[key] === "") {
+        return false;
       }
-    })
-    return true
-   }
+    });
+    return true;
+  };
   const renderMenuItemChildren = (option, props) => {
     return <div key={option.uuid}>{option.label}</div>;
   };
@@ -327,6 +334,7 @@ const PrescriptionFormOrdonance = (type = "") => {
                   {data.drugs.map((d) => {
                     return d.uuid === dta.drug && d.label;
                   })}
+                  {dta.drug === undefined && dta.drugToSave}
                 </span>
               </div>
               <div className="me-2" onClick={(e) => editFromList(e, dta.drug)}>
@@ -347,19 +355,9 @@ const PrescriptionFormOrdonance = (type = "") => {
             />
           ) : null}
           <div className="form-label mt-3">Médicaments ou DCI</div>
+          
           {
-            /**
-             * <InputField
-            type={"select3"}
-            name={"drug"}
-            label="Médicaments ou DCI"
-            placeholder="Veuillez choisir le nom du médicament"
-            formik={formik}
-            options={data.drugs}
-          />
-             */
-          }
-          <Typeahead
+            !autre ? <Typeahead
             id="basic-typeahead-example"
             labelKey="label"
             options={data.drugs}
@@ -368,7 +366,36 @@ const PrescriptionFormOrdonance = (type = "") => {
             //onInputChange={handleInputChange}
             renderMenuItemChildren={renderMenuItemChildren}
             selected={selectedDrug}
+          /> : <>
+          <InputField
+            type={"text2"}
+            name={"drugToSave"}
+            label=""
+            placeholder="Veuillez entrer le nom du medicament"
+            formik={formik}
           />
+          </>
+          }
+          <div className="form-check d-inline-block mt-3">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              onChange={(e) => {
+                console.log(e.target.checked);
+                setAutre(e.target.checked);
+                if(e.target.checked){
+                  formik.setFieldValue("drugToSave","")
+                }else{
+                  setSelectedDrug([]);
+                }
+              }}
+              id="flexCheckChecked"
+              checked={autre}
+            />
+            <label className="form-check-label" htmlFor="flexCheckChecked">
+              Autre médicament ou DCI
+            </label>
+          </div>
           <div className="form-label mt-3">Dosages/Forme galénique</div>
           {/**
            * <InputField
@@ -393,27 +420,26 @@ const PrescriptionFormOrdonance = (type = "") => {
           <div className="form-label mt-3">Durée</div>
           <div className="row">
             <div className="col">
-            <InputField
-            type={"text2"}
-            name={"during"}
-            label="Durée"
-            placeholder="Veuillez entrer le durée"
-            formik={formik}
-          />
+              <InputField
+                type={"text2"}
+                name={"during"}
+                label="Durée"
+                placeholder="Veuillez entrer le durée"
+                formik={formik}
+              />
             </div>
             <div className="col">
-            <InputField
-            type={"select2"}
-            name={"dayOrWeekOrMonth"}
-            label=""
-            placeholder="Sélectionnez l'unité"
-            formik={formik}
-            options={data.dayWeekMonth}
-          />
+              <InputField
+                type={"select2"}
+                name={"dayOrWeekOrMonth"}
+                label=""
+                placeholder="Sélectionnez l'unité"
+                formik={formik}
+                options={data.dayWeekMonth}
+              />
             </div>
           </div>
-          
-          
+
           <div className="form-label mt-3">Nombre de prise par jour</div>
           <div className="mt-3">
             <div
@@ -525,9 +551,7 @@ const PrescriptionFormOrdonance = (type = "") => {
             formik={formik}
             options={[]}
           />
-          {
-            errorMsg !=="" && <p className="fw-bold text-danger">{errorMsg}</p>
-          }
+          {errorMsg !== "" && <p className="fw-bold text-danger">{errorMsg}</p>}
           <div className="modal-footer d-flex justify-content-start border-0">
             <button type="submit" className="btn btn-secondary me-2">
               Valider et ajouter
