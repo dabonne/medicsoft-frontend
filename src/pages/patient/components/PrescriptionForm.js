@@ -114,6 +114,9 @@ const PrescriptionForm = ({
       .get(apiBackOffice.familyBiological, header)
       .then((res) => {
         setFamilyGroup(res.data);
+        //setData(res.data);
+        //console.log(res.data)
+        getList()
       })
       .catch((error) => {
         console.log(error);
@@ -176,8 +179,7 @@ const PrescriptionForm = ({
 
       if (
         presc.type !== "" &&
-        presc.type !== undefined &&
-        presc.detail !== ""
+        presc.type !== undefined 
       ) {
         dataTab = [...list.list, presc];
         console.log("dataTab");

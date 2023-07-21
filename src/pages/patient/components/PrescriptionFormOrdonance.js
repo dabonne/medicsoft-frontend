@@ -179,7 +179,8 @@ const PrescriptionFormOrdonance = (type = "") => {
         if (id !== undefined) {
           handleEditSubmit(dataTab);
         } else {
-          handleSubmit(dataTab);
+          //handleSubmit(dataTab);
+          console.log(dataTab)
         }
       }
 

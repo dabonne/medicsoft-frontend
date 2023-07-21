@@ -28,6 +28,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [totalPage, setTotalPage] = useState(1);
   const [pagination, setPagination] = useState([]);
+  const [dataView, setDataView] = useState({});
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -119,19 +120,21 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1"
-            onClick={(e) => makePagination(e, "prece")}
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "prece")}
             >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1"
-            onClick={(e) => makePagination(e, "suiv")}
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "suiv")}
             >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-          {pageNumber + 1}/{totalPage}
+            {pageNumber + 1}/{totalPage}
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
@@ -167,7 +170,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
                 <th scope="col" className="border-raduis-left">
                   Antécédent ID
                 </th>
-                <th scope="col">Antecedent</th>
+                <th scope="col">Antécédent</th>
                 {/*<th scope="col">Lien de parenté</th>*/}
                 <th scope="col" className="text-center">
                   Actions
@@ -190,6 +193,21 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
                   </td>*/}
                     <td className="text-center">
                       <div className="btn-group">
+                        <div className="d-inline-block mx-1">
+                          <img
+                            title="Voir le rendez vous"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewAtt"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              //getDetail(data.uuid);
+                              setDataView(data);
+                              console.log(data)
+                            }}
+                            src={view}
+                            alt=""
+                          />
+                        </div>
                         <div className="d-inline-block mx-1">
                           <img
                             title="Éditer les données"
@@ -243,6 +261,45 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
         refresh={get}
       />
 
+      <div className="modal fade" id="viewAtt">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            <div className="modal-body">
+              <p className="p-0">
+                <span className="fw-bold">Antecedant</span> <br />
+                <span>{dataView.antecedentLabel}</span>
+              </p>
+              <p className="p-0">
+                <span className="fw-bold">Détails</span> <br />
+                <span>{dataView.detail}</span>
+              </p>
+            </div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  //setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="modal fade" id="notify">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">

@@ -3,7 +3,6 @@ import back from "../../../assets/imgs/back.png";
 import sui from "../../../assets/imgs/sui.png";
 import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
-
 import bck from "../../../assets/imgs/bck.png";
 import { Link } from "react-router-dom";
 import requestPatient from "../../../services/requestPatient";
@@ -50,6 +49,7 @@ const TableParamedal = ({
   const [pageNumber, setPageNumber] = useState(0);
   const [totalPage, setTotalPage] = useState(1);
   const [pagination, setPagination] = useState([]);
+  const [dataView, setDataView] = useState({});
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -153,19 +153,21 @@ const TableParamedal = ({
             />
           </div>
           <div className="btn-group">
-            <div className="d-inline-block my-1 mx-1"
-            onClick={(e) => makePagination(e, "prece")}
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "prece")}
             >
               <img src={back} alt="" />
             </div>
-            <div className="d-inline-block my-1 mx-1"
-            onClick={(e) => makePagination(e, "suiv")}
+            <div
+              className="d-inline-block my-1 mx-1"
+              onClick={(e) => makePagination(e, "suiv")}
             >
               <img src={sui} alt="" />
             </div>
           </div>
           <div className="d-inline-block my-1 mx-1 text-meduim text-bold">
-          {pageNumber + 1}/{totalPage}
+            {pageNumber + 1}/{totalPage}
           </div>
         </div>
         <div className="col-3 d-flex justify-content-end align-items-center">
@@ -295,6 +297,7 @@ const TableParamedal = ({
         oldValue={editValue}
         refresh={get}
       />
+
       <div className="modal fade" id="notify">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">

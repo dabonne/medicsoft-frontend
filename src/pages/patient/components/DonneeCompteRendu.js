@@ -36,6 +36,7 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [totalPage, setTotalPage] = useState(1);
   const [pagination, setPagination] = useState([]);
+  const [dataView, setDataView] = useState({});
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -235,22 +236,21 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
                     </td>
                     <td className="text-center">
                       <div className="btn-group">
-                        {/**
-                         * <div className="d-inline-block mx-1">
-                        <img
-                          title="Voir la prescription"
-                          data-bs-toggle="modal"
-                          data-bs-target="#viewEmploye"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            //setDelete(["" + data.employeeReference]);
-                            //viewEmploye(data);
-                          }}
-                          src={view}
-                          alt=""
-                        />
-                      </div>
-                         */}
+                      <div className="d-inline-block mx-1">
+                          <img
+                            title="Voir le rendez vous"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewPara"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              //getDetail(data.uuid);
+                              setDataView(data);
+                              console.log(data)
+                            }}
+                            src={view}
+                            alt=""
+                          />
+                        </div>
                         <div className="d-inline-block mx-1">
                           <img
                             title="Éditer les données"
@@ -307,7 +307,45 @@ const DonneeCompteRendu = ({ setNameIdx, type = {} }) => {
         refresh={get}
         list={dataList}
       />
+<div className="modal fade" id="viewPara">
+        <div className="modal-dialog modal-dialog-centered modal-md">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim text-bold"></h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
 
+            <div className="modal-body">
+              <p className="p-0">
+                <span className="fw-bold">Intitulé</span> <br />
+                <span>{dataView.entitled}</span>
+              </p>
+              <p className="p-0">
+                <span className="fw-bold">Détails</span> <br />
+                <span>{dataView.detail}</span>
+              </p>
+            </div>
+
+            <div className="modal-footer border-0 d-flex justify-content-start">
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-bs-dismiss="modal"
+                onClick={(e) => {
+                  e.preventDefault();
+                  //setModalNotifyMsg("");
+                }}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="modal fade" id="notify">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
