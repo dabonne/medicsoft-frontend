@@ -29,7 +29,7 @@ const initOrdonnance = {
   quantity: "",
   administrationMode: "",
   precision: "",
-  drugToSave:""
+  drugToSave: "",
 };
 
 const Doc = () => {
@@ -139,29 +139,45 @@ const PrescriptionFormOrdonance = (type = "") => {
     initialValues: initOrdonnance,
 
     onSubmit: (values) => {
-      //console.log(values);
+      console.log(selectedDrug);
+      let periodEnumStringMap = {
+        MORNING: values?.MORNING,
+        NIGHT: values?.NIGHT,
+        EVENING: values?.EVENING,
+        MIDDAY: values?.MIDDAY,
+      };
+      if (
+        values?.MORNING === "" &&
+        values?.NIGHT === "" &&
+        values?.EVENING === "" &&
+        values?.MIDDAY === ""
+      ) {
+        periodEnumStringMap = null;
+      }
+      let hourPrescription = {
+        frequency: values?.frequency,
+        quantity: values?.quantity,
+      };
+      if (values?.frequency === "" && values?.quantity === "") {
+        hourPrescription = null
+      }
       const data = {
         drug: selectedDrug[0]?.uuid,
         dosage: selectedDosage[0]?.uuid,
         drugToSave: values?.drugToSave,
         during: values?.during,
         dayOrWeekOrMonth: values?.dayOrWeekOrMonth,
-        periodEnumStringMap: {
-          MORNING: values?.MORNING,
-          NIGHT: values?.NIGHT,
-          EVENING: values?.EVENING,
-          MIDDAY: values?.MIDDAY,
-        },
-        hourPrescription: {
-          frequency: values?.frequency,
-          quantity: values?.quantity,
-        },
+        periodEnumStringMap: periodEnumStringMap,
+        hourPrescription: hourPrescription,
         administrationMode: selectedAdministation[0]?.uuid,
         precision: values?.precision,
       };
-      console.log(data)
+      console.log(data);
       let dataTab = [...list.list];
-      if ((data.drug !== undefined && data.dosage !== undefined) || data.drugToSave !=="") {
+      if (
+        (data.drug !== undefined && data.dosage !== undefined) ||
+        data.drugToSave !== ""
+      ) {
         dataTab = [...list.list, data];
         setErrorMsg("");
       } else {
@@ -179,8 +195,8 @@ const PrescriptionFormOrdonance = (type = "") => {
         if (id !== undefined) {
           handleEditSubmit(dataTab);
         } else {
-          //handleSubmit(dataTab);
-          console.log(dataTab)
+          handleSubmit(dataTab);
+          console.log(dataTab);
         }
       }
 
@@ -200,23 +216,39 @@ const PrescriptionFormOrdonance = (type = "") => {
   const editFromList = (e, drug) => {
     e.preventDefault();
     console.log(drug);
-    var tab = list.list.filter((data) => {
-      if (data.drug !== drug) {
+    var tab = list.list.filter((item) => {
+      if (item.drug !== drug) {
         return data;
       }
-      formik.setFieldValue("drug", data.drug);
-      formik.setFieldValue("dosage", data.dosage);
-      formik.setFieldValue("during", data.during);
-      formik.setFieldValue("dayOrWeekOrMonth", data.dayOrWeekOrMonth);
-      formik.setFieldValue("MORNING", data.MORNING);
-      formik.setFieldValue("NIGHT", data.NIGHT);
-      formik.setFieldValue("EVENING", data.EVENING);
-      formik.setFieldValue("MIDDAY", data.MIDDAY);
-      formik.setFieldValue("frequency", data.frequency);
-      formik.setFieldValue("quantity", data.quantity);
-      formik.setFieldValue("administrationMode", data.administrationMode);
-      formik.setFieldValue("precision", data.precision);
-      formik.setFieldValue("drugToSave", data.drugToSave);
+      console.log(data)
+      data.drugs.map((value) =>{
+        if(value.uuid === drug){
+          setSelectedDrug([value])
+        }
+      })
+      data.dosage.map((value) =>{
+        if(value.uuid === item.dosage){
+          setSelectedDosage([value])
+        }
+      })
+      data.mode.map((value) =>{
+        if(value.uuid === item.administrationMode){
+          setSelectedAdministation([value])
+        }
+      })
+      formik.setFieldValue("drug", item.drug);
+      formik.setFieldValue("dosage", item.dosage);
+      formik.setFieldValue("during", item.during);
+      formik.setFieldValue("dayOrWeekOrMonth", item.dayOrWeekOrMonth);
+      formik.setFieldValue("MORNING", item.periodPrescriptions[0]?.quantity);
+      formik.setFieldValue("MIDDAY", item.periodPrescriptions[1]?.quantity);
+      formik.setFieldValue("EVENING", item.periodPrescriptions[2]?.quantity);
+      formik.setFieldValue("NIGHT", item.periodPrescriptions[3]?.quantity);
+      formik.setFieldValue("frequency", item.hourPrescription?.frequency);
+      formik.setFieldValue("quantity", item.hourPrescription?.quantity);
+      formik.setFieldValue("administrationMode", item.administrationMode);
+      formik.setFieldValue("precision", item.precision);
+      formik.setFieldValue("drugToSave", item.drugToSave);
     });
 
     setList({
@@ -356,27 +388,29 @@ const PrescriptionFormOrdonance = (type = "") => {
             />
           ) : null}
           <div className="form-label mt-3">Médicaments ou DCI</div>
-          
-          {
-            !autre ? <Typeahead
-            id="basic-typeahead-example"
-            labelKey="label"
-            options={data.drugs}
-            placeholder="Veuillez choisir le nom du médicament"
-            onChange={setSelectedDrug}
-            //onInputChange={handleInputChange}
-            renderMenuItemChildren={renderMenuItemChildren}
-            selected={selectedDrug}
-          /> : <>
-          <InputField
-            type={"text2"}
-            name={"drugToSave"}
-            label=""
-            placeholder="Veuillez entrer le nom du medicament"
-            formik={formik}
-          />
-          </>
-          }
+
+          {!autre ? (
+            <Typeahead
+              id="basic-typeahead-example"
+              labelKey="label"
+              options={data.drugs}
+              placeholder="Veuillez choisir le nom du médicament"
+              onChange={setSelectedDrug}
+              //onInputChange={handleInputChange}
+              renderMenuItemChildren={renderMenuItemChildren}
+              selected={selectedDrug}
+            />
+          ) : (
+            <>
+              <InputField
+                type={"text2"}
+                name={"drugToSave"}
+                label=""
+                placeholder="Veuillez entrer le nom du medicament"
+                formik={formik}
+              />
+            </>
+          )}
           <div className="form-check d-inline-block mt-3">
             <input
               className="form-check-input"
@@ -384,9 +418,9 @@ const PrescriptionFormOrdonance = (type = "") => {
               onChange={(e) => {
                 console.log(e.target.checked);
                 setAutre(e.target.checked);
-                if(e.target.checked){
-                  formik.setFieldValue("drugToSave","")
-                }else{
+                if (e.target.checked) {
+                  formik.setFieldValue("drugToSave", "");
+                } else {
                   setSelectedDrug([]);
                 }
               }}
@@ -463,15 +497,7 @@ const PrescriptionFormOrdonance = (type = "") => {
             </div>
             {periodOrHour ? (
               <div className="mt-3">
-                <span>Toutes les </span>
-                <InputField
-                  inputClass="d-inline-block mx-2"
-                  type={"text2"}
-                  name="frequency"
-                  formik={formik}
-                  placeholder="ex: 6"
-                />
-                <span>heures</span>
+                <span>Quantité </span>
                 <InputField
                   inputClass="d-inline-block mx-2"
                   type={"text2"}
@@ -479,6 +505,16 @@ const PrescriptionFormOrdonance = (type = "") => {
                   formik={formik}
                   placeholder="Veuillez entrer la quantité à prendre"
                 />
+                <span>toutes les</span>
+                
+                <InputField
+                  inputClass="d-inline-block mx-2"
+                  type={"text2"}
+                  name="frequency"
+                  formik={formik}
+                  placeholder="ex: 6"
+                />
+                <span>heure(s)</span>
               </div>
             ) : (
               <div className="mt-3">

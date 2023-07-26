@@ -207,12 +207,19 @@ const PrescriptionForm = ({
   const editFromList = (e, uuid) => {
     e.preventDefault();
     console.log(uuid);
-    var tab = list.list.filter((data) => {
-      if (data.type !== uuid) {
-        return data;
+    var tab = list.list.filter((item) => {
+      if (item.type !== uuid) {
+        return item;
       }
-      formik.setFieldValue("type", data.type);
-      formik.setFieldValue("detail", data.detail);
+      console.log(data)
+      data.map((value) =>{
+        if(value.uuid === uuid){
+          setSelectedOption([value])
+        }
+      })
+
+      formik.setFieldValue("type", item.type);
+      formik.setFieldValue("detail", item.detail);
     });
 
     setList({

@@ -250,9 +250,7 @@ const PrescriptionListe = () => {
         apiPrescription.pdfPescription + "/" + id + "/" + user.organisationRef
       )
       .then((res) => {
-        window.open(
-          "https://laafivisionmedical.com/"+res.data
-        );
+        window.open("https://laafivisionmedical.com/" + res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -551,6 +549,21 @@ const PrescriptionListe = () => {
                             {data.administrationModeLabel}
                           </span>
                         </div>{" "}
+                        {data.hourPrescription !== null && (
+                          <><br />
+                            <div className="d-inline ms-5">
+                              Quantité de prise:{" "}
+                              <span className="fw-bold">
+                                {" "}
+                                {data.hourPrescription?.quantity +
+                                  " chaque " +
+                                  data.hourPrescription?.frequency +
+                                  " Heure(s)"}
+                              </span>
+                            </div>
+                            
+                          </>
+                        )}
                         <br />
                         {data.periodPrescriptions.map((item, idx) => {
                           return (
