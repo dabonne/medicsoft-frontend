@@ -154,6 +154,17 @@ const PrescriptionFormOrdonance = (type = "") => {
       ) {
         periodEnumStringMap = null;
       }
+      if(periodEnumStringMap !== null){
+        let obj = {}
+        Object.keys(periodEnumStringMap).map((key) =>{
+
+          if(periodEnumStringMap[key] !== ""){
+            obj[key] = periodEnumStringMap[key]
+          }
+          //return periodEnumStringMap[key] !== "" && {[key]:periodEnumStringMap[key]}
+        })
+        periodEnumStringMap = obj
+      }
       let hourPrescription = {
         frequency: values?.frequency,
         quantity: values?.quantity,

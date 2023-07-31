@@ -116,7 +116,7 @@ const PrescriptionForm = ({
         setFamilyGroup(res.data);
         //setData(res.data);
         //console.log(res.data)
-        getList()
+        getList();
       })
       .catch((error) => {
         console.log(error);
@@ -177,10 +177,7 @@ const PrescriptionForm = ({
       }
       console.log("presc");
 
-      if (
-        presc.type !== "" &&
-        presc.type !== undefined 
-      ) {
+      if (presc.type !== "" && presc.type !== undefined) {
         dataTab = [...list.list, presc];
         console.log("dataTab");
         setList({
@@ -211,12 +208,25 @@ const PrescriptionForm = ({
       if (item.type !== uuid) {
         return item;
       }
-      console.log(data)
-      data.map((value) =>{
-        if(value.uuid === uuid){
-          setSelectedOption([value])
+      //console.log(data);
+      //console.log(item);
+      data.map((value) => {
+        if (value.uuid === uuid) {
+          if(type.includes("d'examen")){
+            const content = item.typeAnalysis.family !== null ? [item.typeAnalysis.family] : []
+            setSelectedFamily(content)
+            familyChange(content)
+            setSelectedOption([value]);
+          }else if (type.includes("imagerie")) {
+            const content = item.topographicRegion ? [item.topographicRegion] : []
+            setSelectedOption([value]);
+            imageryLocalisationChange([value]);
+            setLocalisationSelected(content);
+          }else{
+            setSelectedOption([value]);
+          }
         }
-      })
+      });
 
       formik.setFieldValue("type", item.type);
       formik.setFieldValue("detail", item.detail);

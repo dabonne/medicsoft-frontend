@@ -566,6 +566,9 @@ const PrescriptionListe = () => {
                         )}
                         <br />
                         {data.periodPrescriptions.map((item, idx) => {
+                          if(item.quantity === null){
+                            return
+                          }
                           return (
                             <>
                               {" "}

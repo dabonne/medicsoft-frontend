@@ -75,7 +75,7 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
     //e.preventDefault();
     console.log(id);
     requestPatient
-      .delete(apiMedical.deleteFamily + "/" + id)
+      .delete(apiMedical.antecedent + "/" + id)
       .then((res) => {
         console.log("suppression ok");
         get();
