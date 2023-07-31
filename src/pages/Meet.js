@@ -424,7 +424,7 @@ const Meet = () => {
                   <div className="d-flex justify-content-between">
                     <span className="text-bold">
                       {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      johndoe@example.com
+                      {/**johndoe@example.com */}
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">
@@ -440,9 +440,9 @@ const Meet = () => {
                   <span className="text-bold">Date de consultation: </span>
                   <span className="text-bold text-meduim">{detail.period}</span>
                   <br />
-                  <span className="text-bold">Heure:</span>
+                  <span className="text-bold">Heure: </span>
                   <span className="text-bold text-meduim">
-                    {detail.startHour}
+                  {detail.startHour +" à "+detail.endHour}
                   </span>
                 </div>
 

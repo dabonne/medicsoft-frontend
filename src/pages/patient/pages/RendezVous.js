@@ -585,7 +585,7 @@ const RendezVous = ({ setLocation }) => {
                   <div className="d-flex justify-content-between">
                     <span className="text-bold">
                       {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      johndoe@example.com
+                      {/**johndoe@example.com */}
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">
@@ -601,8 +601,8 @@ const RendezVous = ({ setLocation }) => {
                   <span className="text-bold">Date de consultation: </span>
                   <span className="text-bold text-meduim">{detail.period}</span>
                   <br />
-                  <span className="text-bold">Heure:</span>
-                  <span className="text-bold text-meduim">{detail.hour}</span>
+                  <span className="text-bold">Heure: </span>
+                  <span className="text-bold text-meduim">{detail.startHour +" à "+detail.endHour}</span>
                 </div>
 
                 <div className="col-12 pt-3 ">
@@ -614,19 +614,13 @@ const RendezVous = ({ setLocation }) => {
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-              >
-                Annuler
-              </button>
+              
               <button
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
               >
-                Confirmer le rendez-vous
+                Fermer
               </button>
             </div>
           </div>
