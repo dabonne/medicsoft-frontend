@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { apiBackOffice, apiPrescription } from "../../../services/api";
 import { Typeahead } from "react-bootstrap-typeahead";
 import requestBackOffice from "../../../services/requestBackOffice";
+import ReactQuill from "react-quill";
 
 const initData = {
   type: "",
@@ -65,6 +66,7 @@ const PrescriptionForm = ({
   const [LocalisationGroup, setLocalisationGroup] = useState([]);
   const [localisationSelected, setLocalisationSelected] = useState([]);
   const [familyGroup, setFamilyGroup] = useState([]);
+  const [precision, setPrecision] = useState("");
   const { id } = useParams();
   useEffect(() => {
     console.log(type);
@@ -153,8 +155,9 @@ const PrescriptionForm = ({
     initialValues: initData,
 
     onSubmit: (values) => {
-      console.log("selectedOption");
-      console.log(selectedOption);
+      //console.log("selectedOption");
+      //console.log(selectedOption);
+      values.detail = precision
       let presc = {
         type: "",
         detail: "",
@@ -212,17 +215,22 @@ const PrescriptionForm = ({
       //console.log(item);
       data.map((value) => {
         if (value.uuid === uuid) {
-          if(type.includes("d'examen")){
-            const content = item.typeAnalysis.family !== null ? [item.typeAnalysis.family] : []
-            setSelectedFamily(content)
-            familyChange(content)
+          if (type.includes("d'examen")) {
+            const content =
+              item.typeAnalysis.family !== null
+                ? [item.typeAnalysis.family]
+                : [];
+            setSelectedFamily(content);
+            familyChange(content);
             setSelectedOption([value]);
-          }else if (type.includes("imagerie")) {
-            const content = item.topographicRegion ? [item.topographicRegion] : []
+          } else if (type.includes("imagerie")) {
+            const content = item.topographicRegion
+              ? [item.topographicRegion]
+              : [];
             setSelectedOption([value]);
             imageryLocalisationChange([value]);
             setLocalisationSelected(content);
-          }else{
+          } else {
             setSelectedOption([value]);
           }
         }
@@ -479,13 +487,25 @@ const PrescriptionForm = ({
           )}
 
           <div className="form-label mt-3">Précisions</div>
-          <InputField
+          {
+            /**
+             * <InputField
             type={"textarea"}
             name={"detail"}
             label=""
             placeholder="Ecrire ici"
             formik={formik}
           />
+             */
+          }
+          <div className="mb-5">
+            <ReactQuill
+              theme="snow"
+              value={precision}
+              onChange={setPrecision}
+              style={{ height: "200px" }}
+            />
+          </div>
 
           <div className="modal-footer d-flex justify-content-start border-0">
             <button type="submit" className="btn btn-secondary me-2">

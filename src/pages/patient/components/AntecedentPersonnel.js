@@ -280,7 +280,8 @@ const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
               </p>
               <p className="p-0">
                 <span className="fw-bold">Détails</span> <br />
-                <span>{dataView.detail}</span>
+                <div className="" dangerouslySetInnerHTML={{__html: dataView.detail}} />
+
               </p>
             </div>
 

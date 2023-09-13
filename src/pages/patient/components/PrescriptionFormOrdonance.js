@@ -15,6 +15,7 @@ import FormNotify from "../../../components/FormNotify";
 import { useNavigate, useParams } from "react-router-dom";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { ta } from "date-fns/locale";
+import ReactQuill from "react-quill";
 
 const initOrdonnance = {
   drug: "",
@@ -80,6 +81,7 @@ const PrescriptionFormOrdonance = (type = "") => {
   const [selectedDosage, setSelectedDosage] = useState([]);
   const [selectedAdministation, setSelectedAdministation] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [precision, setPrecision] = useState("")
   const [autre, setAutre] = useState(false);
   const navigate = useNavigate();
   const notifyRef = useRef();
@@ -139,7 +141,8 @@ const PrescriptionFormOrdonance = (type = "") => {
     initialValues: initOrdonnance,
 
     onSubmit: (values) => {
-      console.log(selectedDrug);
+      //console.log(selectedDrug);
+      values.precision = precision
       let periodEnumStringMap = {
         MORNING: values?.MORNING,
         NIGHT: values?.NIGHT,
@@ -591,7 +594,9 @@ const PrescriptionFormOrdonance = (type = "") => {
             selected={selectedAdministation}
           />
           <div className="form-label mt-3">Précisions</div>
-          <InputField
+          {
+            /**
+             * <InputField
             type={"textarea"}
             name={"precision"}
             label=""
@@ -599,6 +604,16 @@ const PrescriptionFormOrdonance = (type = "") => {
             formik={formik}
             options={[]}
           />
+             */
+          }
+          <div className="mb-5">
+            <ReactQuill
+              theme="snow"
+              value={precision}
+              onChange={setPrecision}
+              style={{ height: "200px" }}
+            />
+          </div>
           {errorMsg !== "" && <p className="fw-bold text-danger">{errorMsg}</p>}
           <div className="modal-footer d-flex justify-content-start border-0">
             <button type="submit" className="btn btn-secondary me-2">

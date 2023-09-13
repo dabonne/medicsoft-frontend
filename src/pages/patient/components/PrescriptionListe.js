@@ -585,7 +585,7 @@ const PrescriptionListe = () => {
                         })}
                         <div className="d-inline ms-5">
                           Précisions:{" "}
-                          <span className="fw-bold"> {data.precision}</span>
+                          <div className=" ms-5 ps-5 fw-bold" dangerouslySetInnerHTML={{__html: data.precision}} />
                         </div>
                       </>
                     ) : (
@@ -613,7 +613,8 @@ const PrescriptionListe = () => {
                         )}
                         <div className="d-inline ms-5">
                           Detail:{" "}
-                          <span className="fw-bold"> {data.detail}</span>
+                          <div className=" ms-5 ps-5 fw-bold" dangerouslySetInnerHTML={{__html: data.detail}} />
+
                         </div>{" "}
                         <br />
                       </>

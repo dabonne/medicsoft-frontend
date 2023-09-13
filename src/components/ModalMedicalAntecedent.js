@@ -6,6 +6,7 @@ import requestPatient from "../services/requestPatient";
 import { apiMedical, apiParamedical } from "../services/api";
 import { AppContext } from "../services/context";
 import requestDoctor from "../services/requestDoctor";
+import ReactQuill from "react-quill";
 
 const initMedical = {
   cni: "",
@@ -13,15 +14,15 @@ const initMedical = {
   isDiseaseGenetic: true,
   startDate: "",
   endDate: "",
-  parent: ""
-}
+  parent: "",
+};
 
 const ModalMedicalAntecedent = ({
   id,
   type,
   title,
   refresh = () => {},
-  oldValue = { id: "",cni: "", detail:"", typeAntecedent:""},
+  oldValue = { id: "", cni: "", detail: "", typeAntecedent: "" },
 }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
@@ -31,13 +32,14 @@ const ModalMedicalAntecedent = ({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [parent, setParent] = useState("");
-  const [list, setList] = useState({})
+  const [list, setList] = useState({});
 
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
   const [notifyMessage, setNotifyMessage] = useState("");
   const [formValidate, setFormValidate] = useState("needs-validation");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
+  const [precision, setPrecision] = useState("");
   const closeRef = useRef();
   const closeEditRef = useRef();
   const notifyRef = useRef();
@@ -47,28 +49,32 @@ const ModalMedicalAntecedent = ({
 
   const [antePerso, setAntePerso] = useState({
     cni: user.cni,
-    detail:"",
-    antecedent:""
-  })
+    detail: "",
+    antecedent: "",
+  });
   useEffect(() => {
-    getForm()
-    if(oldValue.id !=""){
+    getForm();
+    if (oldValue.id != "") {
       setAntePerso({
-        cni:user.cni,
-        antecedent:oldValue.typeAntecedent,
-        detail:oldValue.detail
-      })  
-      console.log(oldValue)  
+        cni: user.cni,
+        antecedent: oldValue.typeAntecedent,
+        detail: oldValue.detail,
+      });
+      console.log(oldValue);
     }
-    
   }, [oldValue.id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     configNotify("loading", "", "Ajout des données en cours...");
     //console.log(jsData)
+    antePerso.detail = precision
     requestDoctor
-      .post(apiMedical.postAntecedent + "/" + user.organisationRef, antePerso, header)
+      .post(
+        apiMedical.postAntecedent + "/" + user.organisationRef,
+        antePerso,
+        header
+      )
       .then((res) => {
         console.log("enregistrement ok");
         configNotify(
@@ -93,13 +99,13 @@ const ModalMedicalAntecedent = ({
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    const {id, ...ant} = antePerso
-    
+    const { id, ...ant } = antePerso;
+
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
+    ant.detail = precision
     requestDoctor
-      .put(
-        apiMedical.putAntecedent +"/" + oldValue.id, ant,header)
+      .put(apiMedical.putAntecedent + "/" + oldValue.id, ant, header)
       .then((res) => {
         console.log("enregistrement ok");
 
@@ -108,9 +114,7 @@ const ModalMedicalAntecedent = ({
           "Modification réussi",
           "Les informations ont bien été modifiées"
         );
-        setModalNotifyMsg(
-          "Les informations ont bien été modifiées"
-        );
+        setModalNotifyMsg("Les informations ont bien été modifiées");
         closeRef.current.click();
         notifyRef.current.click();
         refresh();
@@ -126,17 +130,15 @@ const ModalMedicalAntecedent = ({
   };
 
   const getForm = () => {
-    
     //console.log(jsData)
     requestDoctor
       .get(apiMedical.antecedentForm, header)
       .then((res) => {
-        setList(res.data.antecedents)
-        console.log(res.data)
+        setList(res.data.antecedents);
+        console.log(res.data);
       })
       .catch((error) => {
         console.log(error);
-        
       });
   };
 
@@ -148,7 +150,7 @@ const ModalMedicalAntecedent = ({
   const fValidate = (cl) => {
     setFormValidate(cl);
   };
-  
+
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
     const month =
@@ -160,12 +162,12 @@ const ModalMedicalAntecedent = ({
   };
 
   const onChange = (e) => {
-    console.log(e)
+    console.log(e);
     setAntePerso({
       ...antePerso,
-      [e.target.name]:e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
   return (
     <>
       <div className="modal fade" id={id}>
@@ -196,40 +198,57 @@ const ModalMedicalAntecedent = ({
                   <label htmlFor="lname" className="form-label">
                     Antecedent
                   </label>
-                  
-                  <select 
+
+                  <select
                     className="form-select"
                     name="antecedent"
                     value={antePerso.antecedent}
                     onChange={onChange}
                   >
                     <option>Sélectionnez un antecedent</option>
-                    {
-                      Object.keys(list).map((key, idx) =>{
-
-                        return <option value={key} key={idx}>{list[key]}</option>
-                      })
-                    }
+                    {Object.keys(list).map((key, idx) => {
+                      return (
+                        <option value={key} key={idx}>
+                          {list[key]}
+                        </option>
+                      );
+                    })}
                   </select>
-                  <div className="invalid-feedback">Veuillez entrer le nom de la maladie</div>
+                  <div className="invalid-feedback">
+                    Veuillez entrer le nom de la maladie
+                  </div>
                 </div>
 
                 <div className="mb-3 mt-3">
                   <label htmlFor="detail" className="form-label">
                     Detail
                   </label>
-                  <textarea
+                  {
+                    /**
+                     * <textarea
                     type="text"
                     className="form-control"
                     id="detail"
                     name="detail"
-                    placeholder="Entrer les details"
+                    placeholder="Entrer les details ok"
                     value={antePerso.detail}
                     onChange={onChange}
                     rows={6}
                     required
                   ></textarea>
-                  <div className="invalid-feedback">Veuillez entrer une date valide</div>
+                     */
+                  }
+                  <div className="mb-5">
+                    <ReactQuill
+                      theme="snow"
+                      value={precision}
+                      onChange={setPrecision}
+                      style={{ height: "200px" }}
+                    />
+                  </div>
+                  <div className="invalid-feedback">
+                    Veuillez entrer une date valide
+                  </div>
                 </div>
                 {/*<div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
