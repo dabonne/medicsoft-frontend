@@ -261,7 +261,8 @@ const PrescriptionFormOrdonance = (type = "") => {
       formik.setFieldValue("frequency", item.hourPrescription?.frequency);
       formik.setFieldValue("quantity", item.hourPrescription?.quantity);
       formik.setFieldValue("administrationMode", item.administrationMode);
-      formik.setFieldValue("precision", item.precision);
+      //formik.setFieldValue("precision", item.precision);
+      setPrecision(item.precision)
       formik.setFieldValue("drugToSave", item.drugToSave);
     });
 

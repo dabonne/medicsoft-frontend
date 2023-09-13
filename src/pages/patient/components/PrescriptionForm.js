@@ -237,7 +237,8 @@ const PrescriptionForm = ({
       });
 
       formik.setFieldValue("type", item.type);
-      formik.setFieldValue("detail", item.detail);
+      //formik.setFieldValue("detail", item.detail);
+      setPrecision(item.detail)
     });
 
     setList({

@@ -60,7 +60,8 @@ const ModalMedicalAntecedent = ({
         antecedent: oldValue.typeAntecedent,
         detail: oldValue.detail,
       });
-      console.log(oldValue);
+      setPrecision(oldValue.detail)
+      //console.log(oldValue);
     }
   }, [oldValue.id]);
 

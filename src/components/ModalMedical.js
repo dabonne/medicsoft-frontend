@@ -5,6 +5,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import requestPatient from "../services/requestPatient";
 import { apiMedical, apiParamedical } from "../services/api";
 import { AppContext } from "../services/context";
+import ReactQuill from "react-quill";
 
 const initMedical = {
   patientCni: "",
@@ -257,7 +258,9 @@ const ModalMedical = ({
                   <label htmlFor="lname" className="form-label">
                     Détails
                   </label>
-                  <textarea
+                  {
+                    /**
+                     * <textarea
                     type="text"
                     className="form-control"
                     id="lname"
@@ -271,6 +274,16 @@ const ModalMedical = ({
                     }}
                     required
                   ></textarea>
+                     */
+                  }
+                  <div className="mb-5">
+                    <ReactQuill
+                      theme="snow"
+                      value={detail}
+                      onChange={setDetail}
+                      style={{ height: "200px" }}
+                    />
+                  </div>
                   <div>{detail.length + "/" + 500}</div>
                   <div className="invalid-feedback">
                     Veuillez entrer un détails
