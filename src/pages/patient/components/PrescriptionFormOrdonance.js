@@ -149,11 +149,12 @@ const PrescriptionFormOrdonance = (type = "") => {
         EVENING: values?.EVENING,
         MIDDAY: values?.MIDDAY,
       };
+    
       if (
-        values?.MORNING === "" &&
-        values?.NIGHT === "" &&
-        values?.EVENING === "" &&
-        values?.MIDDAY === ""
+        values?.MORNING === undefined &&
+        values?.NIGHT === undefined &&
+        values?.EVENING === undefined &&
+        values?.MIDDAY === undefined
       ) {
         periodEnumStringMap = null;
       }
@@ -172,7 +173,7 @@ const PrescriptionFormOrdonance = (type = "") => {
         frequency: values?.frequency,
         quantity: values?.quantity,
       };
-      if (values?.frequency === "" && values?.quantity === "") {
+      if (values?.frequency === undefined && values?.quantity === undefined) {
         hourPrescription = null
       }
       const data = {
@@ -186,7 +187,7 @@ const PrescriptionFormOrdonance = (type = "") => {
         administrationMode: selectedAdministation[0]?.uuid,
         precision: values?.precision,
       };
-      console.log(data);
+      //console.log(data);
       let dataTab = [...list.list];
       if (
         (data.drug !== undefined && data.dosage !== undefined) ||
@@ -210,8 +211,9 @@ const PrescriptionFormOrdonance = (type = "") => {
           handleEditSubmit(dataTab);
         } else {
           handleSubmit(dataTab);
-          console.log(dataTab);
         }
+        console.log("données envoyées");
+        console.log(dataTab);
       }
 
       //console.log([...list.list, data]);
