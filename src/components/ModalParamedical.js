@@ -45,34 +45,32 @@ const ModalParamedical = ({
   const [formValidate, setFormValidate] = useState("needs-validation");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   const closeRef = useRef();
-  const notifyRef = useRef();
+  const notifyRef1 = useRef();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
 
   useEffect(() => {
-    console.log(type)
-    if(oldValue.pressDia === null){
-      oldValue.pressDia = ""
+    console.log(type);
+    if (oldValue.pressDia === null) {
+      oldValue.pressDia = "";
     }
-    if(type === "ARTERIAL_PRESSURE"){
-      console.log("ok")
-      formik.setFieldValue("ARTERIAL_PRESSURE1", oldValue.content)
-      formik.setFieldValue("ARTERIAL_PRESSURE2", oldValue.pressDia)
-
-    }else{
-      formik.setFieldValue(type, oldValue.content)
-      formik.setFieldValue("ARTERIAL_PRESSURE2", "")
-
+    if (type === "ARTERIAL_PRESSURE") {
+      console.log("ok");
+      formik.setFieldValue("ARTERIAL_PRESSURE1", oldValue.content);
+      formik.setFieldValue("ARTERIAL_PRESSURE2", oldValue.pressDia);
+    } else {
+      formik.setFieldValue(type, oldValue.content);
+      formik.setFieldValue("ARTERIAL_PRESSURE2", "");
     }
-    
   }, [oldValue.content, oldValue.pressDia]);
 
   const handleSubmit = (value) => {
     initParamedical.patientCni = user.cni;
     initParamedical.paramedicalType = type;
     initParamedical.dateElaborate = formatDate(new Date());
-    initParamedical.value = (type === "ARTERIAL_PRESSURE") ? value["ARTERIAL_PRESSURE1"]:value[type];
+    initParamedical.value =
+      type === "ARTERIAL_PRESSURE" ? value["ARTERIAL_PRESSURE1"] : value[type];
     initParamedical.arterialPressure = value["ARTERIAL_PRESSURE2"];
     configNotify("loading", "", "Ajout des données en cours...");
     requestPatient
@@ -91,7 +89,7 @@ const ModalParamedical = ({
         );
 
         closeRef.current.click();
-        notifyRef.current.click();
+        notifyRef1.current.click();
         refresh();
       })
       .catch((error) => {
@@ -108,7 +106,8 @@ const ModalParamedical = ({
     initParamedical.patientCni = user.cni;
     initParamedical.paramedicalType = type;
     initParamedical.dateElaborate = formatDate(new Date());
-    initParamedical.value = type === "ARTERIAL_PRESSURE" ? value["ARTERIAL_PRESSURE1"]:value[type]
+    initParamedical.value =
+      type === "ARTERIAL_PRESSURE" ? value["ARTERIAL_PRESSURE1"] : value[type];
     initParamedical.arterialPressure = value["ARTERIAL_PRESSURE2"];
     configNotify("loading", "", "Modification des données en cours...");
     //console.log(jsData)
@@ -117,6 +116,8 @@ const ModalParamedical = ({
         apiParamedical.put +
           "/" +
           oldValue.id +
+          "/" +
+          user.cni +
           "?value=" +
           initParamedical.value +
           "&date=" +
@@ -135,7 +136,7 @@ const ModalParamedical = ({
         );
         setModalNotifyMsg("Les informations ont bien été modifiées");
         closeRef.current.click();
-        notifyRef.current.click();
+        notifyRef1.current.click();
         refresh();
       })
       .catch((error) => {
@@ -209,10 +210,10 @@ const ModalParamedical = ({
     validationSchema: validateData,
     onSubmit: (values) => {
       console.log(values);
-      if(oldValue.id === ""){
-        handleSubmit(values)
-      }else{
-        handleEditSubmit(values)
+      if (oldValue.id === "") {
+        handleSubmit(values);
+      } else {
+        handleEditSubmit(values);
       }
     },
   });
@@ -276,18 +277,32 @@ const ModalParamedical = ({
                       type="text"
                       className="form-control"
                       placeholder={placeholderInput}
-                      name={type === "ARTERIAL_PRESSURE" ? "ARTERIAL_PRESSURE1" : type}
-                      value={type === "ARTERIAL_PRESSURE" ? formik.values["ARTERIAL_PRESSURE1"] : formik.values[type]}
+                      name={
+                        type === "ARTERIAL_PRESSURE"
+                          ? "ARTERIAL_PRESSURE1"
+                          : type
+                      }
+                      value={
+                        type === "ARTERIAL_PRESSURE"
+                          ? formik.values["ARTERIAL_PRESSURE1"]
+                          : formik.values[type]
+                      }
                       onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
                     />
                   )}
-                  { type !=="ARTERIAL_PRESSURE" && formik.touched[type] && formik.errors[type] ? (
-                        <div className="text-danger">{formik.errors[type]}</div>
-                      ) : null}
-                  {type ==="ARTERIAL_PRESSURE" && formik.touched["ARTERIAL_PRESSURE1"] && formik.errors["ARTERIAL_PRESSURE1"] ? (
-                        <div className="text-danger">{formik.errors["ARTERIAL_PRESSURE1"]}</div>
-                      ) : null}
+                  {type !== "ARTERIAL_PRESSURE" &&
+                  formik.touched[type] &&
+                  formik.errors[type] ? (
+                    <div className="text-danger">{formik.errors[type]}</div>
+                  ) : null}
+                  {type === "ARTERIAL_PRESSURE" &&
+                  formik.touched["ARTERIAL_PRESSURE1"] &&
+                  formik.errors["ARTERIAL_PRESSURE1"] ? (
+                    <div className="text-danger">
+                      {formik.errors["ARTERIAL_PRESSURE1"]}
+                    </div>
+                  ) : null}
                 </div>
 
                 {labelInput === "Pression artérielle systolique" && (
@@ -324,10 +339,7 @@ const ModalParamedical = ({
                   >
                     Annuler
                   </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                  >
+                  <button type="submit" className="btn btn-primary">
                     Enregistrer
                   </button>
                 </div>
@@ -336,7 +348,7 @@ const ModalParamedical = ({
           </div>
         </div>
       </div>
-      <div className="modal fade" id="notifyRef">
+      <div className="modal fade" id="notifyRef1">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header border-0">
@@ -368,9 +380,9 @@ const ModalParamedical = ({
       </div>
       <input
         type="hidden"
-        ref={notifyRef}
+        ref={notifyRef1}
         data-bs-toggle="modal"
-        data-bs-target="#notifyRef"
+        data-bs-target="#notifyRef1"
         onClick={(e) => {
           e.preventDefault();
           setNotifyBg("");

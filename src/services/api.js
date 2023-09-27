@@ -48,7 +48,7 @@ const apiParamedical = {
     "post":"add-paramedical",
     "postMulti":"v2/add-multiple-paramedical",
     "get":"paramedicals",
-    "put":"update-paramedical",
+    "put":"v2/update-paramedical",
     "delete":"delete-paramedical",
     "synthese":"doctor/medical-record/synthesis"
 }
