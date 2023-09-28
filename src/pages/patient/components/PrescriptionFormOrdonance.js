@@ -173,7 +173,7 @@ const PrescriptionFormOrdonance = (type = "") => {
         frequency: values?.frequency,
         quantity: values?.quantity,
       };
-      if (values?.frequency === undefined && values?.quantity === undefined) {
+      if ((values?.frequency === undefined && values?.quantity === undefined) ||(values?.frequency === '' && values?.quantity === '') ) {
         hourPrescription = null
       }
       const data = {
@@ -187,7 +187,7 @@ const PrescriptionFormOrdonance = (type = "") => {
         administrationMode: selectedAdministation[0]?.uuid,
         precision: values?.precision,
       };
-      //console.log(data);
+      console.log(data);
       let dataTab = [...list.list];
       if (
         (data.drug !== undefined && data.dosage !== undefined) ||
@@ -196,6 +196,7 @@ const PrescriptionFormOrdonance = (type = "") => {
         dataTab = [...list.list, data];
         setErrorMsg("");
       } else {
+
         if (!list.sendata) {
           setErrorMsg("Certains champs n'ont pas été remplis");
         }
