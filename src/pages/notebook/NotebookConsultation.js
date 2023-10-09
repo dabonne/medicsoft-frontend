@@ -505,7 +505,7 @@ const NotebookConsultation = () => {
               ) : null}
               <form className={formValidate} onSubmit={submitEvent} noValidate>
                 <div className="row mb-3">
-                  <div className="col-4">
+                  <div className="col-8 col-md-6">
                     <input
                       className="form-control text-32 border-0 text-primary"
                       type="date"
@@ -515,7 +515,7 @@ const NotebookConsultation = () => {
                       }}
                     />
                   </div>
-                  <div className="col-4">
+                  <div className="col-8 col-md-6">
                     <input
                       className="form-control text-32 border-0 text-primary"
                       type="date"
@@ -1056,7 +1056,7 @@ const NotebookConsultation = () => {
               ) : null}
               <form className={formValidate} onSubmit={submitEvent} noValidate>
                 <div className="row mb-3">
-                  <div className="col-6">
+                  <div className="col-8 col-md-6">
                     <input
                       className="form-control text-32 border-0 text-primary"
                       type="date"
@@ -1068,7 +1068,7 @@ const NotebookConsultation = () => {
                   </div>
                 </div>
                 <div className="row mb-3">
-                  <div className="col-1 ">
+                  <div className="col-3 col-md-2">
                     <span className="d-inline-block">
                       <input
                         className="border-0 bg-white text-bold text-meduim"
@@ -1077,7 +1077,7 @@ const NotebookConsultation = () => {
                       />
                     </span>
                   </div>
-                  <div className="col-3">
+                  <div className="col-6 col-md-4">
                     <input
                       className="form-control border-0"
                       type="time"
@@ -1087,7 +1087,7 @@ const NotebookConsultation = () => {
                       }}
                     />
                   </div>
-                  <div className="col-3">
+                  <div className="col-6 col-md-4">
                     <input
                       className="form-control border-0"
                       type="time"
