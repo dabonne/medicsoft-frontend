@@ -24,6 +24,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Planning from "./pages/Planning";
 import requestUser, { URLLVM } from "./services/requestUser";
 import { apiUser } from "./services/api";
+import Gestion from "./pages/Gestion";
+import Protocole from "./pages/Protocole";
 
 const Dashboard = () => {
   const authCtx = useContext(AppContext);
@@ -237,6 +239,25 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/dashboard/protocole"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
+                    <span className="d-none d-md-block d-lg-none wd-0">
+                      <img src={agenda} alt="" />
+                    </span>
+                    <span
+                      className="d-block d-md-none d-lg-block wd-80"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#sidebarMenu.show"
+                    >
+                      Protocole de biologie
+                    </span>
+                  </NavLink>
+                </li>
               </ul>
 
               <ul className="nav flex-column w-100 position-absolute bottom-0 mb-5">
@@ -392,6 +413,14 @@ const Dashboard = () => {
                 element={
                   <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/protocole"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Protocole />
                   </ProtectedRoute>
                 }
               />

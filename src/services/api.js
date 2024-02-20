@@ -108,12 +108,31 @@ const apiPrescription = {
     "pdfPescription":"prescription/report-prescription"
 }
 
+const apiHospitalisation = {
+    patient:"patients",
+    hospitalRecords:"hospital-records",
+}
+
 const apiBackOffice = {
     "familyBiological":"settings/family-biological",
     "familyBiologicalById":"settings/biological-analysis",
     "getLocalisationTypeImagery":"settings/type-imagery"
 }
-
+const apiDrug = {
+    drugs:"settings/drugs",
+    getCategorie:"settings/drug-categories",
+    settings:"settings"
+}
+const apiOrganisation = {
+    "getJsData":"organisation-request-form",
+    "getAll":"organisation-getlist-request",
+    "get":"organisation-request",
+    "post":"organisation-registration",
+    "put":"organisation-update",
+    "delete":"organisation-delete",
+    "image":"document-head",
+    "widoc":"user-patient"
+}
 export {
     apiEmploye,
     apiUser,
@@ -122,5 +141,8 @@ export {
     apiParamedical,
     apiMedical,
     apiPrescription,
-    apiBackOffice
+    apiBackOffice,
+    apiHospitalisation,
+    apiDrug,
+    apiOrganisation
 }

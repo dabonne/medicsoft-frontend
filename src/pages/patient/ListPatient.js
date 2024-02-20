@@ -80,9 +80,10 @@ const ListPatient = () => {
       });
   };
 
-  const navigateToPatientInfo = (e, idx) => {
+  const navigateToPatientInfo = (e, data) => {
     e.preventDefault();
-    user.cni = idx;
+    user.cni = data.cni;
+    user.patientId = data.patientId;
     onUserChange(user);
     return navigate(`details`);
   };
@@ -168,7 +169,7 @@ const ListPatient = () => {
                 key={idx}
                 className="col"
                 type="button"
-                onClick={(e) => navigateToPatientInfo(e, data.cni)}
+                onClick={(e) => navigateToPatientInfo(e, data)}
               >
                 <div className="card v-card shadow-sm p-1">
                   <div className="d-inline-block mx-auto my-2">

@@ -15,7 +15,7 @@ import Loading from "../../../components/Loading";
 import requestDoctor from "../../../services/requestDoctor";
 import { matrice, onSearch } from "../../../services/service";
 
-const AntecedentPersonnel = ({ setNameIdx, type = {} }) => {
+const AntecedentPersonnel = ({ setNameIdx = () => {}, type = {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);

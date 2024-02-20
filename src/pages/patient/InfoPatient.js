@@ -20,6 +20,7 @@ import { AppContext } from "../../services/context";
 import ModalPatient from "../../components/ModalPatient";
 import DeleteModal from "../../components/DeleteModal";
 import requestDoctor from "../../services/requestDoctor";
+import HospitalisationPatient from "./pages/HospitalisationPatient";
 
 const initPatient = {
   firstname: "",
@@ -84,7 +85,7 @@ const InfoPatient = () => {
       );
     });
 
-    dd !== [] ? setList(dd) : setList(datas);
+    dd.length !== 0 ? setList(dd) : setList(datas);
   };
 
   const onDelete = (id) => {
@@ -206,6 +207,16 @@ const InfoPatient = () => {
                 Comptes rendus
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+                to="patient-hospitalisation"
+              >
+                Hospitalisations
+              </NavLink>
+            </li>
           </ul>
 
           <div className="px-1">
@@ -254,7 +265,12 @@ const InfoPatient = () => {
                 path="/comptes-rendus"
                 element={<CompteRendu setLocation={setLocation} />}
               />
+              <Route
+                path="/patient-hospitalisation/*"
+                element={<HospitalisationPatient setLocation={setLocation} />}
+              />
             </Routes>
+            
           </div>
         </div>
       </div>
