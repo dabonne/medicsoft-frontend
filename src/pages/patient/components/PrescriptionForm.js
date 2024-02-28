@@ -414,6 +414,12 @@ const PrescriptionForm = ({
            */}
           {type.includes("d'examen") ? (
             <>
+            <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" />
+  <label class="form-check-label" for="flexCheckChecked">
+    Sélectionnez parmi les protocoles
+  </label>
+</div>
               <div className="form-label mt-3">
                 {"Sélectionnez une famille d'analyse biologique"}
               </div>

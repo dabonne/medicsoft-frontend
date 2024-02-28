@@ -21,6 +21,9 @@ import { matrice, onSearch } from "../../../services/service";
 import requestDoctor from "../../../services/requestDoctor";
 import requestHospitalisation from "../../../services/requestHospitalisation";
 import Input from "../../../components/Input";
+import Observation from "./Observation";
+import FIchierHospi from "./FIchierHospi";
+import ObservationHospi from "./ObservationHospi";
 
 const initData = {
   motifHospitalisation: "",
@@ -97,20 +100,16 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
             <div className="col-12 col-md-6">
               <div className="btn-group">
                 <div
-                  className="btn btn-secondary me-2"
+                  className="btn btn-primary"
                   onClick={(e) => {
                     e.preventDefault();
                     window.open(
-                      "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
-                        user.cni +
-                        "/" +
-                        user.organisationRef
+                      "https://doctor-management.herokuapp.com/doctor-management/external-api/hospital-records/"+id+"/export-dossier/"+user.organisationRef
                     );
                   }}
                 >
-                  Synthèse
+                  Exporter le dossier
                 </div>
-                <div className="btn btn-primary me-2">Exporter le dossier</div>
               </div>
             </div>
           </div>
@@ -132,6 +131,16 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
               >
                 <div className="text-center">
                   <span className="text-bold">Observations</span> <br />
+                </div>
+              </div>
+            </div>
+            <div className="col">
+              <div
+                onClick={(e) => changeView(e, "fichier")}
+                className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
+              >
+                <div className="text-center">
+                  <span className="text-bold">Fichiers</span> <br />
                 </div>
               </div>
             </div>
@@ -163,9 +172,10 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
           <span onClick={e => changeView(e,"home")}>Retour</span>
         </div>
         {view ==="antecedent" && <AntecedentPersonnel />}
-        {view ==="observation" && <AntecedentPersonnel />}
+        {view ==="observation" && <ObservationHospi />}
         {view ==="evolution" && <AntecedentPersonnel />}
         {view ==="conclusion" && <AntecedentPersonnel />}
+        {view ==="fichier" && <FIchierHospi />}
         </>
       )}
     </>

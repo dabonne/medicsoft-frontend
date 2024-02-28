@@ -23,6 +23,7 @@ import requestHospitalisation from "../../../services/requestHospitalisation";
 import Input from "../../../components/Input";
 import HospitalisationListe from "../hospitalisation/HospitalisationListe";
 import HospitalisationDetail from "../hospitalisation/HospitalisationDetail";
+import FIchierHospi from "../hospitalisation/FIchierHospi";
 
 const initData = {
   motifHospitalisation: "",
@@ -243,8 +244,6 @@ const HospitalisationPatient = ({ setLocation }) => {
       <Routes>
         <Route path="/" element={<HospitalisationListe />} />
         <Route path="/detail/:id" element={<HospitalisationDetail />} />
-        <Route path="/antecedent-personne" element={<AntecedentPersonnel  />} />
-
       </Routes>
     </div>
   );

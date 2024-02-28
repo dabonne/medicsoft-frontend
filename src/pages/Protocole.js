@@ -30,22 +30,6 @@ const Protocole = () => {
   const [dele, setDelete] = useState([]);
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
-  const [jsData, setJsData] = useState({
-    registrationReference: "",
-    firstName: "",
-    lastName: "",
-    cnib: "",
-    title: "",
-    birthdate: "",
-    specialisation: "",
-    specialisations: {},
-    classification: "",
-    classifications: {},
-    email: "",
-    phone: "",
-    doctorNationalId: "",
-    medicalStaff: "",
-  });
 
   const [notifyBg, setNotifyBg] = useState("");
   const [notifyTitle, setNotifyTitle] = useState("");
@@ -70,9 +54,10 @@ const Protocole = () => {
   const [viewData, setViewData] = useState({});
   const [organisations, setOrganisations] = useState([]);
   const [organisationId, setOrganisationId] = useState("");
-
+  const [family,setFamily] = useState([])
   useEffect(() => {
     get();
+    getFamily()
   }, [refresh]);
 
   const formik = useFormik({
@@ -90,7 +75,22 @@ const Protocole = () => {
       }
     },
   });
-
+///backoffice-management/external-api/settings/family-biological
+  const getFamily = () => {
+    requestExternal
+      .get(apiDrug.settings+"/family-biological", header)
+      .then((res) => {
+        console.log(res.data);
+        setFamily(res.data)
+        
+      })
+      .catch((error) => {
+        //deconnect()
+        console.log(error)
+        setStopLoad(true);
+        setFail(true);
+      });
+  };
   const get = () => {
     requestExternal
       .get(apiDrug.settings + "/" + user.organisationRef + "/protocoles", header)
@@ -121,7 +121,6 @@ const Protocole = () => {
 
   const post = (values) => {
     configNotify("loading", "", "Ajout d’un nouvel(le) employé(e) en cours...");
-    console.log(jsData);
     requestExternal
       .post(
         apiDrug.settings + "/" + user.organisationRef + "/protocoles",
@@ -392,11 +391,12 @@ const Protocole = () => {
                       formik={formik}
                     />
                     <Input
-                      type={"text"}
+                      type={"select"}
                       name={"familleId"}
-                      label={"Libelle"}
-                      placeholder={"Entrer le nom du protocole"}
+                      label={"Famille"}
+                      placeholder={"Sélectionnez la famille"}
                       formik={formik}
+                      options={family}
                     />
                   </>
                 ) : (
@@ -593,21 +593,6 @@ const Protocole = () => {
         <p className="text-ultra-small me-auto">
           {list.length} éléments affichés
         </p>
-        <div className="">
-          <select className="form-select" value={organisationId} onChange={e => {
-            setOrganisationId(e.target.value)
-            get(e.target.value)
-          }}>
-            <option selected>Sélectionnez une organisation</option>
-            {organisations.map((data) => {
-              return (
-                <option value={data.registrationReference}>
-                  {data.organisationName}
-                </option>
-              );
-            })}
-          </select>
-        </div>
       </div>
       <Loading data={list} stopLoad={stopLoad} fail={fail}>
         <div className="table-responsive-sm">

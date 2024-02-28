@@ -121,7 +121,8 @@ const apiBackOffice = {
 const apiDrug = {
     drugs:"settings/drugs",
     getCategorie:"settings/drug-categories",
-    settings:"settings"
+    settings:"settings",
+    familyBiological:"family-biological"
 }
 const apiOrganisation = {
     "getJsData":"organisation-request-form",
