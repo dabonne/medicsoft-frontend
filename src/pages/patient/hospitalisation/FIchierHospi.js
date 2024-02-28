@@ -215,6 +215,10 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
     formik.setFieldValue("uuid", data.numero);
   };
 
+  const downloadFile = (e, data) => {
+    e.preventDefault();
+    window.open("https://laafivisionmedical.com/" + data.fileName);}
+
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -268,7 +272,7 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
                 <th scope="col" className="border-raduis-left">
                   Fichier ID
                 </th>
-                <th scope="col">Description</th>
+                <th scope="col">Nom</th>
                 <th scope="col" className="text-center">
                   Actions
                 </th>
@@ -293,13 +297,8 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
                         <div className="d-inline-block mx-1">
                           <img
                             title="Voir le rendez vous"
-                            data-bs-toggle="modal"
-                            data-bs-target="#viewAtt"
                             onClick={(e) => {
-                              e.preventDefault();
-                              //getDetail(data.uuid);
-                              setDataView(data);
-                              console.log(data);
+                              downloadFile(e,data)
                             }}
                             src={view}
                             alt=""
@@ -383,7 +382,7 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
                   <Input
                     type={"text"}
                     name={"description"}
-                    label={"Description"}
+                    label={"Nom du fichier"}
                     placeholder={"Entrer la description du fichier"}
                     formik={formik}
                   />
