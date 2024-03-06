@@ -125,7 +125,8 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
-                <li className="nav-item">
+                {
+                  1 === 2 && <li className="nav-item">
                   <NavLink
                     to="/dashboard/personnel"
                     className={({ isActive }) =>
@@ -144,6 +145,7 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
+                }
                 <li className="nav-item">
                   <NavLink
                     to="/dashboard/rendez-vous"
@@ -182,7 +184,10 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
-                <li className="nav-item">
+                {
+                  1 === 2 && <>
+                  
+                  <li className="nav-item">
                   <NavLink
                     to="/dashboard/patient"
                     className={({ isActive }) =>
@@ -220,6 +225,8 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
+                  </>
+                }
                 <li className="nav-item">
                   <NavLink
                     to="/dashboard/planning"
@@ -239,7 +246,8 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
-                <li className="nav-item">
+                {
+                  1 === 2 && <li className="nav-item">
                   <NavLink
                     to="/dashboard/protocole"
                     className={({ isActive }) =>
@@ -258,6 +266,7 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
+                }
               </ul>
 
               <ul className="nav flex-column w-100 position-absolute bottom-0 mb-5">
@@ -360,14 +369,7 @@ const Dashboard = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/personnel"
-                element={
-                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
-                    <Employe />
-                  </ProtectedRoute>
-                }
-              />
+              
               <Route
                 path="/rendez-vous"
                 element={
@@ -384,22 +386,7 @@ const Dashboard = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/patient/*"
-                element={
-                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
-                    <Patient />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/hospitalisation/*"
-                element={
-                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
-                    <Patient />
-                  </ProtectedRoute>
-                }
-              />
+              
               <Route
                 path="/planning/*"
                 element={
@@ -417,6 +404,32 @@ const Dashboard = () => {
                 }
               />
               <Route
+                path="/personnel"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Employe />
+                  </ProtectedRoute>
+                }
+              />
+              {
+                /**
+                 * <Route
+                path="/patient/*"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Patient />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hospitalisation/*"
+                element={
+                  <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
+                    <Patient />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/protocole"
                 element={
                   <ProtectedRoute isAllowed={user.isAuth} redirectPath="/">
@@ -424,6 +437,8 @@ const Dashboard = () => {
                   </ProtectedRoute>
                 }
               />
+                 */
+              }
             </Routes>
           </main>
           <div className="col-12 col-md-9 ms-sm-auto col-lg-10 px-md-4 text-center text-md-start">

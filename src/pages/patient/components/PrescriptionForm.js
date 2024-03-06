@@ -67,11 +67,14 @@ const PrescriptionForm = ({
   const [localisationSelected, setLocalisationSelected] = useState([]);
   const [familyGroup, setFamilyGroup] = useState([]);
   const [precision, setPrecision] = useState("");
+  const [useProtocole, setUseProtocole] = useState(false)
   const { id } = useParams();
   useEffect(() => {
     console.log(type);
+
     if (type.includes("d'examen")) {
       getfamilyBiological();
+      getFamilyProtocole();
     } else {
       getList();
     }
@@ -81,7 +84,35 @@ const PrescriptionForm = ({
       setFirstCall(firstCall + 1);
     }
     //console.log(list);
+    ///backoffice-management/external-api/settings/{cliniqueId}/protocoles/family
   }, [list]);
+
+  const getFamilyProtocole = () => {
+    //console.log(url);
+    requestBackOffice
+      .get("settings/" + user.organisationRef + "/protocoles/family")
+      .then((res) => {
+        //setData(res.data);
+        setFamilyGroup(res.data);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getListProtocole = () => {
+    //console.log(url);
+    requestBackOffice
+      .get(apiBackOffice.familyBiologicalById + "/" + id, header)
+      .then((res) => {
+        console.log(res.data);
+        setData(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const getList = () => {
     console.log(url);
@@ -157,7 +188,7 @@ const PrescriptionForm = ({
     onSubmit: (values) => {
       //console.log("selectedOption");
       //console.log(selectedOption);
-      values.detail = precision
+      values.detail = precision;
       let presc = {
         type: "",
         detail: "",
@@ -237,8 +268,8 @@ const PrescriptionForm = ({
       });
 
       formik.setFieldValue("type", item.type);
-      //formik.setFieldValue("detail", item.detail); 
-      setPrecision(item.detail)
+      //formik.setFieldValue("detail", item.detail);
+      setPrecision(item.detail);
     });
 
     setList({
@@ -414,12 +445,25 @@ const PrescriptionForm = ({
            */}
           {type.includes("d'examen") ? (
             <>
-            <div class="form-check">
-  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" />
-  <label class="form-check-label" for="flexCheckChecked">
-    Sélectionnez parmi les protocoles
-  </label>
-</div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value=""
+                  id="flexCheckChecked"
+                  onClick={e => {
+                    e.preventDefault()
+                    alert("ok")
+                    if(!useProtocole){
+                      getFamilyProtocole()
+                    }
+                    setUseProtocole(!useProtocole)
+                  }}
+                />
+                <label class="form-check-label" for="flexCheckChecked">
+                  Sélectionnez parmi les protocoles
+                </label>
+              </div>
               <div className="form-label mt-3">
                 {"Sélectionnez une famille d'analyse biologique"}
               </div>
@@ -494,8 +538,7 @@ const PrescriptionForm = ({
           )}
 
           <div className="form-label mt-3">Précisions</div>
-          {
-            /**
+          {/**
              * <InputField
             type={"textarea"}
             name={"detail"}
@@ -503,8 +546,7 @@ const PrescriptionForm = ({
             placeholder="Ecrire ici"
             formik={formik}
           />
-             */
-          }
+             */}
           <div className="mb-5">
             <ReactQuill
               theme="snow"
