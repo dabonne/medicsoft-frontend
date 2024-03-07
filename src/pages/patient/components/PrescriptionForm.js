@@ -101,13 +101,19 @@ const PrescriptionForm = ({
       });
   };
 
-  const getListProtocole = () => {
-    //console.log(url);
+  const getListProtocole = (id) => {
+    console.log(id);
     requestBackOffice
-      .get(apiBackOffice.familyBiologicalById + "/" + id, header)
+      .get("settings/"+user.organisationRef+"/family/"+id+"/protocoles", header)
       .then((res) => {
         console.log(res.data);
-        setData(res.data);
+        const tab = res.data.map((data => {
+          return {
+            label: data.libelle,
+            uuid: data.protocoleId
+          }
+        }))
+        setData(tab);
       })
       .catch((error) => {
         console.log(error);
@@ -186,7 +192,7 @@ const PrescriptionForm = ({
     initialValues: initData,
 
     onSubmit: (values) => {
-      //console.log("selectedOption");
+      console.log(values);
       //console.log(selectedOption);
       values.detail = precision;
       let presc = {
@@ -209,7 +215,7 @@ const PrescriptionForm = ({
           detail: values.detail,
         };
       }
-      console.log("presc");
+      console.log(presc);
 
       if (presc.type !== "" && presc.type !== undefined) {
         dataTab = [...list.list, presc];
@@ -359,7 +365,11 @@ const PrescriptionForm = ({
     console.log(e);
     setSelectedFamily(e);
     if (e.length !== 0) {
-      getfamilyBiologicalById(e[0].uuid);
+      if(useProtocole){
+        getListProtocole(e[0].uuid)
+      }else{
+        getfamilyBiologicalById(e[0].uuid);
+      }
     } else {
       setSelectedOption([]);
     }
@@ -452,10 +462,12 @@ const PrescriptionForm = ({
                   value=""
                   id="flexCheckChecked"
                   onClick={e => {
-                    e.preventDefault()
-                    alert("ok")
+                    //e.preventDefault()
+                    //alert("ok")
                     if(!useProtocole){
                       getFamilyProtocole()
+                    }else{
+                      getfamilyBiological()
                     }
                     setUseProtocole(!useProtocole)
                   }}
