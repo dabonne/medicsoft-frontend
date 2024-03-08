@@ -28,8 +28,9 @@ const initData = {
   examClinic: "",
   conclusion: "",
   entryDate: "",
+  releaseDate: "",
 };
-const HospitalisationListe = ({ setLocation = () =>{} }) => {
+const HospitalisationListe = ({ setLocation = () => {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);
@@ -49,7 +50,7 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
   const [pageNumber, setPageNumber] = useState(0);
   const [totalPage, setTotalPage] = useState(1);
   const [pagination, setPagination] = useState([]);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -73,10 +74,14 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
   };
 
   const formik = useFormik({
-    initialValues: {},
+    initialValues: initData,
     onSubmit: (values) => {
       console.log(values);
-      post(values)
+      if (values.uuid) {
+        update(values);
+      } else {
+        post(values);
+      }
     },
   });
 
@@ -92,6 +97,42 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
       )
       .then((res) => {
         console.log("enregistrement ok");
+        setModalNotifyMsg("Les informations ont bien été enrégistrées");
+        configNotify(
+          "success",
+          "Ajout réussi",
+          "Les informations ont bien été enrégistrées"
+        );
+
+        closeRef.current.click();
+        notifyRef.current.click();
+        setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
+      });
+  };
+  const update = (values) => {
+    //e.preventDefault();
+    configNotify("loading", "", "Ajout des données en cours...");
+    console.log(value);
+    requestHospitalisation
+      .put(
+        apiHospitalisation.patient +
+          "/" +
+          user.patientId +
+          "/hospital-records/" +
+          values.uuid,
+        values,
+        header
+      )
+      .then((res) => {
+        //console.log("enregistrement ok");
         setModalNotifyMsg("Les informations ont bien été enrégistrées");
         configNotify(
           "success",
@@ -194,8 +235,8 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
   };
 
   const onDelete = (id) => {
-    requestPatient
-      .delete(apiMedical.deleteReport + "/" + id)
+    requestHospitalisation
+      .delete(apiHospitalisation.hospitalRecords + "/" + id)
       .then((res) => {
         setModalNotifyMsg("Suppression réussie !");
         closeRef.current.click();
@@ -238,10 +279,20 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
       });
   };
 
-  const goToDetail = (e,id) => {
-    e.preventDefault()
-    navigate("detail/"+id)
-  }
+  const setEditData = (e, data) => {
+    e.preventDefault();
+    formik.setFieldValue("entryDate", data.entryDate);
+    formik.setFieldValue("conclusion", data.conclusion);
+    formik.setFieldValue("releaseDate", data.releaseDate);
+    formik.setFieldValue("examClinic", data.examClinic);
+    formik.setFieldValue("motifHospitalisation", data.motifHospitalisation);
+    formik.setFieldValue("historyDisease", data.historyDisease);
+    formik.setFieldValue("uuid", data.hospitalRecordId);
+  };
+  const goToDetail = (e, id) => {
+    e.preventDefault();
+    navigate("detail/" + id);
+  };
   return (
     <div className="container-fluid">
       <div className="row my-3">
@@ -296,7 +347,8 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
                 <th scope="col" className="border-raduis-left">
                   Motif
                 </th>
-                <th scope="col">Date d'entryDate</th>
+                <th scope="col">Date d'entrée</th>
+                <th scope="col">Date de sortie</th>
                 <th scope="col" className="text-center">
                   Actions
                 </th>
@@ -308,11 +360,12 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
                 return (
                   <tr key={idx}>
                     <td>
-                      <span className="text-bold">{data.motifHospitalisation}</span>
+                      <span className="text-bold">
+                        {data.motifHospitalisation}
+                      </span>
                     </td>
-                    <td>
-                    {data.entryDate}
-                    </td>
+                    <td>{data.entryDate}</td>
+                    <td>{data.releaseDate ? data.releaseDate : "-"}</td>
                     <td className="text-center">
                       <div className="btn-group">
                         <div className="d-inline-block mx-1">
@@ -321,8 +374,8 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
                             onClick={(e) => {
                               //e.preventDefault();
                               //setDelete(["" + data.employeeReference]);
-                             // viewCompteRendu(data.id);
-                              goToDetail(e,data.hospitalRecordId)
+                              // viewCompteRendu(data.id);
+                              goToDetail(e, data.hospitalRecordId);
                             }}
                             src={view}
                             alt=""
@@ -333,12 +386,10 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
                             <div className="d-inline-block mx-1">
                               <img
                                 title="Éditer le rapport"
-                                data-bs-target="#compteRenduModal"
+                                data-bs-target="#create"
                                 data-bs-toggle="modal"
                                 onClick={(e) => {
-                                  e.preventDefault();
-                                  viewCompteRendu(data.id);
-                                  setEditMode(data.id);
+                                  setEditData(e, data);
                                 }}
                                 src={edit}
                                 alt=""
@@ -351,7 +402,7 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
                                 data-bs-toggle="modal"
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  setDeleteId(data.id);
+                                  setDeleteId(data.hospitalRecordId);
                                 }}
                                 src={del}
                                 alt=""
@@ -390,10 +441,7 @@ const HospitalisationListe = ({ setLocation = () =>{} }) => {
                   message={notifyMessage}
                 />
               ) : null}
-              <form
-                className={"mt-3"}
-                onSubmit={formik.handleSubmit}
-              >
+              <form className={"mt-3"} onSubmit={formik.handleSubmit}>
                 <div className="mb-5">
                   <Input
                     type={"text"}

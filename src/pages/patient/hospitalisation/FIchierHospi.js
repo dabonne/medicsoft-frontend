@@ -386,15 +386,13 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
                     placeholder={"Entrer la description du fichier"}
                     formik={formik}
                   />
-                  {formik.values["uuid"] === undefined && (
-                    <Input
+                  <Input
                       type={"file"}
                       name={"file"}
                       label={"Sélectionnez le fichier"}
                       placeholder={""}
                       formik={formik}
                     />
-                  )}
                 </>
 
                 <div className="modal-footer d-flex justify-content-start border-0">

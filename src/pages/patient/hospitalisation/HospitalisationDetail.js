@@ -100,11 +100,22 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
             <div className="col-12 col-md-6">
               <div className="btn-group">
                 <div
+                  className="btn btn-primary me-2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  Date de sortie
+                </div>
+                <div
                   className="btn btn-primary"
                   onClick={(e) => {
                     e.preventDefault();
                     window.open(
-                      "https://doctor-management.herokuapp.com/doctor-management/external-api/hospital-records/"+id+"/export-dossier/"+user.organisationRef
+                      "https://doctor-management.herokuapp.com/doctor-management/external-api/hospital-records/" +
+                        id +
+                        "/export-dossier/" +
+                        user.organisationRef
                     );
                   }}
                 >
@@ -144,7 +155,8 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                 </div>
               </div>
             </div>
-            <div className="col">
+            {/**
+               * <div className="col">
               <div
                 onClick={(e) => changeView(e, "evolution")}
                 className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
@@ -164,18 +176,19 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                 </div>
               </div>
             </div>
+               */}
           </div>
         </>
       ) : (
         <>
-        <div>
-          <span onClick={e => changeView(e,"home")}>Retour</span>
-        </div>
-        {view ==="antecedent" && <AntecedentPersonnel />}
-        {view ==="observation" && <ObservationHospi />}
-        {view ==="evolution" && <AntecedentPersonnel />}
-        {view ==="conclusion" && <AntecedentPersonnel />}
-        {view ==="fichier" && <FIchierHospi />}
+          <div>
+            <span onClick={(e) => changeView(e, "home")}>Retour</span>
+          </div>
+          {view === "antecedent" && <AntecedentPersonnel />}
+          {view === "observation" && <ObservationHospi />}
+          {view === "evolution" && <AntecedentPersonnel />}
+          {view === "conclusion" && <AntecedentPersonnel />}
+          {view === "fichier" && <FIchierHospi />}
         </>
       )}
     </>

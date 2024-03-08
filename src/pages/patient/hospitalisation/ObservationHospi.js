@@ -108,7 +108,18 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
         header
       )
       .then((res) => {
-        console.log(res.data);
+        console.log("enregistrement ok");
+        formik.resetForm()
+        setRefresh(refresh + 1);
+        configNotify(
+          "success",
+          "Ajout réussi",
+          "Les informations ont bien été enrégistrées"
+        );
+        setModalNotifyMsg("L'observation a été ajouté avec succès");
+        closeRef.current.click();
+        notifyRef.current.click();
+        get();
       })
       .catch((error) => {
         console.log(error);
@@ -273,7 +284,8 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                 </th>
                 <th scope="col">Description</th>
                 <th scope="col">Date</th>
-                <th scope="col">Etat</th>
+                <th scope="col">Auteur</th>
+                {/**<th scope="col">Etat</th> */}
                 <th scope="col" className="text-center">
                   Actions
                 </th>
@@ -291,11 +303,16 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                       <span className="text-bold">{data.label}</span>
                     </td>
                     <td>{data.dateObservation}</td>
-                    <td>
+                    <td>{data.user}</td>
+                    {
+                      /**
+                       * <td>
                       {data.isDossierSynthese
                         ? "Copier dans de le dossier synthèse"
                         : "Non copier dans le dossier synthèse"}
                     </td>
+                       */
+                    }
                     <td className="text-center">
                       <div className="btn-group">
                         <div className="d-inline-block mx-1">
