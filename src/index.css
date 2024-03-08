@@ -297,6 +297,10 @@ thead{
   border-radius: var(--border-radius);
 }
 
+.cursor{
+  cursor: pointer;
+}
+
 /**** loading css****/
 .lds-ring {
   display: inline-block;

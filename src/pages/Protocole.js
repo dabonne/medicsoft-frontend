@@ -266,7 +266,7 @@ const Protocole = () => {
       return (
         data.libelle.toLowerCase().includes(str.toLowerCase()) ||
         data.abbreviation.toLowerCase().includes(str.toLowerCase()) ||
-        data.famille.toLowerCase().includes(str.toLowerCase()) ||
+        data.famille?.toLowerCase().includes(str.toLowerCase()) ||
         fullNameOne.toLowerCase().includes(str.toLowerCase()) ||
         fullNameTwo.toLowerCase().includes(str.toLowerCase())
       );

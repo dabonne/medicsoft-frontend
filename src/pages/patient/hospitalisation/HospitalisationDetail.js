@@ -42,11 +42,30 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
   const { id } = useParams();
   const [hospitalDetail, setHospitalDetail] = useState({});
   const [view, setView] = useState("home");
+  const [notifyBg, setNotifyBg] = useState("");
+  const [notifyTitle, setNotifyTitle] = useState("");
+  const [modalNotifyMsg, setModalNotifyMsg] = useState("");
+  const [notifyMessage, setNotifyMessage] = useState("");
+  const closeRef = useRef();
+  const notifyRef = useRef();
 
   useEffect(() => {
     get();
     setLocation(window.location.pathname);
   }, []);
+
+  const formik = useFormik({
+    initialValues: initData,
+    onSubmit: (values) => {
+      console.log(values);
+      update(values)
+      if (values.uuid) {
+       // update(values);
+      } else {
+       // post(values);
+      }
+    },
+  });
 
   const get = () => {
     requestHospitalisation
@@ -60,7 +79,45 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
         setFail(true);
       });
   };
+  const update = (values) => {
+    //e.preventDefault();
+    configNotify("loading", "", "Modification des données en cours...");
+    console.log(values);
+    requestHospitalisation
+      .put(
+        apiHospitalisation.hospitalRecords +
+          "/"+
+          values.uuid,
+        values,
+        header
+      )
+      .then((res) => {
+        //console.log("enregistrement ok");
+        setModalNotifyMsg("Les informations ont bien été enrégistrées");
+        configNotify(
+          "success",
+          "Ajout réussi",
+          "Les informations ont bien été enrégistrées"
+        );
 
+        closeRef.current.click();
+        notifyRef.current.click();
+        //setRefresh(refresh + 1);
+      })
+      .catch((error) => {
+        console.log(error);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
+      });
+  };
+ const configNotify = (bg, title, message) => {
+    setNotifyBg(bg);
+    setNotifyTitle(title);
+    setNotifyMessage(message);
+  };
   const changeView = (e, name) => {
     e.preventDefault();
     setView(name);
@@ -87,12 +144,13 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                   </span>
                 </div>
                 <span>
-                  <Link
-                    to="/dashboard/patient/dossier-paramedical"
-                    className="text-black"
+                  <span
+                    className="text-muted text-decoration-underline cursor"
+                    data-bs-toggle="modal"
+                    data-bs-target="#viewAtt"
                   >
                     Voir les détails
-                  </Link>{" "}
+                  </span>{" "}
                 </span>{" "}
                 <br />
               </div>
@@ -101,9 +159,8 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
               <div className="btn-group">
                 <div
                   className="btn btn-primary me-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                  }}
+                  data-bs-toggle="modal"
+                  data-bs-target="#create"
                 >
                   Date de sortie
                 </div>
@@ -178,11 +235,110 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
             </div>
                */}
           </div>
+          <div className="modal fade" id="viewAtt">
+            <div className="modal-dialog modal-dialog-centered modal-md">
+              <div className="modal-content">
+                <div className="modal-header border-0">
+                  <h4 className="modal-title text-meduim text-bold"></h4>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+
+                <div className="modal-body">
+                  <span className="fw-bold">Date d'entrée : </span>
+                  <span>{hospitalDetail.entryDate}</span> <br />
+                  <span className="fw-bold">Date de sortie : </span>
+                  <span>
+                    {hospitalDetail.releaseDate
+                      ? hospitalDetail.releaseDate
+                      : "Toujours en hospitalisation"}
+                  </span> <br />
+                  <span className="fw-bold">Motif : </span>
+                  <span>{hospitalDetail.motifHospitalisation}</span> <br />
+                  <span className="fw-bold">Examen clinique : </span>
+                  <span>{hospitalDetail.examClinic}</span> <br />
+                  <span className="fw-bold">Histoire de la maladie : </span>
+                  <span>{hospitalDetail.historyDisease}</span> <br />
+                  <span className="fw-bold">Conclusion : </span>
+                  <span>{hospitalDetail.conclusion}</span> <br />
+                </div>
+
+                <div className="modal-footer border-0 d-flex justify-content-start">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    data-bs-dismiss="modal"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      //setModalNotifyMsg("");
+                    }}
+                  >
+                    Ok
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal fade" id="create">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0">
+              <h4 className="modal-title text-meduim">
+                Modification de la date
+              </h4>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+            <div className="modal-body">
+              {/*notifyBg !== "" ? (
+                <FormNotify
+                  bg={notifyBg}
+                  title={notifyTitle}
+                  message={notifyMessage}
+                />
+              ) : null*/}
+              <form className={"mt-3"} onSubmit={formik.handleSubmit}>
+                <div className="mb-5">
+                  <Input
+                    type={"date"}
+                    name={"entryDate"}
+                    label={"Date d'entrée"}
+                    placeholder={"Entrer la date"}
+                    formik={formik}
+                  />
+                </div>
+
+                <div className="modal-footer d-flex justify-content-start border-0">
+                  <button
+                    className="btn btn-danger"
+                    data-bs-dismiss="modal"
+                    //ref={closeRef}
+                    onClick={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    Annuler
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Enregistrer
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
         </>
       ) : (
         <>
           <div>
-            <span onClick={(e) => changeView(e, "home")}>Retour</span>
+            <span className="cursor fw-bold" onClick={(e) => changeView(e, "home")}>Retour</span>
           </div>
           {view === "antecedent" && <AntecedentPersonnel />}
           {view === "observation" && <ObservationHospi />}

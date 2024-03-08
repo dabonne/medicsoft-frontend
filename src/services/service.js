@@ -8,7 +8,7 @@ const onSearch = (e,setList, datas, keys ) => {
     });
 
     console.log(dd)
-    dd !== [] ? setList(dd) : setList(datas);
+    dd.length !== 0 ? setList(dd) : setList(datas);
   };
 
   const verify = (str, keys, data) =>{

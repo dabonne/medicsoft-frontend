@@ -128,6 +128,7 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
       });
   };
   const update = (values) => {
+    console.log(values)
     requestHospitalisation
       .put(
         apiHospitalisation.hospitalRecords +
@@ -161,10 +162,7 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
   const makeSearch = (e) => {
     e.preventDefault();
     onSearch(e, setList, datas, [
-      "antecedentLabel",
-      "typeAntecedent",
-      "cni",
-      "detail",
+      "description",
     ]);
   };
   const onDelete = (deleteId) => {
@@ -285,7 +283,7 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                 <th scope="col">Description</th>
                 <th scope="col">Date</th>
                 <th scope="col">Auteur</th>
-                {/**<th scope="col">Etat</th> */}
+                <th scope="col">Etat</th>
                 <th scope="col" className="text-center">
                   Actions
                 </th>
@@ -304,15 +302,11 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                     </td>
                     <td>{data.dateObservation}</td>
                     <td>{data.user}</td>
-                    {
-                      /**
-                       * <td>
+                    <td>
                       {data.isDossierSynthese
                         ? "Copier dans de le dossier synthèse"
                         : "Non copier dans le dossier synthèse"}
                     </td>
-                       */
-                    }
                     <td className="text-center">
                       <div className="btn-group">
                         <div className="d-inline-block mx-1">

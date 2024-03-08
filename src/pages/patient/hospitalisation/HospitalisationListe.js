@@ -119,14 +119,12 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
   };
   const update = (values) => {
     //e.preventDefault();
-    configNotify("loading", "", "Ajout des données en cours...");
+    configNotify("loading", "", "Modification des données en cours...");
     console.log(value);
     requestHospitalisation
       .put(
-        apiHospitalisation.patient +
-          "/" +
-          user.patientId +
-          "/hospital-records/" +
+        apiHospitalisation.hospitalRecords +
+          "/"+
           values.uuid,
         values,
         header
