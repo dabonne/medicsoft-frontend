@@ -29,7 +29,7 @@ const initData = {
   examClinic: "",
   conclusion: "",
   entryDate: "",
-  releaseDate: "",
+  releaseDate: null,
 };
 
 const validateData = Yup.object({
@@ -87,7 +87,7 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
     initialValues: initData,
     validationSchema: validateData,
     onSubmit: (values) => {
-      console.log(values);
+      //console.log(values);
       if (values.uuid) {
         update(values);
       } else {
@@ -99,7 +99,7 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
   const post = (values) => {
     //e.preventDefault();
     configNotify("loading", "", "Ajout des données en cours...");
-    console.log(value);
+    console.log(values);
     requestHospitalisation
       .post(
         apiHospitalisation.patient + "/" + user.patientId + "/hospital-records",
@@ -408,14 +408,14 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
                     type={"text"}
                     name={"historyDisease"}
                     label={"Histoire de la maladie"}
-                    placeholder={"Entrer history Disease"}
+                    placeholder={"Entrer l'histoire de la maladie"}
                     formik={formik}
                   />
                   <Input
                     type={"text"}
                     name={"examClinic"}
                     label={"Examen clinique"}
-                    placeholder={"Entrer l'examClinic"}
+                    placeholder={"Entrer l'examen clinique"}
                     formik={formik}
                   />
                   <Input
