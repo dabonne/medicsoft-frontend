@@ -19,8 +19,25 @@ import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import Input from "../../../components/Input";
 import FormNotify from "../../../components/FormNotify";
+import * as Yup from "yup";
+import NotifyRef from "../../../components/NofifyRef";
 
-const initData = {};
+const initData = {
+  description: "",
+  resume: "",
+  dateRealisation: "",
+  dateCreation: "",
+  file: "",
+};
+
+const validateData = Yup.object({
+  description: Yup.string().required("Le champ est obligatoire"),
+  resume: Yup.string().required("Le champ est obligatoire"),
+  dateRealisation: Yup.string().required("Le champ est obligatoire"),
+  dateCreation: Yup.string().required("Le champ est obligatoire"),
+  file: Yup.string().required("Le champ est obligatoire"),
+});
+
 const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
@@ -40,7 +57,6 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
   const [notifyMessage, setNotifyMessage] = useState("");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
 
-  const [formValidate, setFormValidate] = useState("needs-validation");
   const header = {
     headers: {
       Authorization: `${user.token}`,
@@ -61,6 +77,7 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
 
   const formik = useFormik({
     initialValues: initData,
+    validationSchema: validateData,
     onSubmit: (values) => {
       console.log(values);
       if (values.uuid) {
@@ -99,6 +116,7 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
   };
 
   const post = (values) => {
+    configNotify("loading", "", "Ajout des données en cours...");
     requestHospitalisation
       .post(
         apiHospitalisation.hospitalRecords + "/" + id + "/hospitalisation-file",
@@ -106,15 +124,15 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
         header
       )
       .then((res) => {
-        console.log("enregistrement ok");
-        formik.resetForm()
+        //console.log("enregistrement ok");
+        formik.resetForm();
         setRefresh(refresh + 1);
         configNotify(
           "success",
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("Le fichier a été ajouté avec succès");
+        setModalNotifyMsg("Les informations ont bien été enrégistrées");
         closeRef.current.click();
         notifyRef.current.click();
         get();
@@ -123,9 +141,15 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
         console.log(error);
         setStopLoad(true);
         setFail(true);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
       });
   };
   const update = (values) => {
+    configNotify("loading", "", "Modification des données en cours...");
     requestHospitalisation
       .put(
         apiHospitalisation.hospitalRecords +
@@ -138,7 +162,7 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
       )
       .then((res) => {
         //console.log("enregistrement ok");
-        formik.resetForm()
+        formik.resetForm();
         setRefresh(refresh + 1);
         configNotify(
           "success",
@@ -154,6 +178,11 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
         console.log(error);
         setStopLoad(true);
         setFail(true);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
       });
   };
   const makeSearch = (e) => {
@@ -211,13 +240,18 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
 
   const setEditData = (e, data) => {
     e.preventDefault();
+    setDataView(data)
     formik.setFieldValue("description", data.description);
+    formik.setFieldValue("dateCreation", data.created);
+    formik.setFieldValue("dateRealisation", data.dateRealisation);
+    formik.setFieldValue("resume", data.resume);
     formik.setFieldValue("uuid", data.numero);
   };
 
   const downloadFile = (e, data) => {
     e.preventDefault();
-    window.open("https://laafivisionmedical.com/" + data.fileName);}
+    window.open("https://laafivisionmedical.com/" + data.fileName);
+  };
 
   return (
     <div className="container-fluid">
@@ -258,6 +292,10 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
             className="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target={"#create"}
+            onClick={(e) => {
+              e.preventDefault();
+              formik.resetForm();
+            }}
           >
             Ajouter
           </button>
@@ -296,13 +334,28 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
                       <div className="btn-group">
                         <div className="d-inline-block mx-1">
                           <img
-                            title="Voir le rendez vous"
+                            title="Voir les données"
+                            data-bs-toggle="modal"
+                            data-bs-target={"#viewAtt"}
                             onClick={(e) => {
-                              downloadFile(e,data)
+                              setEditData(e, data);
                             }}
                             src={view}
                             alt=""
                           />
+                        </div>
+                        <div className="d-inline-block mx-1">
+                          <div
+                            className="btn-ic-size d-flex align-items-center justify-content-center bg-white"
+                            title={"Télécharger le fichier"}
+                            onClick={(e) => {
+                              downloadFile(e, data);
+                            }}
+                          >
+                            <span>
+                              <Download />
+                            </span>
+                          </div>
                         </div>
                         <div className="d-inline-block mx-1">
                           <img
@@ -357,7 +410,7 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
               <h4 className="modal-title text-meduim text-bold">
                 {formik.values["uuid"] !== undefined
                   ? "Modification du fichier"
-                  : "Ajouter un fichier"}
+                  : "Ajout d'un fichier"}
               </h4>
               <button
                 type="button"
@@ -387,12 +440,33 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
                     formik={formik}
                   />
                   <Input
-                      type={"file"}
-                      name={"file"}
-                      label={"Sélectionnez le fichier"}
-                      placeholder={""}
-                      formik={formik}
-                    />
+                    type={"date"}
+                    name={"dateRealisation"}
+                    label={"Date de réalisation"}
+                    placeholder={""}
+                    formik={formik}
+                  />
+                  <Input
+                    type={"date"}
+                    name={"dateCreation"}
+                    label={"Date de création"}
+                    placeholder={""}
+                    formik={formik}
+                  />
+                  <Input
+                    type={"file"}
+                    name={"file"}
+                    label={"Sélectionnez le fichier"}
+                    placeholder={""}
+                    formik={formik}
+                  />
+                  <Input
+                    type={"longText"}
+                    name={"resume"}
+                    label={"Resumé"}
+                    placeholder={""}
+                    formik={formik}
+                  />
                 </>
 
                 <div className="modal-footer d-flex justify-content-start border-0">
@@ -435,15 +509,26 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
 
             <div className="modal-body">
               <p className="p-0">
-                <span className="fw-bold">Antecedant</span> <br />
-                <span>{dataView.antecedentLabel}</span>
+                <span className="fw-bold">Date de création</span> <br />
+                <span>{dataView.created}</span>
               </p>
               <p className="p-0">
-                <span className="fw-bold">Détails</span> <br />
+                <span className="fw-bold">Date de réalisation</span> <br />
+                <span>{dataView.dateRealisation}</span>
+              </p>
+              <p className="p-0">
+                <span className="fw-bold">Titre</span> <br />
+                <span>{dataView.description}</span>
+              </p>
+              <p className="p-0">
+                <span className="fw-bold">Resumé</span> <br />
                 <div
                   className=""
-                  dangerouslySetInnerHTML={{ __html: dataView.detail }}
+                  dangerouslySetInnerHTML={{ __html: dataView.resume }}
                 />
+              </p>
+              <p className="p-0">
+                <span className="text-muted text-decoration-underline cursor" onClick={e => downloadFile(e, dataView)}>Télécharger le fichier</span> <br />
               </p>
             </div>
 
@@ -463,47 +548,26 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
           </div>
         </div>
       </div>
-      <div className="modal fade" id="notifyRef">
-        <div className="modal-dialog modal-dialog-centered modal-md">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold"></h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">{modalNotifyMsg}</div>
-
-            <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setModalNotifyMsg("");
-                }}
-              >
-                Ok
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <input
-        type="hidden"
-        ref={notifyRef}
-        data-bs-toggle="modal"
-        data-bs-target="#notifyRef"
-        onClick={(e) => {
-          e.preventDefault();
-        }}
+      <NotifyRef
+        notifyRef={notifyRef}
+        setNotifyBg={setNotifyBg}
+        modalNotifyMsg={modalNotifyMsg}
       />
     </div>
   );
 };
 
+const Download = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    class="bi bi-download"
+    viewBox="0 0 16 16"
+  >
+    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+  </svg>
+);
 export default FIchierHospi;

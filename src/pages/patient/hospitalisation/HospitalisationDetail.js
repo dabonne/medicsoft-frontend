@@ -13,25 +13,25 @@ import { useFormik } from "formik";
 import FormNotify from "../../../components/FormNotify";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import requestPatient from "../../../services/requestPatient";
 import { apiHospitalisation, apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import Loading from "../../../components/Loading";
 import { matrice, onSearch } from "../../../services/service";
-import requestDoctor from "../../../services/requestDoctor";
 import requestHospitalisation from "../../../services/requestHospitalisation";
 import Input from "../../../components/Input";
-import Observation from "./Observation";
 import FIchierHospi from "./FIchierHospi";
 import ObservationHospi from "./ObservationHospi";
+import * as Yup from "yup";
+import NotifyRef from "../../../components/NofifyRef";
 
 const initData = {
-  motifHospitalisation: "",
-  historyDisease: "",
-  examClinic: "",
-  conclusion: "",
-  entryDate: "",
+  releaseDate: "",
 };
+
+const validateData = Yup.object({
+  releaseDate: Yup.string().required("Le champ est obligatoire"),
+});
+
 const HospitalisationDetail = ({ setLocation = () => {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
@@ -56,13 +56,20 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
 
   const formik = useFormik({
     initialValues: initData,
+    validationSchema: validateData,
     onSubmit: (values) => {
       console.log(values);
-      update(values)
+      console.log(hospitalDetail);
+      values = {
+        ...hospitalDetail,
+        releaseDate: values.releaseDate,
+        uuid: hospitalDetail.hospitalRecordId,
+      };
+      update(values);
       if (values.uuid) {
-       // update(values);
+        // update(values);
       } else {
-       // post(values);
+        // post(values);
       }
     },
   });
@@ -85,9 +92,7 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
     console.log(values);
     requestHospitalisation
       .put(
-        apiHospitalisation.hospitalRecords +
-          "/"+
-          values.uuid,
+        apiHospitalisation.hospitalRecords + "/" + values.uuid,
         values,
         header
       )
@@ -113,7 +118,7 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
         );
       });
   };
- const configNotify = (bg, title, message) => {
+  const configNotify = (bg, title, message) => {
     setNotifyBg(bg);
     setNotifyTitle(title);
     setNotifyMessage(message);
@@ -157,13 +162,15 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
             </div>
             <div className="col-12 col-md-6">
               <div className="btn-group">
-                <div
+                {
+                  hospitalDetail.releaseDate ? null : <div
                   className="btn btn-primary me-2"
                   data-bs-toggle="modal"
                   data-bs-target="#create"
                 >
                   Date de sortie
                 </div>
+                }
                 <div
                   className="btn btn-primary"
                   onClick={(e) => {
@@ -255,7 +262,8 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                     {hospitalDetail.releaseDate
                       ? hospitalDetail.releaseDate
                       : "Toujours en hospitalisation"}
-                  </span> <br />
+                  </span>{" "}
+                  <br />
                   <span className="fw-bold">Motif : </span>
                   <span>{hospitalDetail.motifHospitalisation}</span> <br />
                   <span className="fw-bold">Examen clinique : </span>
@@ -283,62 +291,72 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
             </div>
           </div>
           <div className="modal fade" id="create">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim">
-                Modification de la date
-              </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-            <div className="modal-body">
-              {/*notifyBg !== "" ? (
-                <FormNotify
-                  bg={notifyBg}
-                  title={notifyTitle}
-                  message={notifyMessage}
-                />
-              ) : null*/}
-              <form className={"mt-3"} onSubmit={formik.handleSubmit}>
-                <div className="mb-5">
-                  <Input
-                    type={"date"}
-                    name={"entryDate"}
-                    label={"Date d'entrée"}
-                    placeholder={"Entrer la date"}
-                    formik={formik}
-                  />
-                </div>
-
-                <div className="modal-footer d-flex justify-content-start border-0">
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content">
+                <div className="modal-header border-0">
+                  <h4 className="modal-title text-meduim">
+                    Modification de la date
+                  </h4>
                   <button
-                    className="btn btn-danger"
+                    type="button"
+                    className="btn-close"
                     data-bs-dismiss="modal"
-                    //ref={closeRef}
-                    onClick={(e) => {
-                      e.preventDefault();
-                    }}
-                  >
-                    Annuler
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Enregistrer
-                  </button>
+                  ></button>
                 </div>
-              </form>
+                <div className="modal-body">
+                  {notifyBg !== "" ? (
+                    <FormNotify
+                      bg={notifyBg}
+                      title={notifyTitle}
+                      message={notifyMessage}
+                    />
+                  ) : null}
+                  <form className={"mt-3"} onSubmit={formik.handleSubmit}>
+                    <div className="mb-5">
+                      <Input
+                        type={"date"}
+                        name={"releaseDate"}
+                        label={"Date d'entrée"}
+                        placeholder={"Entrer la date"}
+                        formik={formik}
+                      />
+                    </div>
+
+                    <div className="modal-footer d-flex justify-content-start border-0">
+                      <button
+                        className="btn btn-danger"
+                        data-bs-dismiss="modal"
+                        ref={closeRef}
+                        onClick={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        Annuler
+                      </button>
+                      <button type="submit" className="btn btn-primary">
+                        Enregistrer
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+          <NotifyRef
+            notifyRef={notifyRef}
+            setNotifyBg={setNotifyBg}
+            modalNotifyMsg={modalNotifyMsg}
+          />
         </>
       ) : (
         <>
           <div>
-            <span className="cursor fw-bold" onClick={(e) => changeView(e, "home")}>Retour</span>
+            <span
+              className="cursor fw-bold"
+              onClick={(e) => changeView(e, "home")}
+            >
+              Retour
+            </span>
           </div>
           {view === "antecedent" && <AntecedentPersonnel />}
           {view === "observation" && <ObservationHospi />}

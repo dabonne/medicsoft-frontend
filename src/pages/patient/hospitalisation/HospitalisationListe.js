@@ -21,6 +21,7 @@ import { matrice, onSearch } from "../../../services/service";
 import requestDoctor from "../../../services/requestDoctor";
 import requestHospitalisation from "../../../services/requestHospitalisation";
 import Input from "../../../components/Input";
+import * as Yup from "yup";
 
 const initData = {
   motifHospitalisation: "",
@@ -30,6 +31,15 @@ const initData = {
   entryDate: "",
   releaseDate: "",
 };
+
+const validateData = Yup.object({
+  motifHospitalisation: Yup.string().required("Le champ est obligatoire"),
+  historyDisease: Yup.string().required("Le champ est obligatoire"),
+  examClinic: Yup.string().required("Le champ est obligatoire"),
+  conclusion: Yup.string().required("Le champ est obligatoire"),
+  entryDate: Yup.string().required("Le champ est obligatoire"),
+});
+
 const HospitalisationListe = ({ setLocation = () => {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
@@ -75,6 +85,7 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
 
   const formik = useFormik({
     initialValues: initData,
+    validationSchema: validateData,
     onSubmit: (values) => {
       console.log(values);
       if (values.uuid) {
@@ -120,21 +131,18 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
   const update = (values) => {
     //e.preventDefault();
     configNotify("loading", "", "Modification des données en cours...");
-    console.log(value);
+    console.log(values);
     requestHospitalisation
       .put(
-        apiHospitalisation.hospitalRecords +
-          "/"+
-          values.uuid,
+        apiHospitalisation.hospitalRecords + "/" + values.uuid,
         values,
         header
       )
       .then((res) => {
-        //console.log("enregistrement ok");
         setModalNotifyMsg("Les informations ont bien été enrégistrées");
         configNotify(
           "success",
-          "Ajout réussi",
+          "Modification réussi",
           "Les informations ont bien été enrégistrées"
         );
 
@@ -151,48 +159,7 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
         );
       });
   };
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    console.log(editMode);
-    configNotify("loading", "", "Ajout des données en cours...");
-    //console.log(apiMedical.updateReport + "/" + user.organisationRef + "/" + editMode+"?description="+value);
-    requestPatient
-      .put(
-        apiMedical.updateReport +
-          "/" +
-          user.organisationRef +
-          "/" +
-          editMode +
-          "?description=" +
-          value,
-        {
-          patientCni: user.cni,
-          description: value,
-        },
-        header
-      )
-      .then((res) => {
-        console.log("enregistrement ok");
-        setModalNotifyMsg("Les informations ont bien été enrégistrées");
-        configNotify(
-          "success",
-          "Ajout réussi",
-          "Les informations ont bien été enrégistrées"
-        );
-
-        closeRef.current.click();
-        notifyRef.current.click();
-        setRefresh(refresh + 1);
-      })
-      .catch((error) => {
-        console.log(error);
-        configNotify(
-          "danger",
-          "Oups !",
-          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
-        );
-      });
-  };
+  
 
   const get = () => {
     requestHospitalisation
@@ -219,18 +186,7 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
         setFail(true);
       });
   };
-  const viewCompteRendu = (id) => {
-    requestPatient
-      .get(apiMedical.getReportByID + "/" + id, header)
-      .then((res) => {
-        console.log("view");
-        console.log(res.data);
-        setValue(res.data.description);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  
 
   const onDelete = (id) => {
     requestHospitalisation
@@ -263,18 +219,6 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
       setList(pagination[pageNumber - 1]);
       setDatas(pagination[pageNumber - 1]);
     }
-  };
-
-  const printCompteRendu = (e, id) => {
-    e.preventDefault();
-    requestDoctor
-      .get(apiMedical.printReport + "/" + id + "/" + user.organisationRef)
-      .then((res) => {
-        window.open("https://laafivisionmedical.com/" + res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const setEditData = (e, data) => {
@@ -330,7 +274,10 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
             className="btn btn-primary ms-auto"
             data-bs-target="#create"
             data-bs-toggle="modal"
-            onClick={(e) => setValue("")}
+            onClick={(e) => {
+              e.preventDefault()
+              formik.resetForm()
+            }}
           >
             Envoyer en hospitalisation
           </button>
@@ -381,18 +328,20 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
                         </div>
                         {0 === 0 && (
                           <>
-                            <div className="d-inline-block mx-1">
-                              <img
-                                title="Éditer le rapport"
-                                data-bs-target="#create"
-                                data-bs-toggle="modal"
-                                onClick={(e) => {
-                                  setEditData(e, data);
-                                }}
-                                src={edit}
-                                alt=""
-                              />
-                            </div>
+                            {data.releaseDate ? null : (
+                              <div className="d-inline-block mx-1">
+                                <img
+                                  title="Éditer le rapport"
+                                  data-bs-target="#create"
+                                  data-bs-toggle="modal"
+                                  onClick={(e) => {
+                                    setEditData(e, data);
+                                  }}
+                                  src={edit}
+                                  alt=""
+                                />
+                              </div>
+                            )}
                             <div className="d-inline-block mx-1">
                               <img
                                 title="Supprimer le rapport"
@@ -442,6 +391,13 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
               <form className={"mt-3"} onSubmit={formik.handleSubmit}>
                 <div className="mb-5">
                   <Input
+                    type={"date"}
+                    name={"entryDate"}
+                    label={"Date d'entrée"}
+                    placeholder={"Entrer la date"}
+                    formik={formik}
+                  />
+                  <Input
                     type={"text"}
                     name={"motifHospitalisation"}
                     label={"Motif"}
@@ -467,13 +423,6 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
                     name={"conclusion"}
                     label={"Conclusion"}
                     placeholder={"Entrer la conclusion"}
-                    formik={formik}
-                  />
-                  <Input
-                    type={"date"}
-                    name={"entryDate"}
-                    label={"Date d'entrée"}
-                    placeholder={"Entrer la date"}
                     formik={formik}
                   />
                 </div>

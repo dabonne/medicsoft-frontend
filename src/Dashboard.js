@@ -254,7 +254,7 @@ const Dashboard = () => {
                       data-bs-toggle="collapse"
                       data-bs-target="#sidebarMenu.show"
                     >
-                      Protocole de biologie
+                      Protocoles de biologie
                     </span>
                   </NavLink>
                 </li>

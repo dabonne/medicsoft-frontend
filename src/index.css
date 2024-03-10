@@ -200,6 +200,15 @@ span.wd-80 {
   
 }
 
+.btn-ic-size{
+  display: inline-block;
+  border: 1px solid #C0C0CF;
+  border-radius: 15px;
+  text-align: center;
+  width: 45px;
+  height: 45px;
+}
+
 .bg-secondary{
   background-color: var(--secondary-color) !important;
   border: 1px solid var(--primary-color);

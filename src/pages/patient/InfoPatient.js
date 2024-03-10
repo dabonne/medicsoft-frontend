@@ -158,11 +158,7 @@ const InfoPatient = () => {
                 supprimer
               </Link>
             </span>
-            <span className="d-block mt-3">
-              <Link to="#" className="text-black">
-                Envoyer en hospitalisation
-              </Link>
-            </span>
+            
           </div>
         </div>
         <div className="col-12 col-sm-12 col-md-7 col-lg-9 mx-auto">

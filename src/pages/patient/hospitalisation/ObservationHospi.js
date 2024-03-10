@@ -18,12 +18,23 @@ import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import Input from "../../../components/Input";
 import FormNotify from "../../../components/FormNotify";
+import ReactQuill from "react-quill";
+import NotifyRef from "../../../components/NofifyRef";
+import * as Yup from "yup";
 
 const initData = {
   date: "",
   label: "",
   isDossierSynthese: "",
 };
+
+
+const validateData = Yup.object({
+  date: Yup.string()
+    .required("Le champ est obligatoire"),
+  label: Yup.string()
+    .required("Le champ est obligatoire"),
+});
 
 const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
   const authCtx = useContext(AppContext);
@@ -64,9 +75,11 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
 
   const formik = useFormik({
     initialValues: initData,
+    validationSchema:validateData,
     onSubmit: (values) => {
       console.log(values);
       if (values.uuid) {
+        setModalNotifyMsg("Les informations ont été modifiées");
         update(values);
       } else {
         post(values);
@@ -100,7 +113,7 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
       });
   };
   const post = (values) => {
-    console.log(values);
+    configNotify("loading", "", "Ajout des données en cours...");
     requestHospitalisation
       .post(
         apiHospitalisation.hospitalRecords + "/" + id + "/observations",
@@ -108,15 +121,15 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
         header
       )
       .then((res) => {
-        console.log("enregistrement ok");
-        formik.resetForm()
+        //console.log("enregistrement ok");
+        formik.resetForm();
         setRefresh(refresh + 1);
         configNotify(
           "success",
           "Ajout réussi",
           "Les informations ont bien été enrégistrées"
         );
-        setModalNotifyMsg("L'observation a été ajouté avec succès");
+        setModalNotifyMsg("Les informations ont bien été enrégistrées");
         closeRef.current.click();
         notifyRef.current.click();
         get();
@@ -125,10 +138,15 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
         console.log(error);
         setStopLoad(true);
         setFail(true);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
       });
   };
   const update = (values) => {
-    console.log(values)
+    configNotify("loading", "", "Modification des données en cours...");
     requestHospitalisation
       .put(
         apiHospitalisation.hospitalRecords +
@@ -148,7 +166,6 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
           "Modification réussi",
           "Les informations ont été enrégistrées"
         );
-        setModalNotifyMsg("Les informations ont été modifiées");
         closeRef.current.click();
         notifyRef.current.click();
         get();
@@ -157,13 +174,16 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
         console.log(error);
         setStopLoad(true);
         setFail(true);
+        configNotify(
+          "danger",
+          "Oups !",
+          "Une erreur est survenue. Veuillez réessayer ultérieurement..."
+        );
       });
   };
   const makeSearch = (e) => {
     e.preventDefault();
-    onSearch(e, setList, datas, [
-      "description",
-    ]);
+    onSearch(e, setList, datas, ["description"]);
   };
   const onDelete = (deleteId) => {
     //e.preventDefault();
@@ -211,6 +231,7 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
 
   const setIsDossierSynthese = (e, data) => {
     e.preventDefault();
+    setModalNotifyMsg(!data.isDossierSynthese ? "L'observation a été copiée dans la synthèse" : "L'observation a été retirée de la synthèse");
     update({
       label: data.label,
       date: data.dateObservation,
@@ -266,6 +287,10 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
             className="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target={"#create"}
+            onClick={(e) => {
+              e.preventDefault();
+              formik.resetForm();
+            }}
           >
             Ajouter
           </button>
@@ -280,7 +305,6 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                 <th scope="col" className="border-raduis-left">
                   Observation ID
                 </th>
-                <th scope="col">Description</th>
                 <th scope="col">Date</th>
                 <th scope="col">Auteur</th>
                 <th scope="col">Etat</th>
@@ -296,9 +320,6 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                   <tr key={idx}>
                     <td>
                       <span className="text-bold">PRESC-0218374</span>
-                    </td>
-                    <td>
-                      <span className="text-bold">{data.label}</span>
                     </td>
                     <td>{data.dateObservation}</td>
                     <td>{data.user}</td>
@@ -325,16 +346,19 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                           />
                         </div>
                         <div className="d-inline-block mx-1">
-                          <img
+                          <div
+                            className="btn-ic-size d-flex align-items-center justify-content-center bg-white"
                             title={
                               data.isDossierSynthese
                                 ? "Retirer de la synthèse"
                                 : "Ajouter à la synthèse"
                             }
                             onClick={(e) => setIsDossierSynthese(e, data)}
-                            src={print}
-                            alt=""
-                          />
+                          >
+                            <span>
+                              <Copy />
+                            </span>
+                          </div>
                         </div>
                         <div className="d-inline-block mx-1">
                           <img
@@ -386,7 +410,7 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
               <h4 className="modal-title text-meduim text-bold">
                 {formik.values["uuid"] !== undefined
                   ? "Modification d'une observation"
-                  : "Ajouter une observation"}
+                  : "Ajout d'une observation"}
               </h4>
               <button
                 type="button"
@@ -416,10 +440,10 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
                     formik={formik}
                   />
                   <Input
-                    type={"text"}
+                    type={"longText"}
                     name={"label"}
-                    label={"Détail"}
-                    placeholder={"Entrer les détails"}
+                    label={"Observation"}
+                    //placeholder={"Entrer l'abbreviation du protocole"}
                     formik={formik}
                   />
                 </>
@@ -497,47 +521,29 @@ const ObservationHospi = ({ setNameIdx = () => {}, type = {} }) => {
           </div>
         </div>
       </div>
-      <div className="modal fade" id="notifyRef">
-        <div className="modal-dialog modal-dialog-centered modal-md">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold"></h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">{modalNotifyMsg}</div>
-
-            <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setModalNotifyMsg("");
-                }}
-              >
-                Ok
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <input
-        type="hidden"
-        ref={notifyRef}
-        data-bs-toggle="modal"
-        data-bs-target="#notifyRef"
-        onClick={(e) => {
-          e.preventDefault();
-        }}
+      <NotifyRef
+        notifyRef={notifyRef}
+        setNotifyBg={setNotifyBg}
+        modalNotifyMsg={modalNotifyMsg}
       />
     </div>
   );
 };
+
+const Copy = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    class="bi bi-copy"
+    viewBox="0 0 16 16"
+  >
+    <path
+      fill-rule="evenodd"
+      d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+    />
+  </svg>
+);
 
 export default ObservationHospi;

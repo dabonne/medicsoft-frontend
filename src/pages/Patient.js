@@ -6,23 +6,22 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import InfoPatient from "./patient/InfoPatient";
 import ListPatient from "./patient/ListPatient";
 import DossierParamedical from "./patient/DossierParamedical";
+import ListPatientHospitalisation from "./patient/ListPatientHospitalisation";
 
 const Patient = () => {
   const [datas, setDatas] = useState([]);
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
   let navigate = useNavigate();
-
+  const path = document.location.pathname;
   useEffect(() => {
     setDatas([...Array(20).keys()]);
   }, []);
 
-  
-
-  const navigateToPatientInfo = (e,idx) =>{
-    e.preventDefault()
-    return navigate(`detail`)
-  }
+  const navigateToPatientInfo = (e, idx) => {
+    e.preventDefault();
+    return navigate(`detail`);
+  };
 
   const onSearch = (e) => {
     e.preventDefault();
@@ -51,10 +50,15 @@ const Patient = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<ListPatient />} />
+        {path.includes("patient") && (
+          <Route path="/" element={<ListPatient />} />
+        )}
+        {path.includes("hospitalisation") && (
+          <Route path="/" element={<ListPatientHospitalisation />} />
+        )}
+
         <Route path="details/*" element={<InfoPatient />} />
         <Route path="dossier-paramedical/*" element={<DossierParamedical />} />
-        
       </Routes>
     </>
   );
