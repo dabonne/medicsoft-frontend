@@ -152,11 +152,7 @@ const FIchierMedicaux = ({ setNameIdx = () => {}, type = {} }) => {
     configNotify("loading", "", "Modification des données en cours...");
     requestHospitalisation
       .put(
-        apiHospitalisation.hospitalRecords +
-          "/" +
-          id +
-          "/hospitalisation-file/" +
-          values.uuid,
+        apiMedical.doctor + "/medical-records/" + user.patientId+ "/files/" +values.uuid,
         values,
         header
       )

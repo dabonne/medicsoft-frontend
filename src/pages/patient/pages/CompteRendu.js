@@ -71,8 +71,10 @@ const CompteRendu = ({ setLocation = () => {} }) => {
       console.log(values);
       if (values.uuid) {
         update(values);
+        formik.resetForm()
       } else {
         post(values);
+        formik.resetForm()
       }
     },
   });
@@ -191,7 +193,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
       .then((res) => {
         console.log("view");
         console.log(res.data);
-        setValue(res.data.description);
+        setValue(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -247,8 +249,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
       });
   };
 
-  const setEditData = (e, data) => {
-    e.preventDefault();
+  const setEditData = ( data) => {
     formik.setFieldValue("label", data.label);
     formik.setFieldValue("description", data.description);
     formik.setFieldValue("uuid", data.observationId);
@@ -371,6 +372,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
                                   e.preventDefault();
                                   viewCompteRendu(data.id);
                                   setEditMode(data.id);
+                                  setEditData(data)
                                 }}
                                 src={edit}
                                 alt=""
@@ -475,7 +477,8 @@ const CompteRendu = ({ setLocation = () => {} }) => {
               ></button>
             </div>
             <div className="modal-body">
-              <div dangerouslySetInnerHTML={{ __html: value }}></div>
+              <h3>{value?.label}</h3>
+              <div dangerouslySetInnerHTML={{ __html: value.description }}></div>
             </div>
             <div className="modal-footer d-flex justify-content-start border-0">
               <button className="btn btn-primary" data-bs-dismiss="modal">
