@@ -11,6 +11,8 @@ import AntecedentPersonnel from "../components/AntecedentPersonnel";
 
 import DossierMedicaux from "../components/DossierMedicaux";
 import DonneeCompteRendu from "../components/DonneeCompteRendu";
+import FIchierMedicaux from "../components/FIchierMedicaux";
+import CompteRendu from "./CompteRendu";
 
 const DossierContainer = ({setLocation, setPageName}) => {
   const [datas, setDatas] = useState([]);
@@ -48,6 +50,10 @@ const DossierContainer = ({setLocation, setPageName}) => {
       id: "VARIOUS",
       title: "Résumé consultation",
     },
+    {
+      id: "FICHIER",
+      title: "Fichier dossier médicaux",
+    },
   ]
 
   setPageName(tabName[nameIdx])
@@ -60,7 +66,8 @@ const DossierContainer = ({setLocation, setPageName}) => {
         <Route path="/imageries" element={<DonneeCompteRendu type={medicalType[1]} setNameIdx={setNameIdx} />} />
         <Route path="/examens-specialises" element={<DonneeCompteRendu type={medicalType[2]} setNameIdx={setNameIdx} />} />
         <Route path="/analyses-biologiques" element={<DonneeCompteRendu type={medicalType[3]} setNameIdx={setNameIdx} />} />
-        <Route path="/resume-consultation" element={<DonneeCompteRendu type={medicalType[4]} setNameIdx={setNameIdx} />} />
+        <Route path="/resume-consultation" element={<CompteRendu type={medicalType[4]} setNameIdx={setNameIdx} />} />
+        <Route path="/fichier-dossier-medicaux" element={<FIchierMedicaux type={medicalType[5]} setNameIdx={setNameIdx} />} />
       </Routes>
     </div>
   );

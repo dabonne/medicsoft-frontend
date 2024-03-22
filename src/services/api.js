@@ -85,7 +85,8 @@ const apiMedical = {
     "antecedentRecord":"doctor/medical-record/antecedent",
     "postAntecedent":"doctor/medical-record/antecedent",
     "putAntecedent":"doctor/medical-record/antecedent",
-    "antecedent":"medical-record/antecedent"
+    "antecedent":"medical-record/antecedent",
+    "doctor":"doctor"
     
 }
 

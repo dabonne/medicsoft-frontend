@@ -85,7 +85,7 @@ const ListPatient = () => {
     user.cni = data.cni;
     user.patientId = data.patientId;
     onUserChange(user);
-    return navigate(`details`);
+    return navigate(`details/rendez-vous`);
   };
 
   const makeSearch = (e) => {

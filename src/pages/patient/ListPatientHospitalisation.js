@@ -86,7 +86,7 @@ const ListPatientHospitalisation = () => {
     user.cni = data.cni;
     user.patientId = data.patientId;
     onUserChange(user);
-    return navigate(`details`);
+    return navigate(`details/patient-hospitalisation`);
   };
 
   const makeSearch = (e) => {

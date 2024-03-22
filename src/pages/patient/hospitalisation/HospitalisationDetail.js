@@ -6,6 +6,7 @@ import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
 import user from "../../../assets/imgs/user.png";
 import print from "../../../assets/imgs/print.png";
+import bk from "../../../assets/imgs/bk.png";
 import { Link, Route, Routes, useLocation, useParams } from "react-router-dom";
 import Dossier from "../components/DossierMedicaux";
 import AntecedentPersonnel from "../components/AntecedentPersonnel";
@@ -23,6 +24,7 @@ import FIchierHospi from "./FIchierHospi";
 import ObservationHospi from "./ObservationHospi";
 import * as Yup from "yup";
 import NotifyRef from "../../../components/NofifyRef";
+import InformationPatient from "../../../components/InformationPatient";
 
 const initData = {
   releaseDate: "",
@@ -134,7 +136,7 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
         <>
           <div className="row my-3">
             <div className="col-12 col-md-6">
-              <div className=" me-3 text-bold text-meduim align-top">
+            <div className=" me-3 text-bold text-meduim align-top">
                 <span>{hospitalDetail.motifHospitalisation}</span>
               </div>
               <div className="d-inline-block">
@@ -162,17 +164,17 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
             </div>
             <div className="col-12 col-md-6">
               <div className="btn-group">
-                {
-                  hospitalDetail.releaseDate ? null : <div
-                  className="btn btn-primary me-2"
-                  data-bs-toggle="modal"
-                  data-bs-target="#create"
-                >
-                  Date de sortie
-                </div>
-                }
+                {hospitalDetail.releaseDate ? null : (
+                  <div
+                    className="btn btn-primary me-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#create"
+                  >
+                    Date de sortie
+                  </div>
+                )}
                 <div
-                  className="btn btn-primary"
+                  className="btn btn-primary me-2"
                   onClick={(e) => {
                     e.preventDefault();
                     window.open(
@@ -185,9 +187,16 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                 >
                   Exporter le dossier
                 </div>
+                <Link
+                  className="btn btn-secondary me-2"
+                  to={""}
+                >
+                 Faire une prescription
+                </Link>
               </div>
             </div>
           </div>
+          <InformationPatient disableBtn ={true} />
           <div className="row row-cols-1 row-cols-md-5 my-5">
             <div className="col">
               <div
@@ -355,7 +364,12 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
               className="cursor fw-bold"
               onClick={(e) => changeView(e, "home")}
             >
-              Retour
+              <div className="d-inline-block">
+                <span className="d-inline-block me-2">
+                  <img src={bk} alt="" />
+                </span>
+                <span className="d-inline-block text-bold">retour</span>
+              </div>
             </span>
           </div>
           {view === "antecedent" && <AntecedentPersonnel />}

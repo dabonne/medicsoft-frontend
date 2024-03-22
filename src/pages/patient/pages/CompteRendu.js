@@ -19,8 +19,21 @@ import { AppContext } from "../../../services/context";
 import Loading from "../../../components/Loading";
 import { matrice, onSearch } from "../../../services/service";
 import requestDoctor from "../../../services/requestDoctor";
+import * as Yup from "yup";
+import Input from "../../../components/Input";
 
-const CompteRendu = ({ setLocation }) => {
+const initData = {
+  label: "",
+  description: "",
+};
+
+const validateData = Yup.object({
+  description: Yup.string()
+    .required("Le champ est obligatoire"),
+  label: Yup.string()
+    .required("Le champ est obligatoire"),
+});
+const CompteRendu = ({ setLocation = () => {} }) => {
   const authCtx = useContext(AppContext);
   const { user } = authCtx;
   const [datas, setDatas] = useState([]);
@@ -50,6 +63,20 @@ const CompteRendu = ({ setLocation }) => {
     setLocation(window.location.pathname);
   }, [refresh]);
 
+  const formik = useFormik({
+    initialValues: initData,
+    validationSchema:validateData,
+    onSubmit: (values) => {
+      values.patientCni = user.cni
+      console.log(values);
+      if (values.uuid) {
+        update(values);
+      } else {
+        post(values);
+      }
+    },
+  });
+
   const makeSearch = (e) => {
     e.preventDefault();
     onSearch(e, setList, datas, [
@@ -62,17 +89,13 @@ const CompteRendu = ({ setLocation }) => {
     ]);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const post = (values) => {
     configNotify("loading", "", "Ajout des données en cours...");
     console.log(value);
     requestPatient
       .post(
         apiMedical.postReport + "/" + user.organisationRef,
-        {
-          patientCni: user.cni,
-          description: value,
-        },
+        values,
         header
       )
       .then((res) => {
@@ -97,7 +120,7 @@ const CompteRendu = ({ setLocation }) => {
         );
       });
   };
-  const handleEditSubmit = (e) => {
+  const update = (e) => {
     e.preventDefault();
     console.log(editMode);
     configNotify("loading", "", "Ajout des données en cours...");
@@ -222,6 +245,13 @@ const CompteRendu = ({ setLocation }) => {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const setEditData = (e, data) => {
+    e.preventDefault();
+    formik.setFieldValue("label", data.label);
+    formik.setFieldValue("description", data.description);
+    formik.setFieldValue("uuid", data.observationId);
   };
   return (
     <div className="container-fluid">
@@ -394,16 +424,25 @@ const CompteRendu = ({ setLocation }) => {
               ) : null}
               <form
                 className={"mt-3"}
-                onSubmit={editMode !== "" ? handleEditSubmit : handleSubmit}
+                onSubmit={formik.handleSubmit}
               >
-                <div className="mb-5">
-                  <ReactQuill
-                    theme="snow"
-                    value={value}
-                    onChange={setValue}
-                    style={{ height: "200px" }}
+                
+                <Input
+                    type={"text"}
+                    name={"label"}
+                    label={"Titre"}
+                    placeholder={"Entrer le titre"}
+                    formik={formik}
                   />
-                </div>
+                  <Input
+                    type={"longText"}
+                    name={"description"}
+                    label={"Resumé"}
+                    placeholder={""}
+                    formik={formik}
+                  />
+
+                
                 <div className="modal-footer d-flex justify-content-start border-0">
                   <button
                     className="btn btn-danger"
