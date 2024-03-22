@@ -189,7 +189,7 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                 </div>
                 <Link
                   className="btn btn-secondary me-2"
-                  to={""}
+                  to={"/dashboard/hospitalisation/details/prescriptions"}
                 >
                  Faire une prescription
                 </Link>

@@ -334,14 +334,15 @@ const Dashboard = () => {
 
           <main className="col-md-11 ms-sm-auto col-lg-10 px-md-4 pt-2 h-90 text-small">
             <div className="d-flex justify-content-between py-3">
-              {/**
-               * <div className="d-inline-block">
-                <span className="d-inline-block me-2">
+              
+               <div className="d-inline-block">
+                {/**
+                 * <span className="d-inline-block me-2">
                   <img src={bk} alt="" />
                 </span>
                 <span className="d-inline-block text-bold">retour</span>
+                 */}
               </div>
-               */}
               <div className="d-inline-block btn btn-gray">
                 <span>{user.organisation} - </span>
                 <span
