@@ -71,10 +71,8 @@ const CompteRendu = ({ setLocation = () => {} }) => {
       console.log(values);
       if (values.uuid) {
         update(values);
-        formik.resetForm()
       } else {
         post(values);
-        formik.resetForm()
       }
     },
   });
@@ -112,6 +110,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
         closeRef.current.click();
         notifyRef.current.click();
         setRefresh(refresh + 1);
+        formik.resetForm()
       })
       .catch((error) => {
         console.log(error);
@@ -122,24 +121,19 @@ const CompteRendu = ({ setLocation = () => {} }) => {
         );
       });
   };
-  const update = (e) => {
-    e.preventDefault();
+  const update = (values) => {
     console.log(editMode);
-    configNotify("loading", "", "Ajout des données en cours...");
-    //console.log(apiMedical.updateReport + "/" + user.organisationRef + "/" + editMode+"?description="+value);
+    configNotify("loading", "", "Modification des données en cours...");
     requestPatient
       .put(
         apiMedical.updateReport +
           "/" +
           user.organisationRef +
           "/" +
-          editMode +
+          values.uuid +
           "?description=" +
-          value,
-        {
-          patientCni: user.cni,
-          description: value,
-        },
+          values.description,
+        values,
         header
       )
       .then((res) => {
@@ -147,13 +141,15 @@ const CompteRendu = ({ setLocation = () => {} }) => {
         setModalNotifyMsg("Les informations ont bien été enrégistrées");
         configNotify(
           "success",
-          "Ajout réussi",
-          "Les informations ont bien été enrégistrées"
+          "Modification réussi",
+          "Les informations ont été enrégistrées"
         );
 
         closeRef.current.click();
         notifyRef.current.click();
         setRefresh(refresh + 1);
+        formik.resetForm()
+
       })
       .catch((error) => {
         console.log(error);
@@ -187,17 +183,8 @@ const CompteRendu = ({ setLocation = () => {} }) => {
         setFail(true);
       });
   };
-  const viewCompteRendu = (id) => {
-    requestPatient
-      .get(apiMedical.getReportByID + "/" + id, header)
-      .then((res) => {
-        console.log("view");
-        console.log(res.data);
-        setValue(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const viewCompteRendu = (e, data) => {
+    setValue(data);
   };
 
   const onDelete = (id) => {
@@ -252,7 +239,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
   const setEditData = ( data) => {
     formik.setFieldValue("label", data.label);
     formik.setFieldValue("description", data.description);
-    formik.setFieldValue("uuid", data.observationId);
+    formik.setFieldValue("uuid", data.id);
   };
   return (
     <div className="container-fluid">
@@ -342,9 +329,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
                             data-bs-toggle="modal"
                             data-bs-target="#viewCompteRenduModal"
                             onClick={(e) => {
-                              e.preventDefault();
-                              //setDelete(["" + data.employeeReference]);
-                              viewCompteRendu(data.id);
+                              viewCompteRendu(e,data);
                             }}
                             src={view}
                             alt=""
@@ -370,8 +355,6 @@ const CompteRendu = ({ setLocation = () => {} }) => {
                                 data-bs-toggle="modal"
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  viewCompteRendu(data.id);
-                                  setEditMode(data.id);
                                   setEditData(data)
                                 }}
                                 src={edit}

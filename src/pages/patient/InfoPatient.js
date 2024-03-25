@@ -4,9 +4,7 @@ import {
   NavLink,
   Route,
   Routes,
-  useLocation,
   useNavigate,
-  useParams,
 } from "react-router-dom";
 import profile from "../../assets/imgs/profile.png";
 import back from "../../assets/imgs/bck.png";
@@ -45,7 +43,7 @@ const InfoPatient = () => {
   const [list, setList] = useState("");
   const [isLoad, setIsLoad] = useState(false);
   const [patient, setPatient] = useState(initPatient);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -90,16 +88,19 @@ const InfoPatient = () => {
 
   const onDelete = (id) => {
     requestDoctor
-      .delete(apiPatient.putOrDelete+"/"+id, header)
+      .delete(apiPatient.putOrDelete + "/" + id, header)
       .then((res) => {
         console.log(res.data);
-        navigate("/dashboard/patient")
+        navigate("/dashboard/patient");
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
+  const goBack = () => {
+    navigate(-1);
+  };
   return (
     <>
       <div className="row">
@@ -158,7 +159,6 @@ const InfoPatient = () => {
                 supprimer
               </Link>
             </span>
-            
           </div>
         </div>
         <div className="col-12 col-sm-12 col-md-7 col-lg-9 mx-auto">
@@ -216,25 +216,17 @@ const InfoPatient = () => {
           </ul>
 
           <div className="px-1">
-            <Link
-              to="/dashboard/patient/details/dossiers-medicaux"
-              className="d-inline-block my-2 text-black text-decoration-none"
+            <div
+              className="d-inline-block my-2 cursor"
+              onClick={(e) => {
+                goBack();
+              }}
             >
-              {location.includes("dossiers-medicaux") && (
-                <>
-                  <span>
-                    <img
-                      src={back}
-                      alt=""
-                      onClick={(e) => {
-                        setPageName("Dossier médical");
-                      }}
-                    />
-                  </span>{" "}
-                  <span className="text-bold">{" " + pageName}</span>
-                </>
-              )}
-            </Link>
+              <span>
+                <img src={back} alt="" />
+              </span>{" "}
+              <span className="text-bold">Retour</span>
+            </div>
             <Routes>
               <Route
                 path="/"
@@ -266,12 +258,16 @@ const InfoPatient = () => {
                 element={<HospitalisationPatient setLocation={setLocation} />}
               />
             </Routes>
-            
           </div>
         </div>
       </div>
       {<ModalPatient edit={true} />}
-      <DeleteModal title={"Suppression du patient"} id={user.cni} modal={"delete"} onDelete={onDelete} />
+      <DeleteModal
+        title={"Suppression du patient"}
+        id={user.cni}
+        modal={"delete"}
+        onDelete={onDelete}
+      />
     </>
   );
 };

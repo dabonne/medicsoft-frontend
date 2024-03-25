@@ -9,7 +9,7 @@ import employe from "./assets/imgs/employe.png";
 import rendv from "./assets/imgs/rendezvous.png";
 import agenda from "./assets/imgs/agenda.png";
 import patient from "./assets/imgs/patient.png";
-import bk from "./assets/imgs/bk.png";
+import bk from "./assets/imgs/bck.png";
 import Employe from "./pages/Employe";
 import Settings from "./pages/Settings";
 import Home from "./pages/Home";
@@ -34,6 +34,7 @@ const Dashboard = () => {
   const [userLocal, setUserLocal] = useState("");
   let navigate = useNavigate();
   const [userImg, setUserImg] = useState(userp);
+  
   useEffect(() => {
     //return navigate("/dashboard/")
     setUserImg(user.profile);
@@ -71,6 +72,11 @@ const Dashboard = () => {
     deleteUser();
     onUserChange(initialUser);
   };
+
+  const goBack = (e) => {
+    e.preventDefault()
+    navigate(-1)
+  }
 
   return (
     <>
@@ -298,7 +304,7 @@ const Dashboard = () => {
                       <img
                         className="rounded-circle"
                         width="30px"
-                        src={URLLVM+""+ userImg}
+                        src={URLLVM + "" + userImg}
                         alt=""
                         style={{ marginLeft: "-6px", marginTop: "-6px" }}
                       />
@@ -334,14 +340,11 @@ const Dashboard = () => {
 
           <main className="col-md-11 ms-sm-auto col-lg-10 px-md-4 pt-2 h-90 text-small">
             <div className="d-flex justify-content-between py-3">
-              
-               <div className="d-inline-block">
-                {/**
-                 * <span className="d-inline-block me-2">
+              <div className="d-inline-block cursor" onClick={goBack}>
+                <span className="d-inline-block me-2">
                   <img src={bk} alt="" />
                 </span>
                 <span className="d-inline-block text-bold">retour</span>
-                 */}
               </div>
               <div className="d-inline-block btn btn-gray">
                 <span>{user.organisation} - </span>

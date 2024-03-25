@@ -66,7 +66,7 @@ const DossierMedicaux = () => {
             className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
           >
             <div className="text-center">
-              <span className="text-bold">Compte rendu</span> <br />
+              <span className="text-bold">Comptes rendus</span> <br />
               <span className="text-bold">d’imagerie</span> <br />
             </div>
           </Link>
@@ -77,7 +77,7 @@ const DossierMedicaux = () => {
             className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
           >
             <div className="text-center">
-              <span className="text-bold">Compte rendu</span> <br />
+              <span className="text-bold">Comptes rendus</span> <br />
               <span className="text-bold">d’examens</span> <br />
               <span className="text-bold">spécialisés</span> <br />
             </div>
@@ -89,7 +89,7 @@ const DossierMedicaux = () => {
             className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
           >
             <div className="text-center">
-              <span className="text-bold">Compte rendu</span> <br />
+              <span className="text-bold">Comptes rendus</span> <br />
               <span className="text-bold">d’analyses</span> <br />
               <span className="text-bold">biologiques</span> <br />
             </div>
@@ -101,8 +101,8 @@ const DossierMedicaux = () => {
             className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
           >
             <div className="text-center">
-              <span className="text-bold">Compte</span> <br />
-              <span className="text-bold">Rendu</span> <br />
+              <span className="text-bold">Comptes</span> <br />
+              <span className="text-bold">Rendus</span> <br />
             </div>
           </Link>
         </div>

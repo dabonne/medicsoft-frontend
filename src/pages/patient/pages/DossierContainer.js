@@ -35,16 +35,16 @@ const DossierContainer = ({setLocation, setPageName}) => {
     },
     {
       id: "IMAGERY",
-      title: "Compte rendu d’imagerie",
+      title: "Comptes rendus d’imagerie",
       label: "Imagerie",
     },
     {
       id: "SPECIALIZED_EXAM",
-      title: "Compte rendu d’examens spécialisés",
+      title: "Comptes rendus d’examens spécialisés",
     },
     {
       id: "BIOLOGIC_ANALYSE",
-      title: "Compte rendu d’analyses biologiques",
+      title: "Comptes rendus d’analyses biologiques",
     },
     {
       id: "VARIOUS",
