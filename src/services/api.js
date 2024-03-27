@@ -63,7 +63,7 @@ const apiMedical = {
     "getPersonalList":"medical/personal-family",
     "putFamily":"update-medical/personal-family",
     "deleteFamily":"delete-medical/personal-family",
-    "postReport":"report",
+    "report":"report",
     "getReport": "report-list",
     "getReportByID": "report-id",
     "updateReport":"update-report",

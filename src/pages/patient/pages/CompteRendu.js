@@ -68,7 +68,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
     validationSchema:validateData,
     onSubmit: (values) => {
       values.patientCni = user.cni
-      console.log(values);
+      //console.log(values);
       if (values.uuid) {
         update(values);
       } else {
@@ -94,7 +94,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
     console.log(value);
     requestPatient
       .post(
-        apiMedical.postReport + "/" + user.organisationRef,
+        apiMedical.report + "/" + user.organisationRef,
         values,
         header
       )
@@ -122,18 +122,17 @@ const CompteRendu = ({ setLocation = () => {} }) => {
       });
   };
   const update = (values) => {
-    console.log(editMode);
+    console.log(values);
+    const {uuid, ...data} = values
     configNotify("loading", "", "Modification des données en cours...");
     requestPatient
       .put(
-        apiMedical.updateReport +
+        apiMedical.report +
           "/" +
           user.organisationRef +
           "/" +
-          values.uuid +
-          "?description=" +
-          values.description,
-        values,
+          uuid,
+        data,
         header
       )
       .then((res) => {
@@ -293,6 +292,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
                 <th scope="col" className="border-raduis-left">
                   Rapport ID
                 </th>
+                <th scope="col">Label</th>
                 <th scope="col">Date d’édition</th>
                 <th scope="col">Editer par</th>
                 <th scope="col" className="text-center">
@@ -307,6 +307,9 @@ const CompteRendu = ({ setLocation = () => {} }) => {
                   <tr key={idx}>
                     <td>
                       <span className="text-bold">RAPP-0218374</span>
+                    </td>
+                    <td>
+                      <span className="text-bold">{data.label}</span>
                     </td>
                     <td>
                       <span className="text-bold">{data.editDate}</span>

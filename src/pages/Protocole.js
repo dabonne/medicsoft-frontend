@@ -20,6 +20,7 @@ const initData = {
   familleId: "",
   abbreviation: "",
   libelle: "",
+  analyseBiologicalId:""
 };
 const Protocole = () => {
   const authCtx = useContext(AppContext);
@@ -55,6 +56,7 @@ const Protocole = () => {
   const [organisations, setOrganisations] = useState([]);
   const [organisationId, setOrganisationId] = useState("");
   const [family,setFamily] = useState([])
+  const [analyse,setAnalyse] = useState([])
   useEffect(() => {
     get();
     getFamily()
@@ -190,7 +192,7 @@ const Protocole = () => {
   const update = (values) => {
     configNotify("loading", "", "Modification du médicament en cours...");
     requestExternal
-      .put(apiDrug.settings + "/" + organisationId + "/protocoles",
+      .put(apiDrug.settings + "" + organisationId + "/protocoles",
       values,
       header)
       .then((res) => {
@@ -222,10 +224,13 @@ const Protocole = () => {
   };
   const setEditData = (e, data) => {
     e.preventDefault();
+    console.log(data)
     formik.setFieldValue("abbreviation", data.abbreviation);
     formik.setFieldValue("libelle", data.libelle);
-    formik.setFieldValue("familleId", data.famille);
+    formik.setFieldValue("familleId", data.familyId);
+    formik.setFieldValue("analyseBiologicalId", data.analyseBiologicalId);
     formik.setFieldValue("uuid", data.protocoleId);
+    getAnalyseByFamilyId()
   };
   const onDelete = (e) => {
     e.preventDefault();
@@ -285,9 +290,22 @@ const Protocole = () => {
     setNotifyMessage(message);
   };
 
-  const deconnect = () => {
-    deleteUser();
-    onUserChange(initialUser);
+  const getAnalyseByFamilyId = () => {
+    requestExternal
+      .get(
+        apiDrug.settings + "/biological-analysis/" + formik.values["familleId"],
+        header
+      )
+      .then((res) => {
+        console.log(res.data);
+        setAnalyse(res.data);
+      })
+      .catch((error) => {
+        //deconnect()
+        console.log(error);
+        setStopLoad(true);
+        setFail(true);
+      });
   };
 
   const makePagination = (e, page) => {
@@ -376,6 +394,39 @@ const Protocole = () => {
 
                 {formType === "simple" ? (
                   <>
+                  <div className="mb-3">
+                      <label htmlFor={"familleId"} className="form-label">
+                        {"Famille"}
+                      </label>
+                      <select
+                        className="form-select"
+                        id={"familleId"}
+                        name={"familleId"}
+                        onChange={(e) => {
+                          formik.handleChange(e);
+                          getAnalyseByFamilyId();
+                        }}
+                        value={formik.values["familleId"]}
+                      >
+                        <option value={""}>{"Sélectionnez la famille"}</option>
+                        {family.map((data, idx) => {
+                          return (
+                            <option value={data.uuid} key={data.uuid}>
+                              {data.label}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+                    <Input
+                      type={"select"}
+                      name={"analyseBiologicalId"}
+                      label={"Analyse biologique"}
+                      placeholder={"Sélectionnez une analyse biologique"}
+                      formik={formik}
+                      options={analyse}
+                    />
+
                     <Input
                       type={"text"}
                       name={"abbreviation"}
@@ -389,14 +440,6 @@ const Protocole = () => {
                       label={"Libelle"}
                       placeholder={"Entrer le nom du protocole"}
                       formik={formik}
-                    />
-                    <Input
-                      type={"select"}
-                      name={"familleId"}
-                      label={"Famille"}
-                      placeholder={"Sélectionnez la famille"}
-                      formik={formik}
-                      options={family}
                     />
                   </>
                 ) : (
