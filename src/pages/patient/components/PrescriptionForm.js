@@ -9,7 +9,7 @@ import requestDoctor from "../../../services/requestDoctor";
 import { AppContext } from "../../../services/context";
 import FormNotify from "../../../components/FormNotify";
 import { useNavigate, useParams } from "react-router-dom";
-import { apiBackOffice, apiPrescription } from "../../../services/api";
+import { apiBackOffice, apiDrug, apiPrescription } from "../../../services/api";
 import { Typeahead } from "react-bootstrap-typeahead";
 import requestBackOffice from "../../../services/requestBackOffice";
 import ReactQuill from "react-quill";
@@ -67,7 +67,9 @@ const PrescriptionForm = ({
   const [localisationSelected, setLocalisationSelected] = useState([]);
   const [familyGroup, setFamilyGroup] = useState([]);
   const [precision, setPrecision] = useState("");
-  const [useProtocole, setUseProtocole] = useState(false)
+  const [useProtocole, setUseProtocole] = useState(false);
+  const [descriptif, setDescriptif] = useState([])
+  const [selectedDescriptif, setSelectedDescriptif] = useState([])
   const { id } = useParams();
   useEffect(() => {
     console.log(type);
@@ -104,15 +106,18 @@ const PrescriptionForm = ({
   const getListProtocole = (id) => {
     console.log(id);
     requestBackOffice
-      .get("settings/"+user.organisationRef+"/family/"+id+"/protocoles", header)
+      .get(
+        "settings/" + user.organisationRef + "/family/" + id + "/protocoles",
+        header
+      )
       .then((res) => {
         console.log(res.data);
-        const tab = res.data.map((data => {
+        const tab = res.data.map((data) => {
           return {
             label: data.libelle,
-            uuid: data.protocoleId
-          }
-        }))
+            uuid: data.protocoleId,
+          };
+        });
         setData(tab);
       })
       .catch((error) => {
@@ -177,6 +182,20 @@ const PrescriptionForm = ({
       });
   };
 
+  const getImageryDescriptif = (id) => {
+    requestBackOffice
+      .get(
+        apiDrug.settings + "/localisations/" + id + "/description-type-images",
+        header
+      )
+      .then((res) => {
+        setDescriptif(res.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+  };
+
   const getfamilyBiologicalById = (id) => {
     requestBackOffice
       .get(apiBackOffice.familyBiologicalById + "/" + id, header)
@@ -201,9 +220,11 @@ const PrescriptionForm = ({
       };
       let dataTab = [...list.list];
       if (type.includes("d'imagerie") && selectedOption.length !== 0) {
+        console.log(selectedDescriptif)
         presc = {
           type: selectedOption[0].uuid, // values.type,
           detail: values.detail,
+          descriptifId: selectedDescriptif.length !== 0 ? selectedDescriptif[0].descriptifId : null,
           topographicRegion: {
             uuid: localisationSelected[0].uuid,
           },
@@ -365,9 +386,9 @@ const PrescriptionForm = ({
     console.log(e);
     setSelectedFamily(e);
     if (e.length !== 0) {
-      if(useProtocole){
-        getListProtocole(e[0].uuid)
-      }else{
+      if (useProtocole) {
+        getListProtocole(e[0].uuid);
+      } else {
         getfamilyBiologicalById(e[0].uuid);
       }
     } else {
@@ -387,6 +408,18 @@ const PrescriptionForm = ({
   const renderMenuItemChildren = (option, props) => {
     return <div key={option.uuid}>{option.label}</div>;
   };
+
+  const localisationChange = (e) => {
+    console.log(e);
+    setLocalisationSelected(e);
+    if (e.length !== 0) {
+      getImageryDescriptif(e[0].uuid);
+    } else {
+      setSelectedDescriptif([]);
+    }
+  };
+  
+
   return (
     <div className="row">
       <h2>{title}</h2>
@@ -461,15 +494,15 @@ const PrescriptionForm = ({
                   type="checkbox"
                   value=""
                   id="flexCheckChecked"
-                  onClick={e => {
+                  onClick={(e) => {
                     //e.preventDefault()
                     //alert("ok")
-                    if(!useProtocole){
-                      getFamilyProtocole()
-                    }else{
-                      getfamilyBiological()
+                    if (!useProtocole) {
+                      getFamilyProtocole();
+                    } else {
+                      getfamilyBiological();
                     }
-                    setUseProtocole(!useProtocole)
+                    setUseProtocole(!useProtocole);
                   }}
                 />
                 <label class="form-check-label" for="flexCheckChecked">
@@ -526,10 +559,23 @@ const PrescriptionForm = ({
                     labelKey="label"
                     options={LocalisationGroup}
                     placeholder={"Veuillez choisir le type"}
-                    onChange={setLocalisationSelected}
+                    onChange={localisationChange}
                     onInputChange={handleInputChange}
                     renderMenuItemChildren={renderMenuItemChildren}
                     selected={localisationSelected}
+                  />
+                  <div className="form-label mt-3">
+                    {"Sélectionnez un descriptif"}
+                  </div>
+                  <Typeahead
+                    id="basic-typeahead-example"
+                    labelKey="label"
+                    options={descriptif}
+                    placeholder={"Veuillez choisir le descriptif"}
+                    onChange={setSelectedDescriptif}
+                    onInputChange={handleInputChange}
+                    renderMenuItemChildren={renderMenuItemChildren}
+                    selected={selectedDescriptif}
                   />
                 </>
               ) : (
