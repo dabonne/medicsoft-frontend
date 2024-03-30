@@ -601,11 +601,19 @@ const PrescriptionListe = () => {
                         <br />
                         {viewPresc.type === "MEDICAL_IMAGERY" && (
                           <>
-                            <div className="d-inline ms-5">
+                          
+                          <div className="d-inline ms-5">
                               Région topographique:{" "}
                               <span className="fw-bold">
                                 {" "}
                                 {data.topographicRegion?.label}
+                              </span>
+                            </div><br />
+                            <div className="d-inline ms-5">
+                              Descriptif :{" "}
+                              <span className="fw-bold">
+                                {" "}
+                                {data.descriptionTypeImage?.label}
                               </span>
                             </div>{" "}
                             <br />
