@@ -4,6 +4,7 @@ import { apiPrescription } from "../../../services/api";
 import PrescriptionForm from "../components/PrescriptionForm";
 import PrescriptionFormOrdonance from "../components/PrescriptionFormOrdonance";
 import PrescriptionListe from "../components/PrescriptionListe";
+import PrescriptionFormCatalogue from "../components/PrescriptionFormCatalogue";
 
 const Prescription = ({ setLocation }) => {
   useEffect(() => {
@@ -55,13 +56,13 @@ const Prescription = ({ setLocation }) => {
         <Route
           path="/form-catalogues-de-biologie"
           element={
-            <PrescriptionForm
+            <PrescriptionFormCatalogue
               title={"Catalogues de biologie"}
               group={"Groupe d'examen"}
               type={"Type d'examen"}
               url={{
-                get: apiPrescription.getTypeAnalyse,
-                post: apiPrescription.postTypeAnalyse,
+                get: "settings/biological-analysis",
+                post: "prescription/catalogue",
                 update: apiPrescription.updateTypeAnalyse,
               }}
             />
@@ -70,12 +71,12 @@ const Prescription = ({ setLocation }) => {
         <Route
           path="/form-catalogues-de-biologie/:id"
           element={
-            <PrescriptionForm
+            <PrescriptionFormCatalogue
               title={"Catalogues de biologie"}
               group={"Groupe d'examen"}
               type={"Type d'examen"}
               url={{
-                get: apiPrescription.getTypeAnalyse,
+                get: "settings/biological-analysis",
                 post: apiPrescription.postTypeAnalyse,
                 update: apiPrescription.updateTypeAnalyse,
               }}
