@@ -26,7 +26,7 @@ const Prescription = ({ setLocation }) => {
           path="/form-analyse-biologique"
           element={
             <PrescriptionForm
-              title={"Analyses biologiques"}
+              title={"Protocoles de biologie"}
               group={"Groupe d'examen"}
               type={"Type d'examen"}
               url={{
@@ -41,7 +41,37 @@ const Prescription = ({ setLocation }) => {
           path="/form-analyse-biologique/:id"
           element={
             <PrescriptionForm
-              title={"Analyses biologiques"}
+              title={"Protocoles de biologie"}
+              group={"Groupe d'examen"}
+              type={"Type d'examen"}
+              url={{
+                get: apiPrescription.getTypeAnalyse,
+                post: apiPrescription.postTypeAnalyse,
+                update: apiPrescription.updateTypeAnalyse,
+              }}
+            />
+          }
+        />
+        <Route
+          path="/form-catalogues-de-biologie"
+          element={
+            <PrescriptionForm
+              title={"Catalogues de biologie"}
+              group={"Groupe d'examen"}
+              type={"Type d'examen"}
+              url={{
+                get: apiPrescription.getTypeAnalyse,
+                post: apiPrescription.postTypeAnalyse,
+                update: apiPrescription.updateTypeAnalyse,
+              }}
+            />
+          }
+        />
+        <Route
+          path="/form-catalogues-de-biologie/:id"
+          element={
+            <PrescriptionForm
+              title={"Catalogues de biologie"}
               group={"Groupe d'examen"}
               type={"Type d'examen"}
               url={{

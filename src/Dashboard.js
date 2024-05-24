@@ -34,7 +34,7 @@ const Dashboard = () => {
   const [userLocal, setUserLocal] = useState("");
   let navigate = useNavigate();
   const [userImg, setUserImg] = useState(userp);
-  
+
   useEffect(() => {
     //return navigate("/dashboard/")
     setUserImg(user.profile);
@@ -74,9 +74,9 @@ const Dashboard = () => {
   };
 
   const goBack = (e) => {
-    e.preventDefault()
-    navigate(-1)
-  }
+    e.preventDefault();
+    navigate(-1);
+  };
 
   return (
     <>
@@ -245,7 +245,8 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
-                <li className="nav-item">
+                {/**
+                 * <li className="nav-item">
                   <NavLink
                     to="/dashboard/protocole"
                     className={({ isActive }) =>
@@ -264,6 +265,7 @@ const Dashboard = () => {
                     </span>
                   </NavLink>
                 </li>
+                 */}
               </ul>
 
               <ul className="nav flex-column w-100 position-absolute bottom-0 mb-5">

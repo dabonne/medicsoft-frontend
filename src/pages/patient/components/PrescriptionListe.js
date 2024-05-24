@@ -652,8 +652,8 @@ const PrescriptionListe = () => {
                   ? "Veuillez choisir un type de prescription à créer"
                   : "Choisir parmi une..."}
               </h2>
-              <div className="row row-cols-1 row-cols-md-4 my-5">
-                <div className="col" data-bs-dismiss="modal">
+              <div className="row row-cols-1 row-cols-md-5 my-5">
+                <div className="col mb-3" data-bs-dismiss="modal">
                   <Link
                     to="ordonnance-medicale"
                     className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
@@ -666,19 +666,31 @@ const PrescriptionListe = () => {
                     </div>
                   </Link>
                 </div>
-                <div className="col" data-bs-dismiss="modal">
+                <div className="col mb-3" data-bs-dismiss="modal">
                   <Link
                     to="form-analyse-biologique"
                     className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
                   >
                     <div className="text-center">
                       <AnaBiolo /> <br />
-                      <span className="text-bold">Analyses</span> <br />
-                      <span className="text-bold">biologiques</span> <br />
+                      <span className="text-bold">Protocoles de</span> <br />
+                      <span className="text-bold">biologie</span> <br />
                     </div>
                   </Link>
                 </div>
-                <div className="col" data-bs-dismiss="modal">
+                <div className="col mb-3" data-bs-dismiss="modal">
+                  <Link
+                    to="form-catalogues-de-biologie"
+                    className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
+                  >
+                    <div className="text-center">
+                      <AnaBiolo /> <br />
+                      <span className="text-bold">Catalogues de</span> <br />
+                      <span className="text-bold">biologie</span> <br />
+                    </div>
+                  </Link>
+                </div>
+                <div className="col mb-3" data-bs-dismiss="modal">
                   <Link
                     to="form-imagerie"
                     className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"
@@ -690,7 +702,7 @@ const PrescriptionListe = () => {
                     </div>
                   </Link>
                 </div>
-                <div className="col" data-bs-dismiss="modal">
+                <div className="col mb-3" data-bs-dismiss="modal">
                   <Link
                     to="form-examen-specialise"
                     className="d-flex justify-content-center align-items-center border border-1 border-radius btn-height text-black text-decoration-none"

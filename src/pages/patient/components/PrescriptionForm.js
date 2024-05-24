@@ -68,15 +68,15 @@ const PrescriptionForm = ({
   const [familyGroup, setFamilyGroup] = useState([]);
   const [precision, setPrecision] = useState("");
   const [useProtocole, setUseProtocole] = useState(false);
-  const [descriptif, setDescriptif] = useState([])
-  const [selectedDescriptif, setSelectedDescriptif] = useState([])
+  const [descriptif, setDescriptif] = useState([]);
+  const [selectedDescriptif, setSelectedDescriptif] = useState([]);
   const { id } = useParams();
   useEffect(() => {
     console.log(type);
 
     if (type.includes("d'examen")) {
       getfamilyBiological();
-      getFamilyProtocole();
+      //getFamilyProtocole();
     } else {
       getList();
     }
@@ -189,10 +189,10 @@ const PrescriptionForm = ({
         header
       )
       .then((res) => {
-        setDescriptif(res.data)
+        setDescriptif(res.data);
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
       });
   };
 
@@ -220,11 +220,14 @@ const PrescriptionForm = ({
       };
       let dataTab = [...list.list];
       if (type.includes("d'imagerie") && selectedOption.length !== 0) {
-        console.log(selectedDescriptif)
+        console.log(selectedDescriptif);
         presc = {
           type: selectedOption[0].uuid, // values.type,
           detail: values.detail,
-          descriptifId: selectedDescriptif.length !== 0 ? selectedDescriptif[0].descriptifId : null,
+          descriptifId:
+            selectedDescriptif.length !== 0
+              ? selectedDescriptif[0].descriptifId
+              : null,
           topographicRegion: {
             uuid: localisationSelected[0].uuid,
           },
@@ -386,11 +389,12 @@ const PrescriptionForm = ({
     console.log(e);
     setSelectedFamily(e);
     if (e.length !== 0) {
-      if (useProtocole) {
+      /*if (useProtocole) {
         getListProtocole(e[0].uuid);
       } else {
         getfamilyBiologicalById(e[0].uuid);
-      }
+      }*/
+      getListProtocole(e[0].uuid);
     } else {
       setSelectedOption([]);
     }
@@ -418,7 +422,6 @@ const PrescriptionForm = ({
       setSelectedDescriptif([]);
     }
   };
-  
 
   return (
     <div className="row">
@@ -488,15 +491,13 @@ const PrescriptionForm = ({
            */}
           {type.includes("d'examen") ? (
             <>
-              <div class="form-check">
+              {/*** <div class="form-check">
                 <input
                   class="form-check-input"
                   type="checkbox"
                   value=""
                   id="flexCheckChecked"
                   onClick={(e) => {
-                    //e.preventDefault()
-                    //alert("ok")
                     if (!useProtocole) {
                       getFamilyProtocole();
                     } else {
@@ -504,14 +505,15 @@ const PrescriptionForm = ({
                     }
                     setUseProtocole(!useProtocole);
                   }}
-                />
-                <label class="form-check-label" for="flexCheckChecked">
-                  Sélectionnez parmi les protocoles
-                </label>
-              </div>
-              <div className="form-label mt-3">
-                {"Sélectionnez une famille d'analyse biologique"}
-              </div>
+                  />
+                  <label class="form-check-label" for="flexCheckChecked">
+                    Sélectionnez parmi les protocoles
+                  </label>
+                  </div>
+                  <div className="form-label mt-3">
+                  {"Sélectionnez une famille d'analyse biologique"}
+                  </div>
+               */}
               <Typeahead
                 id="basic-typeahead-goupe"
                 labelKey="label"
