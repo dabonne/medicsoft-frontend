@@ -339,16 +339,19 @@ const PrescriptionListe = () => {
                 return (
                   <tr key={idx}>
                     <td>
-                      <span className="text-bold">PRESC-0218374</span>
+                      <span className="text-bold">PRESC-0{idx + 1}</span>
                     </td>
                     <td>
                       <span className="text-bold">
                         {data.type === "ORDINANCE" && "Ordonnance"}
                         {data.type === "BIOLOGICAL_ANALYSIS" &&
-                          "Analyses biologiques"}
+                          "Protocoles de biologie"}
                         {data.type === "MEDICAL_IMAGERY" && "Imagerie médicale"}
                         {data.type === "CONSULTATION" &&
                           "Consultation et/ou examen spécialisé"}
+                          {data.type === "CATALOGUE" &&
+                          "Catalogues de biologie"}
+                          
                       </span>
                     </td>
                     <td>
