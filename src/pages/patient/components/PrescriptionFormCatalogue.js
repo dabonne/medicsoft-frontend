@@ -135,23 +135,6 @@ const PrescriptionFormCatalogue = ({
         console.log(error);
       });
   };
-
-
-  const getLocalisationImagery = (id) => {
-    requestBackOffice
-      .get(
-        apiBackOffice.getLocalisationTypeImagery + "/" + id + "/localisation",
-        header
-      )
-      .then((res) => {
-        //console.log(res.data);
-        setLocalisationGroup(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   
   const formik = useFormik({
     initialValues: initData,
@@ -218,33 +201,14 @@ const PrescriptionFormCatalogue = ({
       if (item.type !== uuid) {
         return item;
       }
-      //console.log(data);
-      //console.log(item);
       data.map((value) => {
+        console.log(value)
         if (value.uuid === uuid) {
-          if (type.includes("d'examen")) {
-            const content =
-              item.typeAnalysis.family !== null
-                ? [item.typeAnalysis.family]
-                : [];
-            setSelectedFamily(content);
-            familyChange(content);
-            setSelectedOption([value]);
-          } else if (type.includes("imagerie")) {
-            const content = item.topographicRegion
-              ? [item.topographicRegion]
-              : [];
-            setSelectedOption([value]);
-            imageryLocalisationChange([value]);
-            setLocalisationSelected(content);
-          } else {
-            setSelectedOption([value]);
-          }
+          setSelectedOption([value]);
         }
       });
 
       formik.setFieldValue("type", item.type);
-      //formik.setFieldValue("detail", item.detail);
       setPrecision(item.detail);
     });
 
@@ -331,30 +295,7 @@ const PrescriptionFormCatalogue = ({
     );
     return filteredOptions;
   };
-  const familyChange = (e) => {
-    console.log(e);
-    setSelectedFamily(e);
-    if (e.length !== 0) {
-      /*if (useProtocole) {
-        getListProtocole(e[0].uuid);
-      } else {
-        getfamilyBiologicalById(e[0].uuid);
-      }*/
-      getListProtocole(e[0].uuid);
-    } else {
-      setSelectedOption([]);
-    }
-  };
-
-  const imageryLocalisationChange = (e) => {
-    console.log(e);
-    setSelectedOption(e);
-    if (e.length !== 0) {
-      getLocalisationImagery(e[0].uuid);
-    } else {
-      setLocalisationSelected([]);
-    }
-  };
+  
   const renderMenuItemChildren = (option, props) => {
     return <div key={option.uuid}>{option.label}</div>;
   };

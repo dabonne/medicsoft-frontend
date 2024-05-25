@@ -241,6 +241,9 @@ const PrescriptionListe = () => {
     if (typePresc === "CONSULTATION") {
       navigate("form-examen-specialise/" + data.id);
     }
+    if (typePresc === "CATALOGUE") {
+      navigate("form-catalogues-de-biologie/" + data.id);
+    }
   };
 
   const printPresciption = (e, id) => {

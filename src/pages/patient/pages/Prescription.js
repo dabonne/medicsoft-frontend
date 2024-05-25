@@ -63,7 +63,7 @@ const Prescription = ({ setLocation }) => {
               url={{
                 get: "settings/biological-analysis",
                 post: "prescription/catalogue",
-                update: apiPrescription.updateTypeAnalyse,
+                update: "prescription/catalogue",
               }}
             />
           }
@@ -77,8 +77,8 @@ const Prescription = ({ setLocation }) => {
               type={"Type d'examen"}
               url={{
                 get: "settings/biological-analysis",
-                post: apiPrescription.postTypeAnalyse,
-                update: apiPrescription.updateTypeAnalyse,
+                post: "prescription/catalogue",
+                update: "prescription/catalogue",
               }}
             />
           }
