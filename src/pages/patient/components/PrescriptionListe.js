@@ -440,22 +440,27 @@ const PrescriptionListe = () => {
               <div className="d-flex">
                 {viewPresc.type === "ORDINANCE" && (
                   <span className="me-auto text-meduim">
-                    Ordonnance / PRESC-0218374
+                    Ordonnance
                   </span>
                 )}
                 {viewPresc.type === "BIOLOGICAL_ANALYSIS" && (
                   <span className="me-auto text-meduim">
-                    Analyses biologiques / PRESC-0218374
+                    Analyses biologiques
                   </span>
                 )}
                 {viewPresc.type === "MEDICAL_IMAGERY" && (
                   <span className="me-auto text-meduim">
-                    Imagerie médicale / PRESC-0218374
+                    Imagerie médicale
                   </span>
                 )}
                 {viewPresc.type === "CONSULTATION" && (
                   <span className="me-auto text-meduim">
-                    Consultation et/ou examen spécialisé / PRESC-0218374
+                    Consultation et/ou examen spécialisé
+                  </span>
+                )}
+                {viewPresc.type === "CATALOGUE" && (
+                  <span className="me-auto text-meduim">
+                    Catalogue de biologie
                   </span>
                 )}
                 <div className="btn-group me-2">
@@ -594,6 +599,9 @@ const PrescriptionListe = () => {
                     ) : (
                       <>
                         {viewPresc.type === "BIOLOGICAL_ANALYSIS" && (
+                          <AnaBiolo />
+                        )}
+                        {viewPresc.type === "CATALOGUE" && (
                           <AnaBiolo />
                         )}
                         {viewPresc.type === "MEDICAL_IMAGERY" && <Imagery />}
