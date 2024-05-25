@@ -37,7 +37,7 @@ const Doc = () => {
   );
 };
 
-const PrescriptionForm = ({
+const PrescriptionFormProtocole = ({
   title = "",
   type = "",
   group = "",
@@ -60,26 +60,21 @@ const PrescriptionForm = ({
     headers: { Authorization: `${user.token}` },
   };
   const [firstCall, setFirstCall] = useState(0);
-  const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedFamily, setSelectedFamily] = useState([]);
   const [LocalisationGroup, setLocalisationGroup] = useState([]);
   const [localisationSelected, setLocalisationSelected] = useState([]);
   const [familyGroup, setFamilyGroup] = useState([]);
   const [precision, setPrecision] = useState("");
-  const [useProtocole, setUseProtocole] = useState(false);
   const [descriptif, setDescriptif] = useState([]);
   const [selectedDescriptif, setSelectedDescriptif] = useState([]);
+  const [listProtocole, setListProtocole] = useState([])
   const { id } = useParams();
   useEffect(() => {
     console.log(type);
+    getfamilyBiological();
 
-    if (type.includes("d'examen")) {
-      getfamilyBiological();
-      //getFamilyProtocole();
-    } else {
-      getList();
-    }
+    getList();
     //console.log(data);
     if (id !== undefined && firstCall !== 1) {
       getPrescriptionById(id);
@@ -126,12 +121,17 @@ const PrescriptionForm = ({
   };
 
   const getList = () => {
-    console.log(url);
-    requestDoctor
-      .get(url.get)
+    requestBackOffice
+      .get("settings/" + user.organisationRef + "/protocoles")
       .then((res) => {
-        setData(res.data);
-        //console.log(res.data);
+        //setData(res.data);
+        const tab = res.data.map((data) => {
+          return {
+            label: data.libelle,
+            uuid: data.protocoleId,
+          };
+        });
+        setListProtocole(tab);
       })
       .catch((error) => {
         console.log(error);
@@ -435,19 +435,8 @@ const PrescriptionForm = ({
               <div className="me-auto">
                 <Doc />
                 <span className="ms-2 fw-bold">
-                  {data.map((d) => {
-                    if (type.includes("imagerie")) {
-                      return (
-                        d.uuid === dta.type && (
-                          <>
-                            <span className="me-2"> {d.label}</span>
-                            <span> ( {dta.topographicRegion.label} )</span>
-                          </>
-                        )
-                      );
-                    } else {
-                      return d.uuid === dta.type && d.label;
-                    }
+                  {listProtocole.map((d) => {
+                    return d.uuid === dta.type && d.label;
                   })}
                 </span>
               </div>
@@ -680,4 +669,4 @@ const PrescriptionForm = ({
   );
 };
 
-export default PrescriptionForm;
+export default PrescriptionFormProtocole;

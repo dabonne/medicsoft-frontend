@@ -4,7 +4,7 @@ import sui from "../../../assets/imgs/sui.png";
 import view from "../../../assets/imgs/view.png";
 import edit from "../../../assets/imgs/edit.png";
 import del from "../../../assets/imgs/delete.png";
-import user from "../../../assets/imgs/user.png";
+import userProfile from "../../../assets/imgs/userinfo.png";
 import print from "../../../assets/imgs/print.png";
 import { apiPrescription } from "../../../services/api";
 import requestDoctor from "../../../services/requestDoctor";
@@ -515,7 +515,8 @@ const PrescriptionListe = () => {
                   <img
                     className="me-2"
                     width={"42px"}
-                    src={user.profile}
+                    height={"42px"}
+                    src={userProfile}
                     alt=""
                   />
                   <div>

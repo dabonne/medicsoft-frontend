@@ -5,6 +5,7 @@ import PrescriptionForm from "../components/PrescriptionForm";
 import PrescriptionFormOrdonance from "../components/PrescriptionFormOrdonance";
 import PrescriptionListe from "../components/PrescriptionListe";
 import PrescriptionFormCatalogue from "../components/PrescriptionFormCatalogue";
+import PrescriptionFormProtocole from "../components/PrescriptionFormProtocole";
 
 const Prescription = ({ setLocation }) => {
   useEffect(() => {
@@ -26,7 +27,7 @@ const Prescription = ({ setLocation }) => {
         <Route
           path="/form-analyse-biologique"
           element={
-            <PrescriptionForm
+            <PrescriptionFormProtocole
               title={"Protocoles de biologie"}
               group={"Groupe d'examen"}
               type={"Type d'examen"}
@@ -41,7 +42,7 @@ const Prescription = ({ setLocation }) => {
         <Route
           path="/form-analyse-biologique/:id"
           element={
-            <PrescriptionForm
+            <PrescriptionFormProtocole
               title={"Protocoles de biologie"}
               group={"Groupe d'examen"}
               type={"Type d'examen"}
