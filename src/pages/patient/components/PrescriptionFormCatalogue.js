@@ -291,13 +291,16 @@ const PrescriptionFormCatalogue = ({
   const handleInputChange = (input) => {
     // Filter the options based on the user input
     const filteredOptions = data.filter((option) =>
-      option.label.toLowerCase().includes(input.toLowerCase())
+      option.label.toLowerCase().includes(input.toLowerCase()) ||
+      option.code.toLowerCase().includes(input.toLowerCase())
     );
     return filteredOptions;
   };
   
   const renderMenuItemChildren = (option, props) => {
-    return <div key={option.uuid}>{option.label}</div>;
+    return <div key={option.uuid}>
+      {option.label} <span className="fw-bold">({option.code})</span>
+    </div>;
   };
 
   return (
