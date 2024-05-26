@@ -371,7 +371,7 @@ const PrescriptionListe = () => {
                       <div className="d-inline-block align-middle">
                         <span className="text-bold">{data.author}</span>
                         <br />
-                        <span>Psychiatre</span>
+                        <span>{data.speciality}</span>
                       </div>
                     </td>
                     <td className="text-center">
@@ -521,7 +521,7 @@ const PrescriptionListe = () => {
                   />
                   <div>
                     <span className="fw-bold">{viewPresc.author}</span> <br />
-                    <span>Psychiatre</span>
+                    <span>{viewPresc.speciality}</span>
                   </div>
                 </div>
                 <div>
