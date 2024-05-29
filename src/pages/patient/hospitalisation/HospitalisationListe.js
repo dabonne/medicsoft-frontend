@@ -398,28 +398,28 @@ const HospitalisationListe = ({ setLocation = () => {} }) => {
                     formik={formik}
                   />
                   <Input
-                    type={"text"}
+                    type={"textarea"}
                     name={"motifHospitalisation"}
                     label={"Motif"}
                     placeholder={"Entrer le motif"}
                     formik={formik}
                   />
                   <Input
-                    type={"text"}
+                    type={"textarea"}
                     name={"historyDisease"}
                     label={"Histoire de la maladie"}
                     placeholder={"Entrer l'histoire de la maladie"}
                     formik={formik}
                   />
                   <Input
-                    type={"text"}
+                    type={"textarea"}
                     name={"examClinic"}
                     label={"Examen clinique"}
                     placeholder={"Entrer l'examen clinique"}
                     formik={formik}
                   />
                   <Input
-                    type={"text"}
+                    type={"textarea"}
                     name={"conclusion"}
                     label={"Conclusion"}
                     placeholder={"Entrer la conclusion"}
