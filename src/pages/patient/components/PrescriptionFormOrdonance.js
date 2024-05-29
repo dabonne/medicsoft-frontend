@@ -171,10 +171,12 @@ const PrescriptionFormOrdonance = (type = "") => {
       }
       let hourPrescription = {
         frequency: values?.frequency,
-        quantity: values?.quantity,
+        quantity: parseInt(values?.quantity),
       };
       if ((values?.frequency === undefined && values?.quantity === undefined) ||(values?.frequency === '' && values?.quantity === '') ) {
         hourPrescription = null
+      }else{
+        periodEnumStringMap = null
       }
       const data = {
         drug: selectedDrug[0]?.uuid,
@@ -205,7 +207,7 @@ const PrescriptionFormOrdonance = (type = "") => {
         ...list,
         list: dataTab,
       });
-      //console.log(data)
+      console.log(data)
 
       if (list.sendata && dataTab.length !== 0) {
         if (id !== undefined) {
