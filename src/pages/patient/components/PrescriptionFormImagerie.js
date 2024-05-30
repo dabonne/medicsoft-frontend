@@ -256,6 +256,8 @@ const PrescriptionFormImagerie = ({
             setSelectedOption([value]);
             imageryLocalisationChange([value]);
             setLocalisationSelected(content);
+            localisationChange(content)
+            console.log(content)
             setSelectedDescriptif([item.descriptionTypeImage])
         }
       });
