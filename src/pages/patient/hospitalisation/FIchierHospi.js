@@ -95,10 +95,11 @@ const FIchierHospi = ({ setNameIdx = () => {}, type = {} }) => {
         header
       )
       .then((res) => {
-        console.log(res.data);
+        console.log(res);
         console.log("Rien");
+        const resdata = res.data !=="" ? res.data : [];
         setStopLoad(true);
-        const data = matrice(res.data);
+        const data = matrice(resdata);
         setPagination(data.list);
         if (data.list.length !== 0) {
           setDatas(data.list[0]);
