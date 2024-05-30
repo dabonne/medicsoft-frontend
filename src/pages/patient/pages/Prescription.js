@@ -6,6 +6,7 @@ import PrescriptionFormOrdonance from "../components/PrescriptionFormOrdonance";
 import PrescriptionListe from "../components/PrescriptionListe";
 import PrescriptionFormCatalogue from "../components/PrescriptionFormCatalogue";
 import PrescriptionFormProtocole from "../components/PrescriptionFormProtocole";
+import PrescriptionFormImagerie from "../components/PrescriptionFormImagerie";
 
 const Prescription = ({ setLocation }) => {
   useEffect(() => {
@@ -87,7 +88,7 @@ const Prescription = ({ setLocation }) => {
         <Route
           path="/form-imagerie"
           element={
-            <PrescriptionForm
+            <PrescriptionFormImagerie
               title={"Imagerie Médicale"}
               group={"Groupe d'imagerie"}
               type={"Type d'imagerie"}
@@ -102,7 +103,7 @@ const Prescription = ({ setLocation }) => {
         <Route
           path="/form-imagerie/:id"
           element={
-            <PrescriptionForm
+            <PrescriptionFormImagerie
               title={"Imagerie Médicale"}
               group={"Groupe d'imagerie"}
               type={"Type d'imagerie"}
