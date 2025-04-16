@@ -122,6 +122,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(patient);
+    patient.cni = patient.cni?.length !=0 ? patient.cni : '0000000000';
     configNotify("loading", "", "Ajout des données en cours...");
     requestPatient
       .post(apiPatient.post, patient, header)
@@ -390,7 +391,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
                     onChange={(e) => {
                       handleInputChange("cni", e);
                     }}
-                    required
+                    //required
                   />
                   <div className="invalid-feedback">
                     Veuillez entrer le numéro CNI
