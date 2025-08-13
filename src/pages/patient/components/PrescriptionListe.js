@@ -13,6 +13,7 @@ import { Link, useNavigate } from "react-router-dom";
 import DeleteModal from "../../../components/DeleteModal";
 import Loading from "../../../components/Loading";
 import { matrice, onSearch } from "../../../services/service";
+import { URL_FILE_MANAGEMENT } from "../../../services/requestOrganisation";
 
 const Ordonnance = () => {
   return (
@@ -253,7 +254,7 @@ const PrescriptionListe = () => {
         apiPrescription.pdfPescription + "/" + id + "/" + user.organisationRef
       )
       .then((res) => {
-        window.open("https://laafivisionmedical.com/" + res.data);
+        window.open(URL_FILE_MANAGEMENT + "/" + res.data);
       })
       .catch((error) => {
         console.log(error);

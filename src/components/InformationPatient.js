@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { apiParamedical, apiPatient } from "../services/api";
 import { AppContext } from "../services/context";
 import requestPatient from "../services/requestPatient";
-import requestDoctor from "../services/requestDoctor";
+import requestDoctor, { URL_DOCTOR_MANAGEMENT } from "../services/requestDoctor";
 
 const InformationPatient = ({disableBtn = false}) => {
   const authCtx = useContext(AppContext);
@@ -82,7 +82,8 @@ const InformationPatient = ({disableBtn = false}) => {
                 onClick={(e) => {
                   e.preventDefault();
                   window.open(
-                    "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
+                    URL_DOCTOR_MANAGEMENT +
+                      "/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
                       user.cni +
                       "/" +
                       user.organisationRef

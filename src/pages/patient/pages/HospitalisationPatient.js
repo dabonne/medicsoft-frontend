@@ -24,6 +24,7 @@ import Input from "../../../components/Input";
 import HospitalisationListe from "../hospitalisation/HospitalisationListe";
 import HospitalisationDetail from "../hospitalisation/HospitalisationDetail";
 import FIchierHospi from "../hospitalisation/FIchierHospi";
+import { URL_FILE_MANAGEMENT } from "../../../services/requestOrganisation";
 
 const initData = {
   motifHospitalisation: "",
@@ -233,7 +234,7 @@ const HospitalisationPatient = ({ setLocation }) => {
     requestDoctor
       .get(apiMedical.printReport + "/" + id + "/" + user.organisationRef)
       .then((res) => {
-        window.open("https://laafivisionmedical.com/" + res.data);
+        window.open( URL_FILE_MANAGEMENT + "/" + res.data);
       })
       .catch((error) => {
         console.log(error);

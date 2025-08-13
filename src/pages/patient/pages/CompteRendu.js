@@ -21,6 +21,7 @@ import { matrice, onSearch } from "../../../services/service";
 import requestDoctor from "../../../services/requestDoctor";
 import * as Yup from "yup";
 import Input from "../../../components/Input";
+import { URL_FILE_MANAGEMENT } from "../../../services/requestOrganisation";
 
 const initData = {
   label: "",
@@ -227,7 +228,7 @@ const CompteRendu = ({ setLocation = () => {} }) => {
       )
       .then((res) => {
         window.open(
-          "https://laafivisionmedical.com/"+res.data
+          URL_FILE_MANAGEMENT + "/" + res.data
         );
       })
       .catch((error) => {

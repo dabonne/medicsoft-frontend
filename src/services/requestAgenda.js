@@ -3,8 +3,8 @@ import { deleteUser, getUser, setUser } from './storage';
 import { apiUser } from './api';
 import requestUser from './requestUser';
 
-const URL = "https://medicsoft-agenda.herokuapp.com/"
-const URL_BACKOFFICE = "agenda-management/external-api/agenda/"
+const URL = process.env.REACT_APP_AGENDA_MANAGEMENT
+const URL_BACKOFFICE = "/agenda-management/external-api/agenda/"
 
 const requestAgenda = axios.create({
     baseURL: URL+URL_BACKOFFICE,

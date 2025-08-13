@@ -21,6 +21,7 @@ import Input from "../../../components/Input";
 import FormNotify from "../../../components/FormNotify";
 import * as Yup from "yup";
 import NotifyRef from "../../../components/NofifyRef";
+import { URL_FILE_MANAGEMENT } from "../../../services/requestOrganisation";
 
 const initData = {
   description: "",
@@ -246,7 +247,7 @@ const FIchierMedicaux = ({ setNameIdx = () => {}, type = {} }) => {
 
   const downloadFile = (e, data) => {
     e.preventDefault();
-    window.open("https://laafivisionmedical.com/" + data.fileName);
+    window.open(URL_FILE_MANAGEMENT + "/" + data.fileName);
   };
 
   return (

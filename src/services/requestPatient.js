@@ -3,8 +3,8 @@ import { deleteUser, getUser, setUser } from './storage';
 import requestUser from './requestUser';
 import { apiUser } from './api';
 
-const URL = "https://doctor-management.herokuapp.com/"
-const URL_BACKOFFICE = "doctor-management/external-api/doctor/"
+const URL = process.env.REACT_APP_DOCTOR_MANAGEMENT
+const URL_BACKOFFICE = "/doctor-management/external-api/doctor/"
 
 const requestPatient = axios.create({
     baseURL: URL+URL_BACKOFFICE,

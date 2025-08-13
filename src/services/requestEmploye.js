@@ -3,8 +3,8 @@ import { deleteUser, getUser, setUser } from "./storage";
 import requestUser from "./requestUser";
 import { apiUser } from "./api";
 
-const URL = "https://medicsoft-employee-management.herokuapp.com/";
-const URL_EMPLOYE = "employee-management/external-api/employee/";
+const URL = process.env.REACT_APP_EMPLOYEE_MANAGEMENT
+const URL_EMPLOYE = "/employee-management/external-api/employee/";
 
 const requestEmploye = axios.create({
   baseURL: URL + URL_EMPLOYE,

@@ -3,8 +3,9 @@ import requestUser from './requestUser';
 import { apiUser } from './api';
 import { deleteUser, getUser, setUser } from './storage';
 
-const URL = "https://backoffice-dashboard.herokuapp.com/"
-const URL_BACKOFFICE = "backoffice-management/external-api/backoffice/"
+export const URL_FILE_MANAGEMENT = process.env.REACT_APP_FILE_MANAGEMENT || "https://file-management.medicsoft.app";
+const URL = process.env.REACT_APP_BACKOFFICE_MANAGEMENT
+const URL_BACKOFFICE = "/backoffice-management/external-api/backoffice/"
 
 const requestOrganisation = axios.create({
     baseURL: URL+URL_BACKOFFICE,
