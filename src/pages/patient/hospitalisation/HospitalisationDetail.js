@@ -25,6 +25,7 @@ import ObservationHospi from "./ObservationHospi";
 import * as Yup from "yup";
 import NotifyRef from "../../../components/NofifyRef";
 import InformationPatient from "../../../components/InformationPatient";
+import { URL_DOCTOR_MANAGEMENT } from "../../../services/requestDoctor";
 
 const initData = {
   releaseDate: "",
@@ -178,7 +179,7 @@ const HospitalisationDetail = ({ setLocation = () => {} }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     window.open(
-                      "https://doctor-management.herokuapp.com/doctor-management/external-api/hospital-records/" +
+                      URL_DOCTOR_MANAGEMENT +"/doctor-management/external-api/hospital-records/" +
                         id +
                         "/export-dossier/" +
                         user.organisationRef

@@ -63,7 +63,7 @@ export const validateData = Yup.object({
   HEIGHT: Yup.number()
     .typeError("La taille doit être un nombre ex: 1.45")
     .positive("La taille doit être un nombre positif")
-    .max(100, "Entrez un nombre compris entre 0 et 5"),
+    .max(2.5, "Entrez un nombre compris entre 0 et 2.5 mètres"),
   //.required("La taille est obligatoire"),
   BLOOD_GROUP: Yup.string()
     .oneOf(

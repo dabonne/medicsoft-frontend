@@ -40,6 +40,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
   const [notifyMessage, setNotifyMessage] = useState("");
   const [modalNotifyMsg, setModalNotifyMsg] = useState("");
   const [patient, setPatient] = useState(initPatient);
+  const [dateError, setDateError] = useState(false);
   const closeRef = useRef();
   const closeEditRef = useRef();
   const notifyRef = useRef();
@@ -112,7 +113,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
           parentCnib: parent?.cni,
           parentPhoneNumber: parent?.phone,
           linkParental: parent?.linkParentalId,
-          mineur:minor ? "mineur" : ""
+          mineur: minor ? "mineur" : "",
         });
       })
       .catch((error) => {
@@ -122,7 +123,7 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(patient);
-    patient.cni = patient.cni?.length !=0 ? patient.cni : '0000000000';
+    patient.cni = patient.cni?.length != 0 ? patient.cni : "0000000000";
     configNotify("loading", "", "Ajout des données en cours...");
     requestPatient
       .post(apiPatient.post, patient, header)
@@ -187,6 +188,24 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
       [name]: value,
     });
   };
+
+  const handleDateInputChange = (e) => {
+    const today = new Date();
+    const birthDate = new Date(e.target.value);
+    const age = today.getFullYear() - birthDate.getFullYear();
+    if (age > 120) {
+      setDateError(true);
+      setPatient({
+        ...patient,
+        birthdate: "",
+      });
+      fValidate("was-validated");
+    } else {
+      setDateError(false);
+      handleInputChange("birthdate", e);
+    }
+  };
+
   const fValidate = (cl) => {
     setFormValidate(cl);
   };
@@ -268,17 +287,20 @@ const ModalPatient = ({ refresh = () => {}, edit = false }) => {
                   </label>
                   <input
                     type="date"
-                    className="form-control"
+                    className={`form-control${dateError ? " is-invalid" : ""}`}
                     id="date"
                     placeholder="Entrer la date de naissance"
                     value={patient.birthdate}
                     onChange={(e) => {
-                      handleInputChange("birthdate", e);
+                      handleDateInputChange(e);
                     }}
+                    max={new Date().toISOString().split("T")[0]}
                     required
                   />
                   <div className="invalid-feedback">
-                    Veuillez entrer une date de naissance
+                    {dateError
+                      ? "L'âge ne doit pas dépasser 120 ans"
+                      : "Veuillez entrer une date de naissance"}
                   </div>
                 </div>
                 <div className="mb-3">

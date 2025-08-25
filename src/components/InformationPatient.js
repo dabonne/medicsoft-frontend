@@ -92,7 +92,7 @@ const InformationPatient = ({disableBtn = false}) => {
               >
                 Synthèse
               </div>
-              <div className="btn btn-primary me-2">Exporter le dossier</div>
+              <div className="btn btn-primary me-2 disabled">Exporter le dossier</div>
             </div>
           </div>
         }

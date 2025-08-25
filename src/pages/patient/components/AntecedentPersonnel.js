@@ -12,7 +12,7 @@ import { apiMedical } from "../../../services/api";
 import { AppContext } from "../../../services/context";
 import DeleteModal from "../../../components/DeleteModal";
 import Loading from "../../../components/Loading";
-import requestDoctor from "../../../services/requestDoctor";
+import requestDoctor, { URL_DOCTOR_MANAGEMENT } from "../../../services/requestDoctor";
 import { matrice, onSearch } from "../../../services/service";
 
 const AntecedentPersonnel = ({ setNameIdx = () => {}, type = {} }) => {
@@ -143,7 +143,7 @@ const AntecedentPersonnel = ({ setNameIdx = () => {}, type = {} }) => {
             onClick={(e) => {
               e.preventDefault();
               window.open(
-                "https://doctor-management.herokuapp.com/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
+                  URL_DOCTOR_MANAGEMENT + "/doctor-management/external-api/doctor/medical-record/synthesis-report/" +
                   user.cni +
                   "/" +
                   user.organisationRef
