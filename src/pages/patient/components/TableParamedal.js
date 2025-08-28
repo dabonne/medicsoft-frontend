@@ -210,6 +210,12 @@ const TableParamedal = ({
             </thead>
             <tbody>
               {list.map((data, idx) => {
+                if(type.id === "HEIGHT"){
+                  if(navigator.language.includes('fr')){
+                    // convertion avec virgule
+                    data.value = data.value.toString().replace('.', ',');
+                  }
+                }
                 return (
                   <tr key={idx}>
                     <td>
@@ -218,6 +224,7 @@ const TableParamedal = ({
                     <td>
                       <div className="text-bold" style={styles}>
                         {data.value.toString() + " " + unite}
+
                       </div>
                     </td>
                     {type.id === "ARTERIAL_PRESSURE" && (

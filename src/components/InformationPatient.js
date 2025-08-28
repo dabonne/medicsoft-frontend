@@ -60,7 +60,7 @@ const InformationPatient = ({disableBtn = false}) => {
             <span>Poids: </span>
             <span className="text-bold">{data.weight} kg</span> <br />
             <span>Taille: </span>
-            <span className="text-bold">{data.height} m</span> <br />
+            <span className="text-bold">{navigator.language.includes('fr') ? data?.height?.toString().replace('.', ',') : data.height} m</span> <br />
             <span>IMC: </span>
             <span className="text-bold">{data.imc} KG/M²</span> <br />
             <span>

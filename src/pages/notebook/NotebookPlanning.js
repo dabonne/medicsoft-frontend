@@ -27,6 +27,7 @@ import { AppContext } from "../../services/context";
 import requestAgenda from "../../services/requestAgenda";
 import { apiAgenda } from "../../services/api";
 import NotifyRef from "../../components/NofifyRef";
+import { set } from "date-fns";
 
 let localizer = momentLocalizer(moment);
 function getRandomDate() {
@@ -131,7 +132,7 @@ const NotebookPlanning = () => {
   const [indexEvent, setIndexEvent] = useState(0);
   const [refresh, setRefresh] = useState(0);
   const minTime = new Date();
-  minTime.setHours(5,0)
+  minTime.setHours(5, 0);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -354,6 +355,29 @@ const NotebookPlanning = () => {
       });
   };
   let change = handleChange;
+
+  const [timeError, setTimeError] = useState("");
+  const handleTimeChange = (e, setHours, type = "") => {
+    const selected = e.target.value;
+    const now = new Date().toTimeString().slice(0, 5);
+
+    if (selected < now) {
+      //alert("L'heure choisie ne peut pas être inférieure à l'heure actuelle !");
+      setTimeError(
+        "L'heure choisie ne peut pas être inférieure à l'heure actuelle !"
+      );
+      return;
+    }
+
+    if (type === "end" && selected <= startHours) {
+      setTimeError(
+        "L'heure de fin ne peut pas être inférieure ou égale à l'heure de début !"
+      );
+      return;
+    }
+    setTimeError("");
+    setHours(selected);
+  };
   return (
     <>
       <NotifyRef
@@ -418,6 +442,7 @@ const NotebookPlanning = () => {
                       className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={startDay}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={(e) => {
                         setStartDay(e.target.value);
                       }}
@@ -428,6 +453,7 @@ const NotebookPlanning = () => {
                       className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={endDay}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={(e) => {
                         setEndDay(e.target.value);
                       }}
@@ -449,9 +475,10 @@ const NotebookPlanning = () => {
                       className="form-control border-0"
                       type="time"
                       value={startHours}
-                      onChange={(e) => {
-                        setStartHours(e.target.value);
-                      }}
+                      min={new Date().toTimeString().slice(0, 5)}
+                      onChange={(e) =>
+                        handleTimeChange(e, setStartHours, "start")
+                      }
                     />
                   </div>
                   <div className="col-6 col-md-4">
@@ -459,11 +486,13 @@ const NotebookPlanning = () => {
                       className="form-control border-0"
                       type="time"
                       value={endHours}
-                      onChange={(e) => {
-                        setEndHours(e.target.value);
-                      }}
+                      min={new Date().toTimeString().slice(0, 5)}
+                      onChange={(e) => handleTimeChange(e, setEndHours, "end")}
                     />
                   </div>
+                  {timeError && (
+                    <div className="text-danger mt-2">{timeError}</div>
+                  )}
                 </div>
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
@@ -590,6 +619,7 @@ const NotebookPlanning = () => {
                       className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={startDay}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={(e) => {
                         setStartDay(e.target.value);
                       }}
@@ -600,6 +630,7 @@ const NotebookPlanning = () => {
                       className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={endDay}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={(e) => {
                         setEndDay(e.target.value);
                       }}
@@ -621,9 +652,10 @@ const NotebookPlanning = () => {
                       className="form-control border-0"
                       type="time"
                       value={startHours}
-                      onChange={(e) => {
-                        setStartHours(e.target.value);
-                      }}
+                      min={new Date().toTimeString().slice(0, 5)}
+                      onChange={(e) =>
+                        handleTimeChange(e, setStartHours, "start")
+                      }
                     />
                   </div>
                   <div className="col-2">
@@ -631,11 +663,13 @@ const NotebookPlanning = () => {
                       className="form-control border-0"
                       type="time"
                       value={endHours}
-                      onChange={(e) => {
-                        setEndHours(e.target.value);
-                      }}
+                      min={new Date().toTimeString().slice(0, 5)}
+                      onChange={(e) => handleTimeChange(e, setEndHours, "end")}
                     />
                   </div>
+                  {timeError && (
+                    <div className="text-danger mt-2">{timeError}</div>
+                  )}
                 </div>
                 <div className="mb-3 mt-3">
                   <label htmlFor="lname" className="form-label">
@@ -788,11 +822,10 @@ const NotebookPlanning = () => {
             <div className="modal-footer border-0 d-flex justify-content-start">
               <button
                 type="button"
-                className="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteAgenda"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
               >
-                Annuler
+                Fermer
               </button>
               <button
                 type="button"
@@ -806,106 +839,19 @@ const NotebookPlanning = () => {
               >
                 Modifier
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="modal fade" id="detailEvent">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                Information de la consultation
-              </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">
-              <div className="row">
-                <div className="col-3 col-sm-2">
-                  <img width="100px" src={userp} alt="" />
-                </div>
-                <div className="col-9 col-sm-10 py-2">
-                  <div className="d-flex justify-content-between">
-                    <span className="text-bold text-meduim">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      John DOE
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span className="text-bold">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      (00226) xx xx xx xx
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span className="text-bold">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      johndoe@example.com
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span className="">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      <Link to="#" className="text-black">
-                        Dossier patient
-                      </Link>
-                    </span>
-                  </div>
-                </div>
-                <div className="col-12 pt-3 ">
-                  <span className="text-bold">Date de consultation:</span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " " + eventList[indexEvent].start.toLocaleDateString()}
-                  </span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " - " + eventList[indexEvent].end.toLocaleDateString()}
-                  </span>{" "}
-                  <br />
-                  <span className="text-bold">Heure:</span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " " + eventList[indexEvent].start.toLocaleTimeString()}
-                  </span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " - " + eventList[indexEvent].end.toLocaleTimeString()}
-                  </span>
-                </div>
-
-                <div className="col-12 pt-3 ">
-                  <span className="text-bold text-underline">Détails</span>
-                  <hr className="mt-0" />
-                </div>
-              </div>
-              {eventList[indexEvent] && eventList[indexEvent].description}
-            </div>
-
-            <div className="modal-footer border-0 d-flex justify-content-start">
               <button
                 type="button"
                 className="btn btn-danger"
-                data-bs-dismiss="modal"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteAgenda"
               >
-                Annuler
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                Confirmer le rendez-vous
+                Supprimer
               </button>
             </div>
           </div>
         </div>
       </div>
+
       <div className="modal fade" id="deleteAgenda">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">

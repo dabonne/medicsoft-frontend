@@ -61,9 +61,16 @@ export const validateData = Yup.object({
     .max(100, "Entrez un nombre compris entre 0 et 100"),
   //.required("La saturation en oxygène est obligatoire"),
   HEIGHT: Yup.number()
-    .typeError("La taille doit être un nombre ex: 1.45")
+    .transform((value, originalValue) => {
+      // Si c'est une chaîne, remplacer les virgules par des points
+      if (typeof originalValue === 'string') {
+        return parseFloat(originalValue.replace(',', '.'));
+      }
+      return value;
+    })
+    .typeError("La taille doit être un nombre ex: 1.45 ou 1,45")
     .positive("La taille doit être un nombre positif")
-    .max(2.5, "Entrez un nombre compris entre 0 et 2.5 mètres"),
+    .max(2.5, `Entrez un nombre compris entre 0 et ${navigator.language.includes('fr') ? '2,5' : '2.5'} mètres`),
   //.required("La taille est obligatoire"),
   BLOOD_GROUP: Yup.string()
     .oneOf(

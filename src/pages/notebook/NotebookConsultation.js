@@ -143,7 +143,7 @@ const NotebookConsultation = () => {
   const [doctor, setDoctor] = useState("");
   const [rendezVous, setRendezVous] = useState([]);
   const minTime = new Date();
-  minTime.setHours(5,0)
+  minTime.setHours(5, 0);
   const header = {
     headers: { Authorization: `${user.token}` },
   };
@@ -206,7 +206,9 @@ const NotebookConsultation = () => {
             start: new Date(data.startDate + ", " + data.startHour),
             end: new Date(data.endDate + ", " + data.endHour),
             desc: data.typeEvent ? data.typeEvent : "Consultation",
-            title: data.title ? data.title : data.patient.firstname +" " +data.patient.lastname,
+            title: data.title
+              ? data.title
+              : data.patient.firstname + " " + data.patient.lastname,
             name: "John Doe",
             description: data.description ? data.description : "",
             idx: idx,
@@ -270,10 +272,8 @@ const NotebookConsultation = () => {
     eventList[e.idx] && myModal.show();
     eventList[e.idx] && myModal.show();
     //handleSelectEvent();
-    console.log(e)
-
+    console.log(e);
   };
-
 
   const formatDate = (date) => {
     const day = date.getDate() < 10 ? 0 + "" + date.getDate() : date.getDate();
@@ -354,7 +354,7 @@ const NotebookConsultation = () => {
         setType("");
         setDesc("");
         fValidate("needs-validation");
-        getRendezVous(doctor)
+        getRendezVous(doctor);
       })
       .catch((error) => {
         console.log(error);
@@ -404,7 +404,10 @@ const NotebookConsultation = () => {
   };
   const onDelete = () => {
     requestDoctor
-      .delete(apiMedical.deleteRendezVous + "/" + eventList[indexEvent].referenceId, header)
+      .delete(
+        apiMedical.deleteRendezVous + "/" + eventList[indexEvent].referenceId,
+        header
+      )
       .then((res) => {
         setModalNotifyMsg("Suppression réussie !");
         notifyRef.current.click();
@@ -431,16 +434,38 @@ const NotebookConsultation = () => {
     );
   };
   const eventStyleGetter = (event) => {
-    console.log(event)
-    if(event.type ==="CONSULTATION"){
+    console.log(event);
+    if (event.type === "CONSULTATION") {
       return {
         style: {
-          backgroundColor: 'red',
-          borderColor:'red'
-        }
+          backgroundColor: "red",
+          borderColor: "red",
+        },
       };
     }
-    
+  };
+
+  const [timeError, setTimeError] = useState("");
+  const handleTimeChange = (e, setHours, type = "") => {
+    const selected = e.target.value;
+    const now = new Date().toTimeString().slice(0, 5);
+
+    if (selected < now) {
+      //alert("L'heure choisie ne peut pas être inférieure à l'heure actuelle !");
+      setTimeError(
+        "L'heure choisie ne peut pas être inférieure à l'heure actuelle !"
+      );
+      return;
+    }
+
+    if (type === "end" && selected <= startHours) {
+      setTimeError(
+        "L'heure de fin ne peut pas être inférieure ou égale à l'heure de début !"
+      );
+      return;
+    }
+    setTimeError("");
+    setHours(selected);
   };
   return (
     <>
@@ -456,7 +481,7 @@ const NotebookConsultation = () => {
             onClick={() => alert("ok")}
             defaultView="week"
             localizer={localizer}
-            events={[...eventList,...rendezVous]}
+            events={[...eventList, ...rendezVous]}
             startAccessor="start"
             endAccessor="end"
             style={{ height: 500 }}
@@ -475,349 +500,14 @@ const NotebookConsultation = () => {
                 employeList,
                 employeEvent,
                 setDoctor,
-                getRendezVous
+                getRendezVous,
               }),
             }}
           />
         </div>
       </div>
 
-      <div className="modal fade" id="createEvent">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold"></h4>
-              <button
-                type="button"
-                className="btn-close"
-                ref={agendaRef}
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">
-              {notifyBg != "" ? (
-                <FormNotify
-                  bg={notifyBg}
-                  title={notifyTitle}
-                  message={notifyMessage}
-                />
-              ) : null}
-              <form className={formValidate} onSubmit={submitEvent} noValidate>
-                <div className="row mb-3">
-                  <div className="col-8 col-md-6">
-                    <input
-                      className="form-control text-32 border-0 text-primary"
-                      type="date"
-                      value={startDay}
-                      onChange={(e) => {
-                        setStartDay(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <div className="col-8 col-md-6">
-                    <input
-                      className="form-control text-32 border-0 text-primary"
-                      type="date"
-                      value={endDay}
-                      onChange={(e) => {
-                        setEndDay(e.target.value);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-1 ">
-                    <span className="d-inline-block">
-                      <input
-                        className="border-0 bg-white text-bold text-meduim"
-                        type="button"
-                        value="Heure: "
-                      />
-                    </span>
-                  </div>
-                  <div className="col-2">
-                    <input
-                      className="form-control border-0"
-                      type="time"
-                      value={startHours}
-                      onChange={(e) => {
-                        setStartHours(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <div className="col-2">
-                    <input
-                      className="form-control border-0"
-                      type="time"
-                      value={endHours}
-                      onChange={(e) => {
-                        setEndHours(e.target.value);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                    Titre
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer le titre de l'évènement"
-                    value={titre}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setTitre(e.target.value);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer un titre
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="clst" className="form-label">
-                    Type
-                  </label>
-                  <select
-                    id="clst"
-                    className="form-select"
-                    value={type}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setType(e.target.value);
-                    }}
-                    required
-                  >
-                    <option value="">Choisir le type</option>
-                    {Object.keys(listType).map((key) => {
-                      return (
-                        <option key={key} value={key}>
-                          {listType[key]}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="invalid-feedback">
-                    Veuillez Choisir un type
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
-                    Description
-                  </label>
-                  <textarea
-                    type="text"
-                    className="form-control"
-                    id="fname"
-                    placeholder="Entrer la description"
-                    value={desc}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setDesc(e.target.value);
-                    }}
-                    required
-                  ></textarea>
-
-                  <div className="invalid-feedback">
-                    Veuillez entrer une description
-                  </div>
-                </div>
-                <div className="modal-footer d-flex justify-content-start border-0">
-                  <button
-                    className="btn btn-danger"
-                    data-bs-dismiss="modal"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      fValidate("needs-validation");
-                    }}
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    onClick={() => {
-                      fValidate("was-validated");
-                    }}
-                  >
-                    Enregistrer l’activité
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="modal fade" id="editEvent">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold"></h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">
-              {notifyBg != "" ? (
-                <FormNotify
-                  bg={notifyBg}
-                  title={notifyTitle}
-                  message={notifyMessage}
-                />
-              ) : null}
-              <form
-                className={formValidate}
-                onSubmit={submitEditEvent}
-                noValidate
-              >
-                <div className="row mb-3">
-                  <div className="col-4">
-                    <input
-                      className="form-control text-32 border-0 text-primary"
-                      type="date"
-                      value={startDay}
-                      onChange={(e) => {
-                        setStartDay(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <div className="col-4">
-                    <input
-                      className="form-control text-32 border-0 text-primary"
-                      type="date"
-                      value={endDay}
-                      onChange={(e) => {
-                        setEndDay(e.target.value);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-1 ">
-                    <span className="d-inline-block">
-                      <input
-                        className="border-0 bg-white text-bold text-meduim"
-                        type="button"
-                        value="Heure: "
-                      />
-                    </span>
-                  </div>
-                  <div className="col-2">
-                    <input
-                      className="form-control border-0"
-                      type="time"
-                      value={startHours}
-                      onChange={(e) => {
-                        setStartHours(e.target.value);
-                      }}
-                    />
-                  </div>
-                  <div className="col-2">
-                    <input
-                      className="form-control border-0"
-                      type="time"
-                      value={endHours}
-                      onChange={(e) => {
-                        setEndHours(e.target.value);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="mb-3 mt-3">
-                  <label htmlFor="lname" className="form-label">
-                    Titre
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lname"
-                    placeholder="Entrer le nom de famille de l’employé(e)"
-                    value={titre}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setTitre(e.target.value);
-                    }}
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Veuillez entrer un titre
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="clst" className="form-label">
-                    Type
-                  </label>
-                  <select
-                    id="clst"
-                    className="form-select"
-                    value={type}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setType(e.target.value);
-                    }}
-                    required
-                  >
-                    <option value="">Choisir le type</option>
-                    {Object.keys(listType).map((key) => {
-                      return (
-                        <option key={key} value={key}>
-                          {listType[key]}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="invalid-feedback">
-                    Veuillez Choisir un type
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="fname" className="form-label">
-                    Description
-                  </label>
-                  <textarea
-                    type="text"
-                    className="form-control"
-                    id="fname"
-                    placeholder="Entrer la description"
-                    value={desc}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setDesc(e.target.value);
-                    }}
-                    required
-                  ></textarea>
-
-                  <div className="invalid-feedback">
-                    Veuillez entrer une description
-                  </div>
-                </div>
-                <div className="modal-footer d-flex justify-content-start border-0">
-                  <button
-                    className="btn btn-danger"
-                    data-bs-dismiss="modal"
-                    onClick={() => fValidate("needs-validation")}
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    onClick={() => fValidate("was-validated")}
-                  >
-                    Modifier l’activité
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+      
       <div className="modal fade" id="planningEvent">
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">
@@ -878,21 +568,21 @@ const NotebookConsultation = () => {
             </div>
 
             <div className="modal-footer border-0 d-flex justify-content-start">
-              {
-                eventList[indexEvent] !== undefined && eventList[indexEvent].type === "CONSULTATION" ? <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#deleteAgenda"
-              >
-                supprimer
-              </button> : null
-              }
+              {eventList[indexEvent] !== undefined &&
+              eventList[indexEvent].type === "CONSULTATION" ? (
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteAgenda"
+                >
+                  supprimer
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                
               >
                 fermer
               </button>
@@ -900,102 +590,7 @@ const NotebookConsultation = () => {
           </div>
         </div>
       </div>
-      <div className="modal fade" id="detailEvent">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header border-0">
-              <h4 className="modal-title text-meduim text-bold">
-                Information de la consultation
-              </h4>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-
-            <div className="modal-body">
-              <div className="row">
-                <div className="col-3 col-sm-2">
-                  <img width="100px" src={userp} alt="" />
-                </div>
-                <div className="col-9 col-sm-10 py-2">
-                  <div className="d-flex justify-content-between">
-                    <span className="text-bold text-meduim">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      John DOE
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span className="text-bold">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      (00226) xx xx xx xx
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span className="text-bold">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      johndoe@example.com
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span className="">
-                      {/*eventList[indexEvent] && eventList[indexEvent].title*/}
-                      <Link to="#" className="text-black">
-                        Dossier patient
-                      </Link>
-                    </span>
-                  </div>
-                </div>
-                <div className="col-12 pt-3 ">
-                  <span className="text-bold">Date de consultation:</span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " " + eventList[indexEvent].start.toLocaleDateString()}
-                  </span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " - " + eventList[indexEvent].end.toLocaleDateString()}
-                  </span>{" "}
-                  <br />
-                  <span className="text-bold">Heure:</span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " " + eventList[indexEvent].start.toLocaleTimeString()}
-                  </span>
-                  <span className="text-bold text-meduim">
-                    {eventList[indexEvent] &&
-                      " - " + eventList[indexEvent].end.toLocaleTimeString()}
-                  </span>
-                </div>
-
-                <div className="col-12 pt-3 ">
-                  <span className="text-bold text-underline">Détails</span>
-                  <hr className="mt-0" />
-                </div>
-              </div>
-              {eventList[indexEvent] && eventList[indexEvent].description}
-            </div>
-
-            <div className="modal-footer border-0 d-flex justify-content-start">
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-              >
-                Annuler
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-              >
-                Confirmer le rendez-vous
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    
       <div className="modal fade" id="deleteAgenda">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
@@ -1061,6 +656,7 @@ const NotebookConsultation = () => {
                       className="form-control text-32 border-0 text-primary"
                       type="date"
                       value={startDay}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={(e) => {
                         setStartDay(e.target.value);
                       }}
@@ -1082,9 +678,8 @@ const NotebookConsultation = () => {
                       className="form-control border-0"
                       type="time"
                       value={startHours}
-                      onChange={(e) => {
-                        setStartHours(e.target.value);
-                      }}
+                      min={new Date().toTimeString().slice(0, 5)}
+                      onChange={e => handleTimeChange(e, setStartHours, 'start')}
                     />
                   </div>
                   <div className="col-6 col-md-4">
@@ -1092,11 +687,11 @@ const NotebookConsultation = () => {
                       className="form-control border-0"
                       type="time"
                       value={endHours}
-                      onChange={(e) => {
-                        setEndHours(e.target.value);
-                      }}
+                      min={new Date().toTimeString().slice(0, 5)}
+                      onChange={e => handleTimeChange(e, setEndHours, 'end')}
                     />
                   </div>
+                  {timeError && <div className="text-danger mt-2">{timeError}</div>}
                 </div>
                 <div className="row">
                   <div className="col-12 text-meduim">
@@ -1199,7 +794,7 @@ var CustomToolbar = ({
   employeList = [],
   employeEvent,
   setDoctor,
-  getRendezVous
+  getRendezVous,
 }) => {
   const [viewBtn, setViewBtn] = useState({
     type: "week",
